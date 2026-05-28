@@ -10,7 +10,12 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.partner_signed_document import ELECTRONIC_CONSENT_TEXT
-from app.services import partner_document_service, partner_service, partner_tax_service
+from app.services import (
+    partner_document_service,
+    partner_service,
+    partner_signed_document_copy_service,
+    partner_tax_service,
+)
 from app.templates import templates
 
 router = APIRouter(prefix="/partner", tags=["partner"])
@@ -355,6 +360,11 @@ def partner_sign_documents_submit(
         )
         _, tax_token = partner_service.mark_application_docs_signed(db, application.id)
         db.commit()
+        signed_docs = partner_service.list_signed_documents_for_application(db, application.id)
+        partner_signed_document_copy_service.send_signed_document_copy_emails(
+            application=application,
+            signed_documents=signed_docs,
+        )
     except ValueError as exc:
         db.rollback()
         return _render_sign_documents(

@@ -18,13 +18,26 @@ class EmailSendResult:
     error: str | None = None
 
 
+@dataclass(frozen=True)
+class EmailAttachment:
+    filename: str
+    content: str
+    mime_type: str = "text/plain"
+
+
 def smtp_configured() -> bool:
     settings = get_settings()
     return bool(settings.smtp_host and settings.smtp_from_email)
 
 
-def send_email(*, to_email: str, subject: str, body: str) -> EmailSendResult:
-    """Send a plain-text email via SMTP."""
+def send_email(
+    *,
+    to_email: str,
+    subject: str,
+    body: str,
+    attachments: list[EmailAttachment] | None = None,
+) -> EmailSendResult:
+    """Send a plain-text email via SMTP, optionally with text attachments."""
     settings = get_settings()
     if not smtp_configured():
         logger.info("Email skipped (SMTP not configured): to=%s subject=%s", to_email, subject)
@@ -35,6 +48,15 @@ def send_email(*, to_email: str, subject: str, body: str) -> EmailSendResult:
     msg["From"] = settings.smtp_from_email
     msg["To"] = to_email
     msg.set_content(body)
+    for attachment in attachments or []:
+        maintype, _, subtype = attachment.mime_type.partition("/")
+        subtype = subtype or "plain"
+        msg.add_attachment(
+            attachment.content.encode("utf-8"),
+            maintype=maintype,
+            subtype=subtype,
+            filename=attachment.filename,
+        )
 
     try:
         with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15) as smtp:

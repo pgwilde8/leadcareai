@@ -8,7 +8,14 @@
   <style>
     .lc-partner-hero {
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: var(--lc-space-8) 0 var(--lc-space-6);
+    }
+    .lc-partner-hero .lc-hero__actions {
+      justify-content: center;
+      width: 100%;
     }
     .lc-industry-grid {
       list-style: none;
@@ -80,13 +87,16 @@
       {{ settings.app_name }} helps local businesses text missed callers instantly, qualify leads by SMS,
       and alert the owner before hot prospects go cold.
     </p>
-    <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply to become a Sales Partner</a>
+    <div class="lc-hero__actions">
+      <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply to become a Sales Partner</a>
+    </div>
   </section>
 
   <section class="lc-section" aria-labelledby="what-title">
     <h2 id="what-title">What {{ settings.app_name }} does</h2>
     <ul>
       <li><strong>Missed-call text-back</strong> — When a call is missed, the caller gets an immediate SMS.</li>
+      <li><strong>Turn missed-call coverage on when you need it — No answering-service calls. No schedule handoffs. Where your carrier supports it, forward missed calls to LeadCareAI and switch it off when you’re ready</li>
       <li><strong>SMS lead qualification</strong> — Simple questions capture name, need, and urgency.</li>
       <li><strong>HOT / URGENT lead summaries</strong> — Owners see priority at a glance.</li>
       <li><strong>Staff SMS, email, and dashboard alerts</strong> — Your team knows who to call back first.</li>
@@ -203,6 +213,8 @@
   <section class="lc-cta-band" aria-labelledby="apply-cta-title">
     <h2 id="apply-cta-title">Ready to apply?</h2>
     <p>Independent contractor. Commission-based. No income is guaranteed.</p>
-    <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply now</a>
+    <div class="lc-hero__actions" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply now</a>
+    </div>
   </section>
 {% endblock %}
