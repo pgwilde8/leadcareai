@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Business lead — Admin{% endblock %}
+
+{% block content %}
+  <h1>Business lead</h1>
+  <nav>
+    <a href="/admin/business-leads">← Business leads</a>
+  </nav>
+
+  {% if status_error %}
+    <p class="error">{{ status_error }}</p>
+  {% endif %}
+  {% if checkout_error %}
+    <p class="error">{{ checkout_error }}</p>
+  {% endif %}
+
+  <table>
+    <tbody>
+      <tr><th>Business</th><td>{{ lead.business_name }}</td></tr>
+      <tr><th>Contact</th><td>{{ lead.contact_name }}</td></tr>
+      <tr><th>Email</th><td>{{ lead.email }}</td></tr>
+      <tr><th>Phone</th><td>{{ lead.phone }}</td></tr>
+      <tr><th>Industry</th><td>{{ lead.industry or '—' }}</td></tr>
+      <tr><th>Location</th><td>{{ lead.city }}, {{ lead.state }}</td></tr>
+      <tr><th>Lead status</th><td>{{ lead.status }}</td></tr>
+      <tr><th>Payment status</th><td>{{ lead.payment_status }}</td></tr>
+      <tr><th>Source</th><td>{{ lead.source }}</td></tr>
+      <tr><th>Referral code</th><td>{{ lead.referral_code or '—' }}</td></tr>
+      <tr><th>Partner</th><td>{{ lead.partner.display_name if lead.partner else '—' }}</td></tr>
+      <tr><th>Submitted</th><td>{{ lead.created_at }}</td></tr>
+      {% if lead.converted_at %}
+        <tr><th>Converted at</th><td>{{ lead.converted_at }}</td></tr>
+      {% endif %}
+      {% if converted_business %}
+        <tr><th>Business record</th><td><a href="/admin/businesses/{{ converted_business.id }}">{{ converted_business.name }}</a> ({{ converted_business.status }})</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if lead.notes %}
+    <h3>Notes</h3>
+    <p>{{ lead.notes }}</p>
+  {% endif %}
+
+  <h2>Stripe checkout</h2>
+  <p><em>Partner commissions are not created until a future invoice.paid ledger phase.</em></p>
+
+  {% if lead.payment_status == 'paid' %}
+    <p>This lead has completed payment.</p>
+  {% elif lead.stripe_checkout_url %}
+    <p>Checkout link (share with prospect):</p>
+    <p><a href="{{ lead.stripe_checkout_url }}" target="_blank" rel="noopener">{{ lead.stripe_checkout_url }}</a></p>
+    <p><a href="{{ lead.stripe_checkout_url }}" target="_blank" rel="noopener"><strong>Open checkout link</strong></a></p>
+    {% if lead.status in ['contacted', 'qualified', 'converted'] %}
+      <form method="post" action="/admin/business-leads/{{ lead.id }}/create-checkout">
+        <button type="submit">Regenerate checkout link</button>
+      </form>
+    {% endif %}
+  {% elif lead.status in ['contacted', 'qualified'] %}
+    <form method="post" action="/admin/business-leads/{{ lead.id }}/create-checkout">
+      <button type="submit">Create checkout link</button>
+    </form>
+    <p>Creates a pending Business record and Stripe Checkout for Growth ($147/mo) + setup fee ($199).</p>
+  {% else %}
+    <p>Set lead status to <strong>contacted</strong> or <strong>qualified</strong> before creating checkout.</p>
+  {% endif %}
+
+  <h2>Update status</h2>
+  <form method="post" action="/admin/business-leads/{{ lead.id }}/status">
+    <label>Status
+      <select name="status">
+        {% for s in statuses %}
+          <option value="{{ s }}" {% if lead.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit">Save status</button>
+  </form>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

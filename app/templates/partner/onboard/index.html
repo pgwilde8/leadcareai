@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Partner Application — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Partner application</h1>
+  <p>
+    Apply to become an independent sales partner for {{ settings.app_name }}.
+    Commissions apply only to paying business customers you refer — not to recruiting other partners.
+  </p>
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" action="/partner/onboard">
+    <h2>Your information</h2>
+    <label>First name
+      <input type="text" name="first_name" value="{{ form.first_name or '' }}" required />
+    </label>
+    <label>Last name
+      <input type="text" name="last_name" value="{{ form.last_name or '' }}" required />
+    </label>
+    <label>Email
+      <input type="email" name="email" value="{{ form.email or '' }}" required />
+    </label>
+    <label>Phone
+      <input type="text" name="phone" value="{{ form.phone or '' }}" required />
+    </label>
+    <label>City
+      <input type="text" name="city" value="{{ form.city or '' }}" required />
+    </label>
+    <label>State
+      <input type="text" name="state" value="{{ form.state or '' }}" required maxlength="64" />
+    </label>
+    <label>Company name (optional)
+      <input type="text" name="company_name" value="{{ form.company_name or '' }}" />
+    </label>
+    <label>Experience summary (optional)
+      <textarea name="experience_summary" rows="3">{{ form.experience_summary or '' }}</textarea>
+    </label>
+    <label>Why are you interested? (optional)
+      <textarea name="why_interested" rows="3">{{ form.why_interested or '' }}</textarea>
+    </label>
+
+    <h2>Required documents</h2>
+    <p>Review each document below. You will sign all active documents with one typed signature.</p>
+
+    {% for doc in documents %}
+      <section style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #ddd;">
+        <h3>{{ doc.title }} <small>(v{{ doc.version }})</small></h3>
+        <pre style="white-space: pre-wrap; font-family: inherit; font-size: 0.9rem;">{{ doc.body }}</pre>
+      </section>
+    {% endfor %}
+
+    <h2>Electronic signature</h2>
+    <label>
+      <input type="checkbox" name="electronic_consent" required />
+      {{ consent_text }}
+    </label>
+    <label>Type your full legal name as your signature
+      <input type="text" name="signature_text" value="{{ form.signature_text or '' }}" required />
+    </label>
+
+    <button type="submit">Submit application</button>
+  </form>
+{% endblock %}

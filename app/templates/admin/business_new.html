@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}New business — LeadCare AI Admin{% endblock %}
+
+{% block content %}
+  <h1>New business</h1>
+
+  <nav>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/businesses">Businesses</a>
+  </nav>
+
+  {% if error %}
+    <p class="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/businesses">
+    <label for="name">Business name</label>
+    <input id="name" name="name" type="text" required value="{{ form.name or '' }}" />
+
+    <label for="industry">Industry</label>
+    <input id="industry" name="industry" type="text" value="{{ form.industry or '' }}" />
+
+    <label for="website_url">Website URL</label>
+    <input id="website_url" name="website_url" type="url" value="{{ form.website_url or '' }}" />
+
+    <label for="main_phone">Main phone</label>
+    <input id="main_phone" name="main_phone" type="text" value="{{ form.main_phone or '' }}" />
+
+    <label for="timezone">Timezone</label>
+    <input id="timezone" name="timezone" type="text" value="{{ form.timezone or 'America/New_York' }}" />
+
+    <button type="submit">Create business</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Lead — {{ lead.name or lead.phone or "Lead" }}{% endblock %}
+
+{% block content %}
+  <h1>Lead detail</h1>
+  <p>Business: <a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a></p>
+
+  <nav>
+    <a href="/admin/businesses/{{ business.id }}/leads">Back to leads</a>
+  </nav>
+
+  <p><strong>Status:</strong> {{ lead.status }}</p>
+  <p><strong>Source:</strong> {{ lead.source }}</p>
+  <p><strong>Name:</strong> {{ lead.name or "—" }}</p>
+  <p><strong>Phone:</strong> {{ lead.phone or "—" }}</p>
+  <p><strong>Email:</strong> {{ lead.email or "—" }}</p>
+  <p><strong>Service needed:</strong> {{ lead.service_needed or "—" }}</p>
+  <p><strong>Location:</strong> {{ lead.location or "—" }}</p>
+  <p><strong>Urgency:</strong> {{ lead.urgency or "—" }}</p>
+  <p><strong>Preferred contact time:</strong> {{ lead.preferred_contact_time or "—" }}</p>
+  <p><strong>Summary:</strong></p>
+  <p>{{ lead.summary or "—" }}</p>
+
+  <h2>Message history</h2>
+  <p><em>Twilio SMS sync coming later.</em></p>
+
+  {% if messages %}
+    <ul class="message-list">
+      {% for msg in messages %}
+        <li class="message-item message-{{ msg.direction }}">
+          <p class="message-meta">
+            <strong>{{ msg.direction }}</strong>
+            · {{ msg.channel }}
+            · {{ msg.status }}
+            {% if msg.created_at %}· {{ msg.created_at }}{% endif %}
+          </p>
+          <p class="message-body">{{ msg.body }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No messages yet.</p>
+  {% endif %}
+
+  <h3>Add internal message</h3>
+  {% if message_error %}
+    <p class="error"><strong>{{ message_error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/leads/{{ lead.id }}/messages">
+    <label for="direction">Direction</label>
+    <select id="direction" name="direction">
+      <option value="internal" selected>internal</option>
+      <option value="inbound">inbound</option>
+      <option value="outbound">outbound</option>
+    </select>
+
+    <label for="channel">Channel</label>
+    <select id="channel" name="channel">
+      <option value="manual" selected>manual</option>
+      <option value="note">note</option>
+      <option value="sms">sms</option>
+    </select>
+
+    <label for="body">Message</label>
+    <textarea id="body" name="body" rows="4" required></textarea>
+
+    <button type="submit">Add message</button>
+  </form>
+
+  <h2>Update status</h2>
+  {% if status_error %}
+    <p class="error"><strong>{{ status_error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/leads/{{ lead.id }}/status">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if s == lead.status %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Update status</button>
+  </form>
+
+  <style>
+    .message-list {
+      list-style: none;
+      padding: 0;
+    }
+    .message-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .message-meta {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      color: #555;
+    }
+    .message-body {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  </style>
+{% endblock %}

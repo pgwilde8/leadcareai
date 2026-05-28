@@ -1,0 +1,15 @@
+[Unit]
+Description=LeadCare AI FastAPI (uvicorn)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/srv/projects/leadcareai
+EnvironmentFile=/srv/projects/leadcareai/.env
+ExecStart=/srv/projects/leadcareai/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8788
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

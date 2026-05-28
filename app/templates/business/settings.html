@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Settings — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>Business settings</h1>
+  <p>Signed in as <strong>{{ user.email }}</strong></p>
+
+  {% include "business/_nav.html" %}
+
+  {% if saved %}
+    <p class="success"><strong>Settings saved.</strong></p>
+  {% endif %}
+  {% if error %}
+    <p class="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/business/settings">
+    <h2>Business profile</h2>
+
+    <label for="name">Business name</label>
+    <input id="name" name="name" type="text" required value="{{ form.name }}" />
+
+    <label for="industry">Industry</label>
+    <input id="industry" name="industry" type="text" value="{{ form.industry }}" />
+
+    <label for="website_url">Website</label>
+    <input id="website_url" name="website_url" type="url" value="{{ form.website_url }}" />
+
+    <label for="contact_email">Contact email</label>
+    <input id="contact_email" name="contact_email" type="email" value="{{ form.contact_email }}" />
+
+    <label for="contact_phone">Contact phone</label>
+    <input id="contact_phone" name="contact_phone" type="text" value="{{ form.contact_phone }}" />
+
+    <label for="sms_signature">SMS display name / signature</label>
+    <input id="sms_signature" name="sms_signature" type="text" maxlength="120" value="{{ form.sms_signature }}" />
+    <p><em>Used in default missed-call text when no custom message is set.</em></p>
+
+    <h2>Assigned phone numbers</h2>
+    <p><em>Read-only. Contact support to add or change Twilio numbers.</em></p>
+    {% if phone_numbers %}
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Provider</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pn in phone_numbers %}
+            <tr>
+              <td>{{ pn.phone_number }}</td>
+              <td>{{ pn.provider }}</td>
+              <td>{{ pn.status }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No phone numbers assigned yet.</p>
+    {% endif %}
+
+    <h2>Missed-call text-back</h2>
+    <p>Sent automatically after an inbound call (one SMS per call).</p>
+    <p><strong>Platform default:</strong></p>
+    <p class="hint">{{ default_missed_call_message }}</p>
+
+    <label for="missed_call_textback_message">Custom message (optional)</label>
+    <textarea id="missed_call_textback_message" name="missed_call_textback_message" rows="4" maxlength="240">{{ form.missed_call_textback_message }}</textarea>
+    <p><em>Max 240 characters. Must include STOP or we append “Reply STOP to opt out.” Links are not allowed. Leave blank to use the default.</em></p>
+
+    <label for="lead_intake_prompt">Lead intake notes (optional)</label>
+    <textarea id="lead_intake_prompt" name="lead_intake_prompt" rows="3">{{ form.lead_intake_prompt }}</textarea>
+    <p><em>Saved for your account. AI intake behavior is unchanged in this release.</em></p>
+
+    <h2>Notifications</h2>
+    <p class="hint">
+      <strong>notification_email</strong> receives email alerts when a new missed-call lead or inbound SMS reply arrives.<br />
+      <strong>notification_phone</strong> receives staff SMS alerts (separate from customer text-backs).<br />
+      Alerts are best-effort. Delivery may fail silently if email or Twilio is not configured.<br />
+      Customer-facing missed-call text-back is configured above and is not the same as staff SMS alerts.
+    </p>
+
+    <label for="notification_email">Notification email</label>
+    <input id="notification_email" name="notification_email" type="email" value="{{ form.notification_email }}" />
+
+    <label for="notification_phone">Notification phone (staff SMS)</label>
+    <input id="notification_phone" name="notification_phone" type="text" value="{{ form.notification_phone }}" />
+
+    <button type="submit">Save settings</button>
+  </form>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+
+  <style>
+    body { max-width: 48rem; }
+    .success { color: #0d6b0d; }
+    .hint { font-size: 0.9rem; color: #555; white-space: pre-wrap; }
+  </style>
+{% endblock %}

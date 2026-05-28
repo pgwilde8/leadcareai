@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Payment received — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Thank you for subscribing</h1>
+  <p>Your payment was received. Our team will follow up shortly to complete onboarding.</p>
+  {% if session_id %}
+    <p><small>Reference: {{ session_id }}</small></p>
+  {% endif %}
+  <p><a href="/">Return home</a></p>
+{% endblock %}

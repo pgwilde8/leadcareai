@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}{{ business.name }} — LeadCare AI Admin{% endblock %}
+
+{% block content %}
+  <h1>{{ business.name }}</h1>
+
+  <nav>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/businesses">Businesses</a>
+    <a href="/admin/businesses/{{ business.id }}/leads">All leads</a>
+  </nav>
+
+  <p><strong>Status:</strong> {{ business.status }}</p>
+  <p><strong>Industry:</strong> {{ business.industry or "—" }}</p>
+  <p><strong>Website:</strong> {{ business.website_url or "—" }}</p>
+  <p><strong>Phone:</strong> {{ business.main_phone or "—" }}</p>
+  <p><strong>Timezone:</strong> {{ business.timezone }}</p>
+  <p><strong>Contact email:</strong> {{ business.contact_email or "—" }}</p>
+  <p><strong>Notification email:</strong> {{ business.notification_email or "—" }}</p>
+  <p><strong>Notification phone:</strong> {{ business.notification_phone or "—" }}</p>
+  <p><strong>SMS signature:</strong> {{ business.sms_signature or "—" }}</p>
+  <p><strong>Missed-call text-back:</strong></p>
+  <p>{{ business.missed_call_textback_message or "— (platform default)" }}</p>
+  {% if business.lead_intake_prompt %}
+    <p><strong>Lead intake notes:</strong> {{ business.lead_intake_prompt }}</p>
+  {% endif %}
+
+  <h2>SMS compliance (A2P 10DLC)</h2>
+  <p><em>A2P 10DLC submission coming later.</em></p>
+  <p>
+    <a href="/admin/businesses/{{ business.id }}/compliance">Edit compliance profile</a>
+  </p>
+  {% if compliance_profile %}
+    <p><strong>Compliance status:</strong> {{ compliance_profile.status }}</p>
+    <p><strong>Legal business name:</strong> {{ compliance_profile.legal_business_name or "—" }}</p>
+    <p><strong>Twilio brand SID:</strong> {{ compliance_profile.twilio_brand_sid or "—" }}</p>
+    <p><strong>Twilio campaign SID:</strong> {{ compliance_profile.twilio_campaign_sid or "—" }}</p>
+    {% if compliance_profile.status == "rejected" and compliance_profile.rejection_reason %}
+      <p><strong>Rejection reason:</strong> {{ compliance_profile.rejection_reason }}</p>
+    {% endif %}
+  {% else %}
+    <p>No compliance profile yet. <a href="/admin/businesses/{{ business.id }}/compliance">Start setup</a>.</p>
+  {% endif %}
+
+  <h2>Phone numbers</h2>
+  <p><em>Active numbers receive inbound SMS via Twilio webhook.</em></p>
+  <p><a href="/admin/businesses/{{ business.id }}/phone-numbers/new">Add phone number</a></p>
+  {% if phone_numbers %}
+    <table>
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Label</th>
+          <th>Provider</th>
+          <th>Status</th>
+          <th>Forward to</th>
+          <th>Set status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pn in phone_numbers %}
+          <tr>
+            <td>{{ pn.phone_number }}</td>
+            <td>{{ pn.label or "—" }}</td>
+            <td>{{ pn.provider }}</td>
+            <td>{{ pn.status }}</td>
+            <td>{{ pn.forward_to_number or "—" }}</td>
+            <td>
+              <form method="post" action="/admin/phone-numbers/{{ pn.id }}/status">
+                <select name="status">
+                  <option value="pending" {% if pn.status == 'pending' %}selected{% endif %}>pending</option>
+                  <option value="active" {% if pn.status == 'active' %}selected{% endif %}>active</option>
+                  <option value="inactive" {% if pn.status == 'inactive' %}selected{% endif %}>inactive</option>
+                </select>
+                <button type="submit">Update</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No phone numbers on file yet.</p>
+  {% endif %}
+
+  <h2>Leads</h2>
+  <p>
+    <a href="/admin/businesses/{{ business.id }}/leads">View all leads</a>
+    ·
+    <a href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
+  </p>
+  {% if leads %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads[:5] %}
+          <tr>
+            <td>{{ lead.name or "—" }}</td>
+            <td>{{ lead.phone or "—" }}</td>
+            <td>{{ lead.status }}</td>
+            <td><a href="/admin/leads/{{ lead.id }}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if leads|length > 5 %}
+      <p>Showing 5 most recent. <a href="/admin/businesses/{{ business.id }}/leads">See all</a>.</p>
+    {% endif %}
+  {% else %}
+    <p>No leads yet.</p>
+  {% endif %}
+
+  <h2>Linked users</h2>
+  {% if links %}
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in links %}
+          <tr>
+            <td>{{ link.user.email }}</td>
+            <td>{{ link.role }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No users linked yet.</p>
+  {% endif %}
+
+  <h2>Link existing user</h2>
+  {% if link_error %}
+    <p class="error"><strong>{{ link_error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/businesses/{{ business.id }}/users">
+    <label for="email">User email</label>
+    <input id="email" name="email" type="email" required />
+
+    <label for="role">Role</label>
+    <select id="role" name="role">
+      <option value="owner">owner</option>
+      <option value="manager">manager</option>
+      <option value="staff">staff</option>
+    </select>
+
+    <button type="submit">Link user</button>
+  </form>
+{% endblock %}

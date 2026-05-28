@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Add phone number — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>Add phone number</h1>
+  <p>Business: <strong>{{ business.name }}</strong></p>
+
+  <nav>
+    <a href="/admin/businesses/{{ business.id }}">Back to business</a>
+  </nav>
+
+  <p><em>Inbound SMS routes to this number when status is <strong>active</strong> and Twilio posts to <code>/webhooks/twilio/sms</code>.</em></p>
+
+  {% if error %}
+    <p class="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/businesses/{{ business.id }}/phone-numbers">
+    <label for="phone_number">Phone number</label>
+    <input id="phone_number" name="phone_number" type="text" required value="{{ form.phone_number or '' }}" />
+
+    <label for="label">Label</label>
+    <input id="label" name="label" type="text" value="{{ form.label or '' }}" placeholder="e.g. Main tracking line" />
+
+    <label for="forward_to_number">Forward to number</label>
+    <input id="forward_to_number" name="forward_to_number" type="text" value="{{ form.forward_to_number or '' }}" />
+
+    <label for="provider">Provider</label>
+    <select id="provider" name="provider">
+      <option value="manual" {% if (form.provider or 'twilio') == 'manual' %}selected{% endif %}>manual</option>
+      <option value="twilio" {% if (form.provider or 'twilio') == 'twilio' %}selected{% endif %}>twilio</option>
+    </select>
+
+    <label for="provider_sid">Twilio phone number SID (optional)</label>
+    <input id="provider_sid" name="provider_sid" type="text" value="{{ form.provider_sid or '' }}" />
+
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="pending" {% if (form.status or 'active') == 'pending' %}selected{% endif %}>pending</option>
+      <option value="active" {% if (form.status or 'active') == 'active' %}selected{% endif %}>active</option>
+      <option value="inactive" {% if (form.status or 'active') == 'inactive' %}selected{% endif %}>inactive</option>
+    </select>
+
+    <button type="submit">Save phone number</button>
+  </form>
+{% endblock %}

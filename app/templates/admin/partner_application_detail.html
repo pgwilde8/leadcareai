@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Partner application — Admin{% endblock %}
+
+{% block content %}
+  <h1>Partner application</h1>
+  <nav>
+    <a href="/admin/partners">← Partners</a>
+  </nav>
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+  {% if reject_error %}
+    <p class="error">{{ reject_error }}</p>
+  {% endif %}
+
+  {% if activation_notice and activation_notice.temporary_password %}
+    <section style="margin: 1rem 0; padding: 1rem; border: 2px solid #b00020; background: #fff8f8;">
+      <h2>Partner login — temporary password (shown once)</h2>
+      <p>Copy these credentials and send them to the partner through a secure channel.</p>
+      <p><strong>Login email:</strong> {{ activation_notice.login_email }}</p>
+      <p><strong>Temporary password:</strong> <code>{{ activation_notice.temporary_password }}</code></p>
+      <p>Partner login URL: <a href="/login">/login</a></p>
+      <p><em>TODO: Replace with emailed invite or password-reset link when that flow exists.</em></p>
+    </section>
+  {% endif %}
+
+  <h2>Applicant</h2>
+  <table>
+    <tbody>
+      <tr><th>Name</th><td>{{ application.first_name }} {{ application.last_name }}</td></tr>
+      <tr><th>Email</th><td>{{ application.email }}</td></tr>
+      <tr><th>Phone</th><td>{{ application.phone }}</td></tr>
+      <tr><th>Location</th><td>{{ application.city }}, {{ application.state }}</td></tr>
+      <tr><th>Company</th><td>{{ application.company_name or '—' }}</td></tr>
+      <tr><th>Status</th><td>{{ application.status }}</td></tr>
+      <tr><th>Submitted</th><td>{{ application.created_at }}</td></tr>
+      {% if application.reviewed_at %}
+        <tr><th>Reviewed</th><td>{{ application.reviewed_at }}</td></tr>
+      {% endif %}
+      {% if application.rejection_reason %}
+        <tr><th>Rejection reason</th><td>{{ application.rejection_reason }}</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if application.experience_summary %}
+    <h3>Experience</h3>
+    <p>{{ application.experience_summary }}</p>
+  {% endif %}
+  {% if application.why_interested %}
+    <h3>Why interested</h3>
+    <p>{{ application.why_interested }}</p>
+  {% endif %}
+
+  <h2>Signed documents</h2>
+  {% for doc in signed_docs %}
+    <section style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #ddd;">
+      <h3>{{ doc.document_title }} ({{ doc.document_code }}, v{{ doc.document_version }})</h3>
+      <p><strong>Signed at:</strong> {{ doc.signed_at }}</p>
+      <p><strong>Signer:</strong> {{ doc.signer_name }} &lt;{{ doc.signer_email }}&gt;</p>
+      <p><strong>Typed signature:</strong> {{ doc.signature_text }}</p>
+      <p><strong>IP:</strong> {{ doc.ip_address or '—' }}</p>
+      <p><strong>User agent:</strong> {{ doc.user_agent or '—' }}</p>
+      <p><strong>Consent:</strong> {{ doc.consent_text }}</p>
+      <h4>Document snapshot at signing</h4>
+      <pre style="white-space: pre-wrap; font-family: inherit; font-size: 0.9rem;">{{ doc.document_snapshot }}</pre>
+    </section>
+  {% else %}
+    <p>No signed documents on file.</p>
+  {% endfor %}
+
+  {% if partner %}
+    <h2>Partner record</h2>
+    <table>
+      <tbody>
+        <tr><th>Approval status</th><td>{{ partner.status }}</td></tr>
+        <tr><th>Referral code</th><td><strong>{{ partner.referral_code }}</strong></td></tr>
+        {% if referral_link %}
+          <tr><th>Referral link</th><td><code>{{ referral_link }}</code></td></tr>
+        {% endif %}
+        <tr><th>Linked login email</th><td>{{ linked_user.email if linked_user else '—' }}</td></tr>
+        <tr><th>Login active</th><td>{{ 'Yes' if login_active else 'No' }}</td></tr>
+      </tbody>
+    </table>
+    {% if linked_user and login_active and not activation_notice %}
+      <p>Partner can sign in at <a href="/login">/login</a> with the linked account.</p>
+      <p><em>If a temporary password was issued at approval, it was shown once and is not stored in plain text.</em></p>
+    {% elif not partner.user_id %}
+      <p><em>Login will be created automatically when you approve this application.</em></p>
+    {% endif %}
+  {% endif %}
+
+  {% if application.status == 'admin_review' %}
+    <h2>Review actions</h2>
+    <form method="post" action="/admin/partners/{{ application.id }}/approve">
+      <button type="submit">Approve application</button>
+    </form>
+    <form method="post" action="/admin/partners/{{ application.id }}/reject" style="margin-top: 1rem;">
+      <label>Rejection reason
+        <textarea name="rejection_reason" rows="3" required></textarea>
+      </label>
+      <button type="submit">Reject application</button>
+    </form>
+  {% elif application.status == 'approved' and partner %}
+    <p>Application approved. Partner is {{ partner.status }}.</p>
+  {% endif %}
+
+  {% if partner and referred_leads %}
+    <h2>Referred business leads</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in referred_leads %}
+          <tr>
+            <td>{{ lead.business_name }}</td>
+            <td>{{ lead.city }}, {{ lead.state }}</td>
+            <td>{{ lead.status }}</td>
+            <td>{{ lead.created_at }}</td>
+            <td><a href="/admin/business-leads/{{ lead.id }}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif partner %}
+    <h2>Referred business leads</h2>
+    <p>No referred businesses yet.</p>
+  {% endif %}
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — LeadCare AI{% endblock %}
+
+{% block content %}
+  <h1>LeadCare AI Admin</h1>
+  <p>Signed in as <strong>{{ user.email }}</strong></p>
+
+  <nav>
+    <a href="/admin/businesses">Businesses</a>
+    <a href="/admin/business-leads">Business leads</a>
+    <a href="/admin/partners">Partners</a>
+  </nav>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

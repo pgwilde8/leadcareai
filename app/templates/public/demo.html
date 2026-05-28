@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Book a demo — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Book a demo</h1>
+  <p>Tell us about your business. We'll follow up about missed-call recovery and SMS lead follow-up.</p>
+
+  {% if referral_partner_name %}
+    <p><em>Referred by partner: {{ referral_partner_name }}{% if referral_code %} ({{ referral_code }}){% endif %}</em></p>
+  {% endif %}
+
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" action="/demo">
+    <label>Business name
+      <input type="text" name="business_name" value="{{ form.business_name or '' }}" required />
+    </label>
+    <label>Your name
+      <input type="text" name="contact_name" value="{{ form.contact_name or '' }}" required />
+    </label>
+    <label>Email
+      <input type="email" name="email" value="{{ form.email or '' }}" required />
+    </label>
+    <label>Phone
+      <input type="text" name="phone" value="{{ form.phone or '' }}" required />
+    </label>
+    <label>Industry
+      <input type="text" name="industry" value="{{ form.industry or '' }}" placeholder="e.g. HVAC, plumbing" />
+    </label>
+    <label>City
+      <input type="text" name="city" value="{{ form.city or '' }}" required />
+    </label>
+    <label>State
+      <input type="text" name="state" value="{{ form.state or '' }}" required maxlength="64" />
+    </label>
+    <label>What happens when you miss calls?
+      <textarea name="notes" rows="4" placeholder="Optional — how you handle voicemails, after-hours, etc.">{{ form.notes or '' }}</textarea>
+    </label>
+    <button type="submit">Submit</button>
+  </form>
+
+  <p><a href="/">← Back</a></p>
+{% endblock %}

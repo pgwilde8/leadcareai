@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Leads — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>Leads</h1>
+  <p>Business: <strong>{{ business.name }}</strong></p>
+
+  <nav>
+    <a href="/admin/businesses/{{ business.id }}">Back to business</a>
+    <a href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
+  </nav>
+
+  {% if leads %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Service</th>
+          <th>Status</th>
+          <th>Source</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+          <tr>
+            <td>{{ lead.name or "—" }}</td>
+            <td>{{ lead.phone or "—" }}</td>
+            <td>{{ lead.service_needed or "—" }}</td>
+            <td>{{ lead.status }}</td>
+            <td>{{ lead.source }}</td>
+            <td><a href="/admin/leads/{{ lead.id }}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No leads yet. <a href="/admin/businesses/{{ business.id }}/leads/new">Add one</a>.</p>
+  {% endif %}
+{% endblock %}

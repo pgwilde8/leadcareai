@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <article>
+    <h1>Terms of Service</h1>
+    <p><strong>Last updated:</strong> May 27, 2026</p>
+
+    <p>
+      These Terms of Service (“Terms”) govern access to and use of {{ settings.app_name }} (the “Service”).
+      By creating an account, using the Service, or allowing your business to be onboarded, you agree to these Terms.
+    </p>
+
+    <h2>1. The Service</h2>
+    <p>
+      {{ settings.app_name }} provides tools for local businesses to capture and follow up on leads, including
+      missed-call text-back, SMS conversations, lead tracking, and related notifications. Features may change over time.
+    </p>
+
+    <h2>2. Eligibility and accounts</h2>
+    <ul>
+      <li>You must have authority to bind the business you represent.</li>
+      <li>You are responsible for safeguarding login credentials and activity under your account.</li>
+      <li>You must provide accurate business and contact information.</li>
+    </ul>
+
+    <h2>3. SMS and telecommunications compliance</h2>
+    <p>
+      If you use SMS features, you agree to comply with applicable laws and carrier rules, including TCPA,
+      CAN-SPAM (where applicable), and Twilio acceptable use policies. You are solely responsible for obtaining
+      and documenting consent before texting consumers. Our
+      <a href="/sms">SMS Program Terms</a> describe baseline requirements for messaging through the Service.
+    </p>
+
+    <h2>4. Acceptable use</h2>
+    <p>You may not use the Service to:</p>
+    <ul>
+      <li>Send unlawful, harassing, deceptive, or spam messages;</li>
+      <li>Transmit malware or attempt unauthorized access;</li>
+      <li>Impersonate others or misrepresent your identity;</li>
+      <li>Send messages without required consent;</li>
+      <li>Violate third-party rights or applicable law.</li>
+    </ul>
+
+    <h2>5. Fees and billing</h2>
+    <p>
+      Paid plans, setup fees, and billing terms are presented at signup or in your order form. Fees are generally
+      non-refundable except where required by law or expressly stated. Failure to pay may result in suspension.
+    </p>
+
+    <h2>6. Third-party services</h2>
+    <p>
+      The Service integrates with third parties (for example, Twilio, Stripe, and AI providers). Your use of those
+      services may be subject to their terms. We are not responsible for third-party outages or actions.
+    </p>
+
+    <h2>7. Disclaimers</h2>
+    <p>
+      THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE.” WE DISCLAIM WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+      PARTICULAR PURPOSE, AND NON-INFRINGEMENT TO THE MAXIMUM EXTENT PERMITTED BY LAW. WE DO NOT GUARANTEE THAT YOU
+      WILL RECEIVE ANY NUMBER OF LEADS, SALES, OR REVENUE.
+    </p>
+
+    <h2>8. Limitation of liability</h2>
+    <p>
+      TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
+      OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, OR GOODWILL. OUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO
+      THE SERVICE IS LIMITED TO THE AMOUNTS YOU PAID US IN THE TWELVE (12) MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM.
+    </p>
+
+    <h2>9. Indemnification</h2>
+    <p>
+      You agree to defend and indemnify us against claims arising from your use of the Service, your messages to
+      consumers, or your violation of these Terms or applicable law.
+    </p>
+
+    <h2>10. Termination</h2>
+    <p>
+      You may stop using the Service at any time. We may suspend or terminate access for violation of these Terms,
+      non-payment, or risk to the platform. Provisions that by nature should survive will survive termination.
+    </p>
+
+    <h2>11. Changes</h2>
+    <p>
+      We may modify these Terms. We will post the updated Terms with a new “Last updated” date. Material changes may
+      require additional notice where required by law.
+    </p>
+
+    <h2>12. Governing law</h2>
+    <p>
+      These Terms are governed by the laws of the State of New Jersey, USA, without regard to conflict-of-law rules,
+      except where prohibited by law.
+    </p>
+
+    <h2>13. Contact</h2>
+    <p>
+      Questions about these Terms:
+      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
+    </p>
+
+    <p><a href="/privacy">Privacy Policy</a> · <a href="/sms">SMS Program Terms</a></p>
+  </article>
+{% endblock %}

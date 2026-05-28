@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Partner dashboard — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Partner dashboard</h1>
+  <p>Signed in as <strong>{{ partner.display_name }}</strong> ({{ partner.email }})</p>
+  <p>Status: <strong>{{ partner.status }}</strong></p>
+
+  <h2>Your referral link</h2>
+  <p>Share this link with local service businesses. When they book a demo, you get attribution credit.</p>
+  <p>
+    <input type="text" readonly value="{{ referral_link }}" id="referral-link" style="width: 100%; font-family: monospace;" onclick="this.select()" />
+  </p>
+  <p>Referral code: <strong>{{ partner.referral_code }}</strong></p>
+
+  <h2>Overview</h2>
+  <table>
+    <tbody>
+      <tr><th>Referred businesses</th><td>{{ stats.businesses_referred }}</td></tr>
+      <tr><th>Active paying customers</th><td>{{ stats.active_paying_customers }} <em>(not tracked yet)</em></td></tr>
+      <tr><th>Pending commissions</th><td>{{ stats.pending_commissions }} <em>(coming with Stripe)</em></td></tr>
+      <tr><th>Approved commissions</th><td>{{ stats.approved_commissions }} <em>(coming with Stripe)</em></td></tr>
+      <tr><th>Paid commissions</th><td>{{ stats.paid_commissions }} <em>(coming with Stripe)</em></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Referred businesses</h2>
+  {% if referred_leads %}
+    <table>
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Location</th>
+          <th>Lead status</th>
+          <th>Payment</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in referred_leads %}
+          <tr>
+            <td>{{ lead.business_name }}</td>
+            <td>{{ lead.city }}, {{ lead.state }}</td>
+            <td>{{ lead.status }}</td>
+            <td><em>Not paying yet</em></td>
+            <td>{{ lead.created_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No referred businesses yet. Share your referral link to get started.</p>
+  {% endif %}
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

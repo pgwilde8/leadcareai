@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ settings.app_name }} — Missed call follow-up{% endblock %}
+
+{% block content %}
+  <h1>{{ settings.app_name }}</h1>
+  <p>Turn missed calls into booked jobs with automated SMS follow-up for local service businesses.</p>
+
+  <h2>See how many missed calls you're losing</h2>
+  <p>Most home-service businesses miss 20–40% of inbound calls. Every missed call is a lead walking to a competitor.</p>
+
+  {% if referral_partner_name %}
+    <p><em>Referred by {{ referral_partner_name }}{% if referral_code %} ({{ referral_code }}){% endif %}</em></p>
+  {% endif %}
+
+  <p>
+    <a href="/demo"><strong>Book a demo</strong></a> — tell us about your business and we'll show you how {{ settings.app_name }} helps.
+  </p>
+
+  <nav>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/partner/onboard">Become a partner</a>
+    <a href="/login">Log in</a>
+  </nav>
+{% endblock %}

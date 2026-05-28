@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Leads — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>Lead inbox</h1>
+  <p>Business: <strong>{{ business.name }}</strong></p>
+
+  {% include "business/_nav.html" %}
+
+  {% if inbox_rows %}
+    <table class="lead-inbox">
+      <thead>
+        <tr>
+          <th>Created</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Source</th>
+          <th>Summary</th>
+          <th>Urgency</th>
+          <th>AI temp</th>
+          <th>Last message</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in inbox_rows %}
+          {% set lead = row.lead %}
+          <tr>
+            <td>{% if lead.created_at %}{{ lead.created_at.strftime("%Y-%m-%d %H:%M") }}{% else %}—{% endif %}</td>
+            <td>{{ lead.phone or "—" }}</td>
+            <td>{{ lead.status }}</td>
+            <td>
+              {% if lead.source == "sms" %}SMS
+              {% elif lead.source == "missed_call" %}Missed call
+              {% else %}{{ lead.source }}{% endif %}
+            </td>
+            <td>{{ (lead.summary or "—")[:80] }}{% if lead.summary and lead.summary|length > 80 %}…{% endif %}</td>
+            <td>{{ lead.urgency or "—" }}</td>
+            <td>{{ lead.ai_temperature or "—" }}</td>
+            <td>{{ row.last_message_preview or "—" }}</td>
+            <td><a href="/business/leads/{{ lead.id }}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No leads yet. Inbound SMS and missed calls will appear here.</p>
+  {% endif %}
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+
+  <style>
+    body { max-width: 56rem; }
+    .lead-inbox { font-size: 0.9rem; }
+    .lead-inbox th, .lead-inbox td { vertical-align: top; }
+  </style>
+{% endblock %}

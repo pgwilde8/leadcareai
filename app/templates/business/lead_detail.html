@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Lead — {{ lead.phone or lead.name or "Detail" }}{% endblock %}
+
+{% block content %}
+  <h1>Lead detail</h1>
+  <p>Business: <strong>{{ business.name }}</strong></p>
+
+  {% include "business/_nav.html" %}
+  <p><a href="/business/leads">← Back to inbox</a></p>
+
+  <h2>Contact</h2>
+  <p><strong>Phone:</strong> {{ lead.phone or "—" }}</p>
+  <p><strong>Name:</strong> {{ lead.name or "—" }}</p>
+  <p><strong>Source:</strong>
+    {% if lead.source == "sms" %}SMS
+    {% elif lead.source == "missed_call" %}Missed call
+    {% else %}{{ lead.source }}{% endif %}
+  </p>
+  <p><strong>Status:</strong> {{ lead.status }}</p>
+  <p><strong>Service needed:</strong> {{ lead.service_needed or "—" }}</p>
+  <p><strong>Location:</strong> {{ lead.location or "—" }}</p>
+  <p><strong>Urgency:</strong> {{ lead.urgency or "—" }}</p>
+
+  <h2>AI intake</h2>
+  <p><strong>Summary:</strong></p>
+  <p>{{ lead.summary or "—" }}</p>
+  <p><strong>Next question:</strong> {{ lead.ai_next_question or "—" }}</p>
+  <p><strong>Temperature:</strong> {{ lead.ai_temperature or "—" }}</p>
+  <p><strong>Confidence:</strong>
+    {% if lead.ai_confidence is not none %}{{ "%.0f"|format(lead.ai_confidence * 100) }}%{% else %}—{% endif %}
+  </p>
+  {% if lead.ai_last_analyzed_at %}
+    <p><strong>Last analyzed:</strong> {{ lead.ai_last_analyzed_at }}</p>
+  {% endif %}
+
+  <h2>Message timeline</h2>
+  {% if messages %}
+    <ul class="message-list">
+      {% for msg in messages %}
+        <li class="message-item message-{{ msg.direction }}">
+          <p class="message-meta">
+            <strong>
+              {% if msg.channel == "voice" %}Voice call
+              {% elif msg.channel == "sms" and msg.direction == "inbound" %}Inbound SMS
+              {% elif msg.channel == "sms" and msg.direction == "outbound" %}Outbound SMS
+              {% else %}{{ msg.direction }} · {{ msg.channel }}{% endif %}
+            </strong>
+            · {{ msg.status }}
+            {% if msg.created_at %}· {{ msg.created_at }}{% endif %}
+          </p>
+          <p class="message-body">{{ msg.body }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No messages yet.</p>
+  {% endif %}
+
+  <h2>Update status</h2>
+  {% if status_error %}
+    <p class="error"><strong>{{ status_error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/business/leads/{{ lead.id }}/status">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if s == lead.status %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Update status</button>
+  </form>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+
+  <style>
+    body { max-width: 48rem; }
+    .message-list { list-style: none; padding: 0; }
+    .message-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .message-meta { margin: 0 0 0.5rem; font-size: 0.875rem; color: #555; }
+    .message-body { margin: 0; white-space: pre-wrap; }
+  </style>
+{% endblock %}

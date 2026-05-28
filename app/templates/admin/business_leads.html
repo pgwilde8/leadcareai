@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Business leads — Admin{% endblock %}
+
+{% block content %}
+  <h1>Business leads</h1>
+  <nav>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/partners">Partners</a>
+  </nav>
+
+  {% if leads %}
+    <table>
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Contact</th>
+          <th>Location</th>
+          <th>Partner / ref</th>
+          <th>Status</th>
+          <th>Payment</th>
+          <th>Submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+          <tr>
+            <td>{{ lead.business_name }}</td>
+            <td>{{ lead.contact_name }}<br /><small>{{ lead.email }}</small></td>
+            <td>{{ lead.city }}, {{ lead.state }}</td>
+            <td>
+              {% if lead.partner %}
+                {{ lead.partner.display_name }}<br />
+              {% endif %}
+              {% if lead.referral_code %}
+                <small>{{ lead.referral_code }}</small>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ lead.status }}</td>
+            <td>{{ lead.payment_status }}</td>
+            <td>{{ lead.created_at }}</td>
+            <td><a href="/admin/business-leads/{{ lead.id }}">Review</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No business leads yet.</p>
+  {% endif %}
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

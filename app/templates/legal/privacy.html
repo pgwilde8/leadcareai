@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <article>
+    <h1>Privacy Policy</h1>
+    <p><strong>Last updated:</strong> May 27, 2026</p>
+
+    <p>
+      {{ settings.app_name }} (“we,” “us,” or “our”) provides software that helps local service businesses
+      follow up on missed calls and manage leads by SMS. This Privacy Policy describes how we collect,
+      use, and share information when you visit our website, use our platform, or interact with SMS
+      programs operated through our service.
+    </p>
+
+    <h2>1. Who this policy applies to</h2>
+    <ul>
+      <li><strong>Business customers</strong> who subscribe to {{ settings.app_name }}.</li>
+      <li><strong>Business staff</strong> who log in to manage leads and messages.</li>
+      <li><strong>End users (consumers)</strong> who call or text a business phone number connected to our service.</li>
+      <li><strong>Website visitors</strong> who browse our marketing site or contact us.</li>
+    </ul>
+
+    <h2>2. Information we collect</h2>
+    <p>Depending on how you interact with us, we may collect:</p>
+    <ul>
+      <li><strong>Account and business information</strong> — name, email, business name, phone numbers, billing details, and settings you provide.</li>
+      <li><strong>Lead and message data</strong> — phone numbers, message content, call/SMS metadata, lead status, notes, and timestamps when businesses use our platform.</li>
+      <li><strong>Communications</strong> — support requests and correspondence with us.</li>
+      <li><strong>Technical data</strong> — IP address, browser type, device information, and logs needed to operate and secure the service.</li>
+    </ul>
+
+    <h2>3. SMS and telecommunications data</h2>
+    <p>
+      When a business uses {{ settings.app_name }} for missed-call recovery or lead follow-up, we process
+      SMS and related telephony data through providers such as Twilio. This may include the phone numbers
+      involved, message body, delivery status, and carrier metadata. Businesses are responsible for obtaining
+      appropriate consent from their customers before sending marketing or automated texts, as described in our
+      <a href="/sms">SMS Program Terms</a>.
+    </p>
+
+    <h2>4. How we use information</h2>
+    <ul>
+      <li>Provide, maintain, and improve the platform;</li>
+      <li>Route inbound and outbound SMS, create leads, and send notifications to business staff;</li>
+      <li>Process subscriptions and payments;</li>
+      <li>Detect abuse, fraud, and security issues;</li>
+      <li>Comply with law and enforce our agreements.</li>
+    </ul>
+
+    <h2>5. How we share information</h2>
+    <p>
+      We do not sell personal information. We may share information with service providers that help us operate
+      the platform (for example, hosting, payment processing, SMS delivery, and email), subject to contractual
+      safeguards. We may also disclose information if required by law or to protect rights, safety, and security.
+    </p>
+
+    <h2>6. Retention</h2>
+    <p>
+      We retain information for as long as needed to provide the service, meet legal obligations, resolve
+      disputes, and enforce agreements. Businesses may request deletion of certain data subject to applicable
+      law and technical constraints.
+    </p>
+
+    <h2>7. Security</h2>
+    <p>
+      We use reasonable administrative, technical, and organizational measures to protect information.
+      No method of transmission or storage is completely secure.
+    </p>
+
+    <h2>8. Your choices</h2>
+    <ul>
+      <li>Consumers can opt out of SMS from a business by replying <strong>STOP</strong> to that business’s messages.</li>
+      <li>Business users may access, update, or delete certain account information through the platform or by contacting us.</li>
+      <li>You may have additional rights under applicable privacy laws depending on your location.</li>
+    </ul>
+
+    <h2>9. Children</h2>
+    <p>
+      Our service is not directed to children under 13, and we do not knowingly collect their personal information.
+    </p>
+
+    <h2>10. Changes</h2>
+    <p>
+      We may update this Privacy Policy from time to time. The “Last updated” date above will change when we do.
+      Continued use of the service after changes means you accept the updated policy.
+    </p>
+
+    <h2>11. Contact</h2>
+    <p>
+      Questions about this policy:
+      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
+    </p>
+
+    <p><a href="/terms">Terms of Service</a> · <a href="/sms">SMS Program Terms</a></p>
+  </article>
+{% endblock %}

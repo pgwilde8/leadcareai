@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Businesses — LeadCare AI Admin{% endblock %}
+
+{% block content %}
+  <h1>Businesses</h1>
+  <p>Signed in as <strong>{{ user.email }}</strong></p>
+
+  <nav>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/businesses/new">New business</a>
+  </nav>
+
+  {% if businesses %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Industry</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for business in businesses %}
+          <tr>
+            <td>{{ business.name }}</td>
+            <td>{{ business.status }}</td>
+            <td>{{ business.industry or "—" }}</td>
+            <td><a href="/admin/businesses/{{ business.id }}">View</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No businesses yet. <a href="/admin/businesses/new">Create one</a>.</p>
+  {% endif %}
+{% endblock %}

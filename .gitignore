@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.env
+.coverage
+htmlcov/
+.DS_Store
+*.log
+leadcareai-dev.db
+
+# Local / working docs (not for repo)
+misc.md
+LEADCAREAI.md
+README.md
+README1.md

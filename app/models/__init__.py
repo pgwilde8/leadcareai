@@ -1,0 +1,37 @@
+"""ORM models — import here so Alembic sees all tables."""
+
+from app.core.database import Base
+from app.models.business import Business
+from app.models.business_lead import BusinessLead
+from app.models.business_compliance_profile import BusinessComplianceProfile
+from app.models.business_user import BusinessUser
+from app.models.lead import Lead
+from app.models.message import Message
+from app.models.notification_log import NotificationLog
+from app.models.payment_event import PaymentEvent
+from app.models.partner import Partner
+from app.models.partner_application import PartnerApplication
+from app.models.partner_customer import PartnerCustomer
+from app.models.partner_document_template import PartnerDocumentTemplate
+from app.models.partner_signed_document import PartnerSignedDocument
+from app.models.phone_number import PhoneNumber
+from app.models.user import User
+
+__all__ = [
+    "Base",
+    "Business",
+    "BusinessLead",
+    "BusinessComplianceProfile",
+    "BusinessUser",
+    "Lead",
+    "Message",
+    "NotificationLog",
+    "PaymentEvent",
+    "Partner",
+    "PartnerApplication",
+    "PartnerCustomer",
+    "PartnerDocumentTemplate",
+    "PartnerSignedDocument",
+    "PhoneNumber",
+    "User",
+]

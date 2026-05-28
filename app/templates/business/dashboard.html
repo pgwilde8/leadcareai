@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>{{ business.name }}</h1>
+  <p>Signed in as <strong>{{ user.email }}</strong></p>
+
+  {% include "business/_nav.html" %}
+
+  <h2>Overview</h2>
+  <table>
+    <tbody>
+      <tr><th>New leads</th><td>{{ stats.new }}</td></tr>
+      <tr><th>Qualifying</th><td>{{ stats.qualifying }}</td></tr>
+      <tr><th>Urgent / hot</th><td>{{ stats.urgent_hot }}</td></tr>
+      <tr><th>Total leads</th><td>{{ stats.total }}</td></tr>
+    </tbody>
+  </table>
+
+  <p><a href="/business/leads">View all leads →</a></p>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+{% endblock %}

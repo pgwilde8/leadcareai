@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}New lead — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>New manual lead</h1>
+  <p>Business: <strong>{{ business.name }}</strong></p>
+
+  <nav>
+    <a href="/admin/businesses/{{ business.id }}/leads">Back to leads</a>
+  </nav>
+
+  {% if error %}
+    <p class="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/admin/businesses/{{ business.id }}/leads">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" value="{{ form.name or '' }}" />
+
+    <label for="phone">Phone</label>
+    <input id="phone" name="phone" type="text" value="{{ form.phone or '' }}" />
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="{{ form.email or '' }}" />
+
+    <label for="service_needed">Service needed</label>
+    <input id="service_needed" name="service_needed" type="text" value="{{ form.service_needed or '' }}" />
+
+    <label for="location">Location</label>
+    <input id="location" name="location" type="text" value="{{ form.location or '' }}" />
+
+    <label for="urgency">Urgency</label>
+    <input id="urgency" name="urgency" type="text" value="{{ form.urgency or '' }}" />
+
+    <label for="summary">Summary</label>
+    <textarea id="summary" name="summary" rows="4">{{ form.summary or '' }}</textarea>
+
+    <button type="submit">Create lead</button>
+  </form>
+{% endblock %}
