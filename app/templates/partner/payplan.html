@@ -1,0 +1,350 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Sales Partner Pay Plan — {{ settings.app_name }}{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .lc-payplan-example {
+      margin: var(--lc-space-4) 0;
+      padding: var(--lc-space-4);
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-radius: var(--lc-radius);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .lc-payplan-flow {
+      margin: var(--lc-space-4) 0;
+      padding-left: var(--lc-space-5);
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <article>
+    <h1>{{ settings.app_name }} Sales Partner Pay Plan</h1>
+    <p class="lc-page-header__lead">
+      How commissions work when you refer real business customers who sign up, pay, and stay active.
+    </p>
+
+    {% if partner and referral_link %}
+      <p>
+        Signed in as <strong>{{ partner.display_name }}</strong>.
+        <a href="/partner/dashboard">Back to dashboard</a>
+      </p>
+    {% else %}
+      <p>
+        <a href="/partner/onboard">Apply to become a Sales Partner</a>
+        ·
+        <a href="/login">Partner login</a>
+      </p>
+    {% endif %}
+
+    <h2>Simple summary</h2>
+    <p>
+      {{ settings.app_name }} Sales Partners earn commissions by referring real business customers who sign up,
+      pay, and remain active. You are paid for helping local businesses use {{ settings.app_name }} — not for
+      recruiting people.
+    </p>
+    <p>
+      {{ settings.app_name }} helps businesses respond faster to missed calls, qualify leads by SMS, and alert
+      their team before hot prospects go cold.
+    </p>
+
+    <h2>What customers buy</h2>
+    <p>The standard {{ settings.app_name }} Growth Plan is:</p>
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Customer price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Setup fee</td>
+            <td>$199 one-time</td>
+          </tr>
+          <tr>
+            <td>Monthly subscription</td>
+            <td>$147/month</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      The setup fee helps cover onboarding, phone/SMS setup, business configuration, and support.
+      The monthly subscription keeps the service active.
+    </p>
+
+    <h2>Your Sales Partner pay</h2>
+    <p>As an approved {{ settings.app_name }} Sales Partner, you can earn:</p>
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Commission type</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Activation bonus</td>
+            <td>$100 per activated paid customer</td>
+          </tr>
+          <tr>
+            <td>Monthly recurring commission</td>
+            <td>$25/month per active paid customer</td>
+          </tr>
+          <tr>
+            <td>Retention bonus</td>
+            <td>$100 after the customer stays paid for 6 months</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Example: one customer</h2>
+    <p>If you refer one business customer and they sign up for the Growth Plan:</p>
+    <div class="lc-payplan-example">Customer pays:
+$199 setup fee
+$147 first month</div>
+    <p>Your potential commission:</p>
+    <div class="lc-payplan-example">$100 activation bonus
+$25 monthly recurring commission
+$100 retention bonus after 6 paid months</div>
+    <p>If the customer remains active for 6 months, that one customer can be worth:</p>
+    <div class="lc-payplan-example">$100 activation bonus
++ $25/month for 6 months
++ $100 retention bonus
+= $350 total potential commission</div>
+    <p>
+      After 6 months, you may continue earning $25/month while the customer remains active and eligible under
+      the commission rules.
+    </p>
+
+    <h2>Example: 10 active customers</h2>
+    <div class="lc-payplan-example">10 customers × $25/month = $250/month recurring commission</div>
+    <p>That is before any new activation bonuses or retention bonuses.</p>
+
+    <h2>Example: 20 active customers</h2>
+    <div class="lc-payplan-example">20 customers × $25/month = $500/month recurring commission</div>
+    <p>That is recurring commission while those customers remain active and paid.</p>
+
+    <h2>When you earn</h2>
+    <p>Commissions are based on real customer payments. A commission may be created when:</p>
+    <ol>
+      <li>The business customer signs up.</li>
+      <li>The customer pays successfully.</li>
+      <li>The customer is connected to your referral code/link or assigned to you by {{ settings.app_name }}.</li>
+      <li>The customer becomes active.</li>
+      <li>You are an approved and active Sales Partner.</li>
+    </ol>
+
+    <h2>Pending and approved commissions</h2>
+    <p>Commissions are not paid instantly. When a customer pays, your commission is first marked as <strong>pending</strong>.</p>
+    <p>After the review period, the commission may become <strong>approved</strong> if:</p>
+    <ul>
+      <li>The customer payment was successful.</li>
+      <li>The customer did not refund.</li>
+      <li>The customer did not dispute or charge back payment.</li>
+      <li>The customer is valid and active.</li>
+      <li>There is no fraud, fake account, or policy issue.</li>
+      <li>You followed {{ settings.app_name }} sales and marketing rules.</li>
+    </ul>
+    <p>Approved commissions are paid on the company payout schedule.</p>
+
+    <h2>Review period</h2>
+    <p>
+      {{ settings.app_name }} uses a review period before commissions become payable. This protects the company
+      and partners from refunds, chargebacks, fake accounts, and cancelled customers.
+    </p>
+    <p>Standard review flow:</p>
+    <ol class="lc-payplan-flow">
+      <li>Customer pays</li>
+      <li>Commission becomes pending</li>
+      <li>Review period passes</li>
+      <li>Commission becomes approved</li>
+      <li>Approved commissions are paid</li>
+    </ol>
+
+    <h2>When commissions are not paid</h2>
+    <p>No commission is paid for:</p>
+    <ul>
+      <li>Free trials</li>
+      <li>Demo accounts</li>
+      <li>Test accounts</li>
+      <li>Fake accounts</li>
+      <li>Internal accounts</li>
+      <li>Unpaid customers</li>
+      <li>Cancelled customers</li>
+      <li>Refunded payments</li>
+      <li>Disputed payments</li>
+      <li>Chargebacks</li>
+      <li>Customers who never complete payment</li>
+      <li>Recruiting other partners by itself</li>
+      <li>Customers not properly connected to your referral code/link</li>
+      <li>Customers obtained through false, misleading, or unauthorized claims</li>
+    </ul>
+
+    <h2>Customer cancellation</h2>
+    <p>Customers may cancel their subscription. If a customer cancels:</p>
+    <ul>
+      <li>Future monthly recurring commissions stop.</li>
+      <li>Pending commissions may be cancelled.</li>
+      <li>Approved commissions may be reversed if payment is refunded, disputed, or charged back.</li>
+      <li>Paid commissions may be offset from future commissions if a refund, dispute, chargeback, or fraud issue occurs.</li>
+    </ul>
+    <p>See also our <a href="/refund-policy">Refund &amp; Cancellation Policy</a>.</p>
+
+    <h2>Retention bonus</h2>
+    <p>
+      You may earn a $100 retention bonus when a customer remains paid and active for 6 months. The retention
+      bonus is not guaranteed at signup. The customer must remain valid, active, paid, and not refunded or disputed.
+    </p>
+
+    <h2>Recurring commission</h2>
+    <p>You may earn $25/month for each active paid customer assigned to you. Recurring commission continues only while:</p>
+    <ul>
+      <li>The customer remains active.</li>
+      <li>The customer continues paying.</li>
+      <li>The account is valid.</li>
+      <li>You remain eligible under the Sales Partner Agreement.</li>
+      <li>There are no refund, dispute, fraud, or policy issues.</li>
+    </ul>
+
+    <h2>What you are selling</h2>
+    <p>You are introducing businesses to {{ settings.app_name }}. {{ settings.app_name }} helps businesses:</p>
+    <ul>
+      <li>Text missed callers automatically</li>
+      <li>Qualify leads by SMS</li>
+      <li>See leads in a dashboard</li>
+      <li>Receive staff alerts</li>
+      <li>Follow up faster</li>
+      <li>Recover leads that might otherwise be lost</li>
+    </ul>
+    <div class="lc-payplan-example">{{ settings.app_name }} helps local businesses stop losing customers when they miss calls.</div>
+
+    <h2>What you should not say</h2>
+    <p>Do not claim:</p>
+    <ul>
+      <li>Guaranteed income</li>
+      <li>Passive income with no work</li>
+      <li>Guaranteed business results</li>
+      <li>Guaranteed leads</li>
+      <li>Guaranteed appointments</li>
+      <li>Guaranteed revenue</li>
+      <li>That {{ settings.app_name }} is an emergency service</li>
+      <li>That {{ settings.app_name }} is a full human answering service</li>
+      <li>That you are an employee of {{ settings.app_name }}</li>
+      <li>That customers can get features or pricing not approved by {{ settings.app_name }}</li>
+    </ul>
+    <p>Do not make promises that are not in approved {{ settings.app_name }} materials.</p>
+
+    <h2>Approved income language</h2>
+    <p>You may say:</p>
+    <div class="lc-payplan-example">Sales Partners can earn commissions when real business customers they refer become paying subscribers and remain active.</div>
+    <p>You may also say:</p>
+    <div class="lc-payplan-example">Actual earnings depend on your sales activity, customer retention, expenses, and compliance with {{ settings.app_name }} rules.</div>
+    <p><strong>Do not promise or imply that anyone is guaranteed to earn money.</strong></p>
+
+    <h2>Your role</h2>
+    <p>As a Sales Partner, your job is to:</p>
+    <ol>
+      <li>Find businesses that miss calls or need better lead follow-up.</li>
+      <li>Explain what {{ settings.app_name }} does.</li>
+      <li>Share your referral link or book a demo.</li>
+      <li>Follow approved sales scripts and marketing rules.</li>
+      <li>Help interested businesses take the next step.</li>
+    </ol>
+    <p>Good target businesses include:</p>
+    <ul>
+      <li>Plumbers</li>
+      <li>Roofers</li>
+      <li>HVAC companies</li>
+      <li>Contractors</li>
+      <li>Med spas</li>
+      <li>Insurance agencies</li>
+      <li>Real estate teams</li>
+      <li>Home service businesses</li>
+      <li>Local service companies that depend on phone leads</li>
+    </ul>
+
+    <h2>Referral tracking</h2>
+    <p>You will receive a referral link or referral code. Use it when sending prospects to {{ settings.app_name }}.</p>
+    {% if referral_link %}
+      <p>Your referral link:</p>
+      <p>
+        <input
+          type="text"
+          readonly
+          value="{{ referral_link }}"
+          class="lc-input"
+          style="width: 100%; font-family: ui-monospace, monospace;"
+          onclick="this.select()"
+        />
+      </p>
+      <p>Referral code: <strong>{{ partner.referral_code }}</strong></p>
+    {% else %}
+      <p>Example:</p>
+      <div class="lc-payplan-example">{{ referral_example }}</div>
+    {% endif %}
+    <p>
+      If a customer signs up without your referral link/code, commission credit is not guaranteed. If there is a
+      referral dispute, {{ settings.app_name }} will make the final attribution decision based on system records
+      and available evidence.
+    </p>
+
+    <h2>Payout requirements</h2>
+    <p>Before receiving payment, you must complete required onboarding steps, which may include:</p>
+    <ul>
+      <li>Sales Partner Agreement</li>
+      <li>Commission Plan acknowledgment</li>
+      <li>W-9 or required tax form</li>
+      <li>Payout information</li>
+      <li>Marketing policy acknowledgment</li>
+      <li>Privacy/data handling acknowledgment</li>
+    </ul>
+    <p>{{ settings.app_name }} may withhold payment until required documents are complete.</p>
+
+    <h2>No recruiting requirement</h2>
+    <p>
+      You do not need to recruit other people to earn. You earn by referring real business customers who become
+      paying {{ settings.app_name }} subscribers. No commission is paid for recruiting people alone.
+    </p>
+
+    <h2>Final pay plan summary</h2>
+    <div class="lc-payplan-example">Customer price:
+$199 setup
+$147/month
+
+Partner pay:
+$100 activation bonus per activated paid customer
+$25/month recurring per active paid customer
+$100 retention bonus after 6 paid months
+
+Important:
+Commissions start as pending.
+Commissions are paid only after review and approval.
+No commission on refunds, disputes, cancellations, unpaid accounts, fake accounts, or recruiting alone.</div>
+
+    <h2>Plain-English version</h2>
+    <p>
+      Find real businesses that need better missed-call follow-up. If they become paying {{ settings.app_name }}
+      customers and stay active, you earn commissions. The more good customers you bring in and retain, the more
+      recurring commission you can build.
+    </p>
+
+    <p>
+      {% if partner %}
+        <a href="/partner/dashboard">Partner dashboard</a> ·
+      {% endif %}
+      <a href="/partner/onboard">Apply as a partner</a> ·
+      <a href="/refund-policy">Refund &amp; Cancellation Policy</a> ·
+      <a href="/contact">Contact</a>
+    </p>
+  </article>
+{% endblock %}

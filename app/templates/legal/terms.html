@@ -5,100 +5,463 @@
 {% block content %}
   <article>
     <h1>Terms of Service</h1>
-    <p><strong>Last updated:</strong> May 27, 2026</p>
+    <p><strong>Last updated:</strong> May 28, 2026</p>
 
     <p>
-      These Terms of Service (“Terms”) govern access to and use of {{ settings.app_name }} (the “Service”).
-      By creating an account, using the Service, or allowing your business to be onboarded, you agree to these Terms.
+      These Terms of Service (“Terms”) govern your access to and use of {{ settings.app_name }}, a service operated
+      by Webwise Solutions LLC (“Company,” “we,” “us,” or “our”).
     </p>
-
-    <h2>1. The Service</h2>
     <p>
-      {{ settings.app_name }} provides tools for local businesses to capture and follow up on leads, including
-      missed-call text-back, SMS conversations, lead tracking, and related notifications. Features may change over time.
+      By accessing or using {{ settings.app_name }}, creating an account, purchasing a subscription, using our website,
+      or authorizing us to provide services, you agree to these Terms.
+    </p>
+    <p>If you do not agree, do not use {{ settings.app_name }}.</p>
+
+    <h2>1. Company information</h2>
+    <p>{{ settings.app_name }} is operated by:</p>
+    <p>
+      Webwise Solutions LLC<br />
+      304 S. Jones Blvd<br />
+      Las Vegas, NV 89107<br />
+      United States
+    </p>
+    <p>
+      Support:
+      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a><br />
+      Website:
+      <a href="/contact">{{ settings.app_name }} contact</a>
     </p>
 
-    <h2>2. Eligibility and accounts</h2>
+    <h2>2. The Service</h2>
+    <p>
+      {{ settings.app_name }} provides tools for missed-call recovery, SMS lead intake, AI-assisted lead qualification,
+      business lead dashboards, staff notifications, basic follow-up automation, review request tools, reporting,
+      billing access, and related setup/support services.
+    </p>
+    <p>
+      The Service is designed to help businesses and other eligible users respond faster to missed calls, qualify
+      incoming leads by text message, and organize lead information.
+    </p>
+    <p>{{ settings.app_name }} may include features such as:</p>
     <ul>
-      <li>You must have authority to bind the business you represent.</li>
-      <li>You are responsible for safeguarding login credentials and activity under your account.</li>
-      <li>You must provide accurate business and contact information.</li>
+      <li>Missed-call text-back</li>
+      <li>AI-assisted SMS lead qualification</li>
+      <li>Lead inbox/dashboard</li>
+      <li>Staff notifications</li>
+      <li>Basic follow-up automation</li>
+      <li>Review request tools</li>
+      <li>Monthly lead reports</li>
+      <li>Billing portal access</li>
+      <li>Setup and onboarding support</li>
+      <li>Partner/referral attribution where applicable</li>
     </ul>
-
-    <h2>3. SMS and telecommunications compliance</h2>
     <p>
-      If you use SMS features, you agree to comply with applicable laws and carrier rules, including TCPA,
-      CAN-SPAM (where applicable), and Twilio acceptable use policies. You are solely responsible for obtaining
-      and documenting consent before texting consumers. Our
-      <a href="/sms">SMS Program Terms</a> describe baseline requirements for messaging through the Service.
+      {{ settings.app_name }} is not an emergency response service, live human answering service, call center, legal
+      advisor, medical provider, financial advisor, insurance carrier, licensed trade provider, or guarantee of sales,
+      leads, revenue, appointments, or business results.
     </p>
 
-    <h2>4. Acceptable use</h2>
-    <p>You may not use the Service to:</p>
+    <h2>3. Eligibility</h2>
+    <p>You must be at least 18 years old to use {{ settings.app_name }}.</p>
+    <p>
+      You may use {{ settings.app_name }} for lawful business, organizational, professional, or service-related purposes.
+    </p>
+    <p>
+      You may not use {{ settings.app_name }} for illegal activity, fraud, abusive activity, harassment, spam, deceptive
+      marketing, unlawful communications, or any activity that places Webwise Solutions LLC, {{ settings.app_name }},
+      our vendors, our customers, or the public at legal, regulatory, financial, reputational, or operational risk.
+    </p>
+    <p>
+      We may refuse, suspend, or terminate service for any account, customer, industry, use case, or activity that we
+      determine is unlawful, unsafe, abusive, unsupported, high-risk, prohibited by our vendors, or inconsistent with
+      these Terms.
+    </p>
+    <p>
+      Licensed businesses may be considered where legally permitted and where our vendors, payment processors,
+      telecommunications providers, and policies allow support. We reserve the right to require proof of licensing,
+      reject an account, limit service, or terminate service if we determine the account is not supportable.
+    </p>
+
+    <h2>4. Account registration and security</h2>
+    <p>You agree to provide accurate, complete, and current account information.</p>
+    <p>
+      You are responsible for maintaining the confidentiality of your login credentials and for all activity under your
+      account.
+    </p>
+    <p>
+      You must notify us promptly if you suspect unauthorized access, account misuse, lost credentials, or a security
+      issue.
+    </p>
+    <p>
+      We may suspend or restrict account access if we suspect unauthorized access, misuse, fraud, non-payment, policy
+      violations, or security risk.
+    </p>
+
+    <h2>5. Customer responsibilities</h2>
+    <p>You are responsible for:</p>
     <ul>
-      <li>Send unlawful, harassing, deceptive, or spam messages;</li>
-      <li>Transmit malware or attempt unauthorized access;</li>
-      <li>Impersonate others or misrepresent your identity;</li>
-      <li>Send messages without required consent;</li>
-      <li>Violate third-party rights or applicable law.</li>
+      <li>Providing accurate business, contact, billing, and service information</li>
+      <li>Keeping staff notification phone numbers and email addresses current</li>
+      <li>Configuring call forwarding or phone routing correctly</li>
+      <li>Testing your missed-call recovery setup</li>
+      <li>Monitoring your dashboard, messages, alerts, and leads</li>
+      <li>Responding to your customers and prospects</li>
+      <li>Reviewing AI-generated summaries, recommendations, and classifications</li>
+      <li>Complying with laws that apply to your business and communications</li>
+      <li>Obtaining any required customer permissions or consents</li>
+      <li>Avoiding prohibited or abusive use</li>
+      <li>Keeping your account credentials secure</li>
+      <li>Disabling or changing call forwarding after cancellation, if applicable</li>
     </ul>
-
-    <h2>5. Fees and billing</h2>
     <p>
-      Paid plans, setup fees, and billing terms are presented at signup or in your order form. Fees are generally
-      non-refundable except where required by law or expressly stated. Failure to pay may result in suspension.
+      {{ settings.app_name }} helps collect, organize, and summarize lead information, but you remain responsible for
+      customer service, follow-up, business decisions, appointments, pricing, professional advice, emergency handling,
+      and final communications with your customers.
     </p>
 
-    <h2>6. Third-party services</h2>
+    <h2>6. Pricing and billing</h2>
+    <p>{{ settings.app_name }}’s standard Growth Plan is:</p>
+    <ul>
+      <li>Setup fee: $199 one-time</li>
+      <li>Monthly subscription: $147/month</li>
+    </ul>
     <p>
-      The Service integrates with third parties (for example, Twilio, Stripe, and AI providers). Your use of those
-      services may be subject to their terms. We are not responsible for third-party outages or actions.
+      Prices may vary based on promotions, plan changes, custom agreements, upgrades, discounts, or future pricing
+      updates.
+    </p>
+    <p>
+      By purchasing a subscription, you authorize recurring billing until you cancel. Monthly subscriptions are billed
+      in advance for the upcoming billing period.
+    </p>
+    <p>
+      You agree to keep your payment method current and authorize us and our payment processor to charge applicable
+      fees. We may use third-party payment processors such as Stripe to process payments.
     </p>
 
-    <h2>7. Disclaimers</h2>
+    <h2>7. Setup fee</h2>
+    <p>The setup fee helps cover onboarding and configuration work, which may include:</p>
+    <ul>
+      <li>Account setup</li>
+      <li>Phone number or recovery number assignment</li>
+      <li>SMS/text-back configuration</li>
+      <li>Business name, SMS signature, and industry setup</li>
+      <li>Staff notification setup</li>
+      <li>Call-forwarding assistance</li>
+      <li>Dashboard configuration</li>
+      <li>Missed-call recovery testing</li>
+      <li>Setup and onboarding support</li>
+    </ul>
+    <p>The setup fee is non-refundable once setup work has begun. Setup work may begin after purchase.</p>
+
+    <h2>8. Refunds and cancellations</h2>
     <p>
-      THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE.” WE DISCLAIM WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-      PARTICULAR PURPOSE, AND NON-INFRINGEMENT TO THE MAXIMUM EXTENT PERMITTED BY LAW. WE DO NOT GUARANTEE THAT YOU
-      WILL RECEIVE ANY NUMBER OF LEADS, SALES, OR REVENUE.
+      Refunds and cancellations are governed by our
+      <a href="/refund-policy">Refund &amp; Cancellation Policy</a>, which is incorporated into these Terms.
+    </p>
+    <p>Unless otherwise stated in writing:</p>
+    <ul>
+      <li>Customers may cancel anytime before the next billing date.</li>
+      <li>Cancellation stops future billing.</li>
+      <li>Monthly fees already paid are not prorated or refunded.</li>
+      <li>The setup fee is non-refundable once setup work begins.</li>
+      <li>
+        Service may remain active until the end of the paid billing period unless suspended or terminated for
+        non-payment, misuse, legal risk, or policy violation.
+      </li>
+    </ul>
+    <p>
+      To cancel, use the billing portal if available or contact support at
+      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>.
     </p>
 
-    <h2>8. Limitation of liability</h2>
+    <h2>9. Failed payments and non-payment</h2>
     <p>
-      TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
-      OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, OR GOODWILL. OUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO
-      THE SERVICE IS LIMITED TO THE AMOUNTS YOU PAID US IN THE TWELVE (12) MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM.
+      If your payment fails, we may retry the payment, notify you, suspend service, limit features, disable automations,
+      or cancel your account.
+    </p>
+    <p>
+      {{ settings.app_name }} is not responsible for missed calls, missed leads, message failures, dashboard
+      interruptions, or other consequences caused by non-payment, suspended service, failed payment methods, cancelled
+      subscriptions, or disabled accounts.
     </p>
 
-    <h2>9. Indemnification</h2>
+    <h2>10. SMS, calling, and communications consent</h2>
+    <p><strong>[TO BE FINALIZED]</strong></p>
     <p>
-      You agree to defend and indemnify us against claims arising from your use of the Service, your messages to
-      consumers, or your violation of these Terms or applicable law.
+      This section should address customer responsibility for consent, SMS/text messaging rules, call-forwarding
+      authorization, opt-out handling, STOP/HELP behavior, telemarketing restrictions, and telecommunications
+      compliance. See also our <a href="/sms">SMS Program Terms</a>.
     </p>
 
-    <h2>10. Termination</h2>
+    <h2>11. AI features and limitations</h2>
     <p>
-      You may stop using the Service at any time. We may suspend or terminate access for violation of these Terms,
-      non-payment, or risk to the platform. Provisions that by nature should survive will survive termination.
+      {{ settings.app_name }} may use artificial intelligence, automation, rules-based logic, and third-party AI
+      providers to help classify, summarize, or respond to lead inquiries.
+    </p>
+    <p>
+      AI features are designed to assist with lead intake and qualification. They are not a substitute for human
+      review, professional judgment, customer service, emergency response, legal advice, medical advice, financial
+      advice, insurance advice, or licensed trade advice.
+    </p>
+    <p>AI outputs may be inaccurate, incomplete, delayed, outdated, or inappropriate.</p>
+    <p>
+      You are responsible for reviewing AI-generated summaries, lead classifications, urgency labels, suggested actions,
+      text responses, and other outputs before relying on them.
+    </p>
+    <p>{{ settings.app_name }} and its AI features must not be used to:</p>
+    <ul>
+      <li>Promise pricing, availability, appointments, or emergency response</li>
+      <li>Provide legal, medical, financial, insurance, or professional advice</li>
+      <li>Make decisions requiring licensed professional judgment</li>
+      <li>Replace emergency services</li>
+      <li>Mislead customers</li>
+      <li>Send unlawful or prohibited communications</li>
+    </ul>
+    <p>We may limit, modify, disable, or remove AI features at any time.</p>
+
+    <h2>12. No guarantee of results</h2>
+    <p>
+      {{ settings.app_name }} does not guarantee that you will receive any number of leads, appointments, calls,
+      customers, sales, revenue, profit, reviews, or business results.
+    </p>
+    <p>
+      {{ settings.app_name }} does not guarantee that every missed call will be recovered, every SMS will be delivered,
+      every lead will respond, every AI classification will be correct, or every notification will be received.
+    </p>
+    <p>
+      Results depend on many factors outside our control, including your business operations, customer behavior, phone
+      provider, internet service, telecom carriers, third-party vendors, payment status, message deliverability, staff
+      response time, and market conditions.
     </p>
 
-    <h2>11. Changes</h2>
+    <h2>13. Third-party services</h2>
     <p>
-      We may modify these Terms. We will post the updated Terms with a new “Last updated” date. Material changes may
-      require additional notice where required by law.
+      {{ settings.app_name }} may rely on third-party providers, including payment processors, telecommunications
+      providers, SMS providers, hosting providers, AI providers, email providers, analytics providers, and other vendors.
+    </p>
+    <p>
+      Third-party service interruptions, delays, limitations, rate limits, outages, pricing changes, compliance
+      requirements, or restrictions may affect {{ settings.app_name }}.
+    </p>
+    <p>We are not responsible for failures, delays, or limitations caused by third-party services.</p>
+    <p>
+      Your use of {{ settings.app_name }} may also be subject to third-party terms, including payment processor,
+      telecommunications, SMS, and AI provider terms.
     </p>
 
-    <h2>12. Governing law</h2>
+    <h2>14. Phone numbers, call forwarding, and routing</h2>
     <p>
-      These Terms are governed by the laws of the State of New Jersey, USA, without regard to conflict-of-law rules,
-      except where prohibited by law.
+      {{ settings.app_name }} may assign or configure phone numbers, tracking numbers, recovery numbers, or SMS-enabled
+      numbers for use with the Service. Phone numbers may be provided through third-party telecommunications providers.
+    </p>
+    <p>
+      You do not own phone numbers assigned through {{ settings.app_name }} unless we expressly agree in writing.
+    </p>
+    <p>
+      We may release, disable, reassign, or stop supporting phone numbers after cancellation, non-payment, termination,
+      inactivity, misuse, or vendor restriction.
+    </p>
+    <p>
+      If you configure call forwarding from your existing phone number to a {{ settings.app_name }} number, you are
+      responsible for ensuring the forwarding is set correctly and for disabling or changing forwarding after
+      cancellation.
+    </p>
+    <p>
+      {{ settings.app_name }} is not responsible for calls or messages routed incorrectly because of your phone provider
+      settings, forwarding configuration, carrier limitations, user error, cancellation, or third-party service issues.
     </p>
 
-    <h2>13. Contact</h2>
+    <h2>15. Acceptable use</h2>
+    <p>You may not use {{ settings.app_name }} to:</p>
+    <ul>
+      <li>Violate laws or regulations</li>
+      <li>Send spam or unlawful messages</li>
+      <li>Harass, threaten, deceive, or abuse others</li>
+      <li>Send messages to people who have opted out where messaging is prohibited</li>
+      <li>Impersonate another person or business</li>
+      <li>Misrepresent your identity, services, pricing, credentials, or availability</li>
+      <li>Collect sensitive information unnecessarily</li>
+      <li>Sell, misuse, or expose customer data</li>
+      <li>Interfere with the Service</li>
+      <li>Attempt unauthorized access</li>
+      <li>Reverse engineer, scrape, attack, overload, or bypass security controls</li>
+      <li>Use the Service for illegal goods or services</li>
+      <li>Use the Service in a way prohibited by our vendors or payment processors</li>
+    </ul>
+    <p>We may suspend or terminate accounts that violate this section.</p>
+
+    <h2>16. Prohibited and high-risk uses</h2>
     <p>
-      Questions about these Terms:
+      We may refuse, restrict, or terminate service for illegal, unsupported, high-risk, or vendor-prohibited activity.
+    </p>
+    <p>Examples may include, depending on law, vendor rules, and our judgment:</p>
+    <ul>
+      <li>Illegal products or services</li>
+      <li>Fraudulent offers</li>
+      <li>Unlicensed regulated activity</li>
+      <li>Deceptive lead generation</li>
+      <li>Spam or abusive messaging</li>
+      <li>Hate, harassment, or exploitation</li>
+      <li>Unsafe emergency-related use cases</li>
+      <li>High-risk financial or legal claims</li>
+      <li>Unsupported regulated industries</li>
+      <li>Any activity that creates unacceptable risk for Webwise Solutions LLC or our vendors</li>
+    </ul>
+    <p>
+      We may require additional review, documentation, licensing proof, or written approval for regulated businesses.
+    </p>
+
+    <h2>17. Data and privacy</h2>
+    <p>
+      Our collection and use of personal information is described in our
+      <a href="/privacy">Privacy Policy</a>, which is incorporated into these Terms.
+    </p>
+    <p>
+      You authorize us to process account data, customer lead data, message data, call data, billing data, and related
+      information as needed to provide, maintain, secure, troubleshoot, support, improve, and enforce the Service.
+    </p>
+    <p>You retain responsibility for the data you provide or route through {{ settings.app_name }}.</p>
+    <p>
+      We may use aggregated or de-identified data to improve the Service, develop features, understand usage, monitor
+      performance, and support business operations, provided that such data does not identify you or your customers.
+    </p>
+
+    <h2>18. Customer data</h2>
+    <p>
+      As between you and {{ settings.app_name }}, you retain ownership of your business customer and lead data, subject
+      to the rights you grant us to operate the Service.
+    </p>
+    <p>
+      You grant us permission to store, process, transmit, display, summarize, analyze, and use your data as necessary
+      to provide {{ settings.app_name }}.
+    </p>
+    <p>
+      After cancellation or termination, we may retain data as needed for legal, tax, audit, fraud prevention, dispute
+      resolution, backup, security, compliance, and legitimate business purposes.
+    </p>
+
+    <h2>19. Partner and referral relationships</h2>
+    <p>
+      Customers may be introduced to {{ settings.app_name }} by independent sales partners, referral partners, affiliates,
+      or ambassadors.
+    </p>
+    <p>
+      Sales partners are independent contractors and are not employees, agents, or legal representatives of Webwise
+      Solutions LLC.
+    </p>
+    <p>
+      Partners may not modify these Terms, change pricing, promise features, guarantee results, approve refunds, bind
+      Webwise Solutions LLC, or make representations not authorized by us.
+    </p>
+    <p>Your agreement is with Webwise Solutions LLC, not with the referring partner.</p>
+    <p>
+      If a partner makes a promise that conflicts with these Terms or our written materials, these Terms control unless
+      we approve the promise in writing.
+    </p>
+
+    <h2>20. Service availability and support</h2>
+    <p>
+      We aim to provide reliable service, but we do not guarantee uninterrupted, error-free, delay-free, or
+      always-available operation.
+    </p>
+    <p>
+      The Service may be unavailable or limited due to maintenance, outages, third-party provider issues, carrier issues,
+      internet issues, security events, testing, updates, non-payment, or events beyond our control.
+    </p>
+    <p>
+      Support may be provided by email, dashboard tools, documentation, onboarding assistance, or other methods we
+      choose. Contact:
+      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>.
+    </p>
+    <p>We may modify, suspend, or discontinue features at any time.</p>
+
+    <h2>21. Account suspension and termination</h2>
+    <p>We may suspend, restrict, or terminate your account or access to the Service if:</p>
+    <ul>
+      <li>You fail to pay</li>
+      <li>A payment is disputed, reversed, charged back, or suspected fraudulent</li>
+      <li>You violate these Terms</li>
+      <li>You misuse the Service</li>
+      <li>You send unlawful, abusive, or prohibited communications</li>
+      <li>Your business or use case becomes unsupported or high-risk</li>
+      <li>You violate vendor, telecom, payment processor, or AI provider rules</li>
+      <li>You create legal, regulatory, operational, security, or reputational risk</li>
+      <li>You provide false information</li>
+      <li>You interfere with the Service</li>
+      <li>
+        We are required to do so by law, vendor restriction, payment processor, carrier, court order, or government
+        authority
+      </li>
+    </ul>
+    <p>
+      Termination may result in loss of access to dashboards, automations, messages, phone numbers, reports, referral
+      tracking, and related features.
+    </p>
+
+    <h2>22. Intellectual property</h2>
+    <p>
+      {{ settings.app_name }}, the website, software, dashboards, workflows, designs, templates, text, graphics, logos,
+      names, scripts, documentation, and related materials are owned by Webwise Solutions LLC or its licensors.
+    </p>
+    <p>
+      You may not copy, modify, resell, sublicense, reverse engineer, scrape, frame, white-label, or create derivative
+      works from {{ settings.app_name }} unless we give written permission.
+    </p>
+    <p>
+      We grant you a limited, revocable, non-exclusive, non-transferable right to use the Service during your active
+      subscription, subject to these Terms.
+    </p>
+
+    <h2>23. Feedback</h2>
+    <p>
+      If you provide feedback, suggestions, ideas, or recommendations, you grant us the right to use them without
+      restriction or compensation.
+    </p>
+
+    <h2>24. Disclaimers</h2>
+    <p>{{ settings.app_name }} is provided on an “as is” and “as available” basis.</p>
+    <p>
+      We disclaim warranties to the maximum extent permitted by law, including implied warranties of merchantability,
+      fitness for a particular purpose, non-infringement, uninterrupted operation, accuracy, deliverability, and
+      error-free performance.
+    </p>
+    <p>Some jurisdictions may not allow certain disclaimers, so some disclaimers may not apply to you.</p>
+
+    <h2>25. Liability and disputes</h2>
+    <p><strong>[TO BE FINALIZED]</strong></p>
+    <p>
+      This section should address liability cap, excluded damages, indemnification, governing law, venue, arbitration or
+      court process, class-action waiver if used, and dispute notice process.
+    </p>
+
+    <h2>26. Changes to the Service or Terms</h2>
+    <p>We may update the Service or these Terms from time to time.</p>
+    <p>
+      When we make material changes, we may provide notice by posting updated Terms, sending notice, displaying dashboard
+      notice, or another reasonable method.
+    </p>
+    <p>
+      Your continued use of {{ settings.app_name }} after updated Terms become effective means you accept the updated
+      Terms.
+    </p>
+
+    <h2>27. Contact</h2>
+    <p>For questions about these Terms, contact us at:</p>
+    <p>
+      <a href="/contact">{{ settings.app_name }} contact form</a><br />
       <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
     </p>
+    <p>
+      Webwise Solutions LLC<br />
+      304 S. Jones Blvd<br />
+      Las Vegas, NV 89107<br />
+      United States
+    </p>
 
-    <p><a href="/privacy">Privacy Policy</a> · <a href="/sms">SMS Program Terms</a></p>
+    <p>
+      <a href="/privacy">Privacy Policy</a> ·
+      <a href="/sms">SMS Program Terms</a> ·
+      <a href="/refund-policy">Refund &amp; Cancellation Policy</a>
+    </p>
   </article>
 {% endblock %}

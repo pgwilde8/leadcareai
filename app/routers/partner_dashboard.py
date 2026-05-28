@@ -12,7 +12,8 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.models.partner import Partner
 from app.models.business import Business
-from app.routers.auth import require_partner
+from app.routers.auth import get_current_user, require_partner
+from app.services.partner_service import PARTNER_STATUS_ACTIVE
 from app.services import business_lead_service, commission_service
 from app.services.demo_live_service import DEMO_PHONE_DISPLAY
 from app.templates import templates
@@ -59,5 +60,31 @@ def partner_dashboard(
                 "paid_commissions": commission_stats["paid"],
             },
             "demo_phone_display": DEMO_PHONE_DISPLAY,
+        },
+    )
+
+
+@router.get("/payplan", response_class=HTMLResponse, response_model=None)
+def partner_payplan(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+) -> HTMLResponse:
+    settings = get_settings()
+    base = settings.app_base_url.rstrip("/")
+    partner = None
+    referral_link = None
+    user = get_current_user(request, db)
+    if user is not None and user.is_active and user.role == "partner":
+        partner = db.query(Partner).filter(Partner.user_id == user.id).one_or_none()
+        if partner is not None and partner.status == PARTNER_STATUS_ACTIVE:
+            referral_link = f"{base}/?ref={partner.referral_code}"
+
+    return templates.TemplateResponse(
+        request,
+        "partner/payplan.html",
+        {
+            "partner": partner,
+            "referral_link": referral_link,
+            "referral_example": f"{base}/?ref=YOURCODE",
         },
     )

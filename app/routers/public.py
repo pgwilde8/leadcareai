@@ -29,6 +29,10 @@ def _sms(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "legal/sms.html", {})
 
 
+def _refund_policy(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "legal/refund-policy.html", {})
+
+
 @router.get("/about", response_class=HTMLResponse, response_model=None)
 def about_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/about.html", {})
@@ -185,6 +189,11 @@ def sms(request: Request) -> HTMLResponse:
     return _sms(request)
 
 
+@router.get("/refund-policy", response_class=HTMLResponse, response_model=None)
+def refund_policy(request: Request) -> HTMLResponse:
+    return _refund_policy(request)
+
+
 @router.get("/legal/privacy", response_class=HTMLResponse, response_model=None)
 def legal_privacy(request: Request) -> HTMLResponse:
     return _privacy(request)
@@ -198,3 +207,8 @@ def legal_terms(request: Request) -> HTMLResponse:
 @router.get("/legal/sms", response_class=HTMLResponse, response_model=None)
 def legal_sms(request: Request) -> HTMLResponse:
     return _sms(request)
+
+
+@router.get("/legal/refund-policy", response_class=HTMLResponse, response_model=None)
+def legal_refund_policy(request: Request) -> HTMLResponse:
+    return _refund_policy(request)
