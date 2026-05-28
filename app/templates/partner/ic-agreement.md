@@ -1,3 +1,5 @@
+<!-- Canonical template for onboarding: app/templates/partner/documents/independent_contractor_agreement.md -->
+
 # Independent Contractor Sales Partner Agreement
 
 This Independent Contractor Sales Partner Agreement (“Agreement”) is entered into as of __________***, 20*** (“Effective Date”) by and between:

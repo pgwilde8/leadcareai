@@ -7,6 +7,15 @@
 
 {% block extra_head %}
   {% include "admin/_admin_head.html" %}
+  <style>
+    .lc-check-ok { color: var(--lc-success, #0a7a3e); font-weight: 600; }
+    .lc-check-warn { color: var(--lc-warning, #9a6700); font-weight: 600; }
+    .lc-check-error { color: var(--lc-danger, #b42318); font-weight: 600; }
+    .lc-check-info { color: inherit; }
+    .lc-system-check-notes { margin: var(--lc-space-2) 0 0; padding-left: 1.25rem; font-size: 0.9rem; color: var(--lc-text-muted, #555); }
+    .lc-system-check-notes li { margin: 0.25rem 0; }
+    .lc-system-check-notes code { font-size: 0.85rem; word-break: break-all; }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -15,30 +24,56 @@
   <header class="lc-admin-header">
     <h1 class="lc-admin-header__title">System Check</h1>
     <p class="lc-admin-header__lead">
-      Secrets are never displayed here; only configured/not-configured status values are shown.
+      Production readiness audit. Secrets are never displayed — only configured/missing status,
+      safe modes, and masked connection hints.
     </p>
   </header>
 
   <nav class="lc-page-nav lc-admin-nav" aria-label="System check">
-    <a href="/admin">← Back to admin dashboard</a>
+    <a href="/admin">← Admin dashboard</a>
+    <a href="/admin/notification-logs">Notification logs</a>
   </nav>
 
-  <div class="lc-table-wrap">
-    <table class="lc-table">
-      <thead>
-        <tr>
-          <th>Check</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for check in checks %}
-          <tr>
-            <td>{{ check.name }}</td>
-            <td>{{ check.value }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="lc-alert lc-alert--info" role="note">
+    Before inviting real businesses or partners, complete
+    <strong>docs/production-launch-checklist-v1.md</strong> and resolve any errors below.
+    This page does not send test SMS, email, or external API calls.
   </div>
+
+  {% for section in sections %}
+    <section class="lc-admin-section">
+      <h2 class="lc-admin-section__title">{{ section.title }}</h2>
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Check</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.items %}
+              <tr>
+                <td>{{ item.name }}</td>
+                <td class="lc-check-{{ item.status }}">{{ item.value }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if section.notes %}
+        <ul class="lc-system-check-notes">
+          {% for note in section.notes %}
+            <li>
+              {% if note.startswith('http') or note.startswith('/') %}
+                <code>{{ note }}</code>
+              {% else %}
+                {{ note }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </section>
+  {% endfor %}
 {% endblock %}

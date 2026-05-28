@@ -2,6 +2,8 @@
 
 Staff alerts when a new missed-call lead or inbound SMS reply is recorded.
 
+See also [live-conversation-notifications-v1.md](live-conversation-notifications-v1.md) for the full customer-reply flow and urgent wording.
+
 ## Channels
 
 | Channel | Field | Behavior |
@@ -16,16 +18,16 @@ If a field is blank, that channel is skipped (no error).
 | Event | When | Duplicate protection |
 |-------|------|----------------------|
 | `missed_call` | After new voice `CallSid` is stored and customer text-back is attempted | Same as voice webhook (`CallSid` dedupe) |
-| `inbound_sms` | After new inbound SMS is stored, AI reply, and customer auto-response | Same as SMS webhook (`MessageSid` dedupe) |
+| `inbound_sms` | After new inbound SMS is stored, AI analysis applied, customer auto-response, then staff notify | Same as SMS webhook (`MessageSid` dedupe) |
 
 ## Email
 
 **Subject examples:**
 
 - `New missed-call lead: {business.name}`
-- `New SMS reply: {business.name}`
+- `New customer reply: {business.name}` (prefix `[URGENT]` when urgent/hot)
 
-**Body includes:** business name, customer phone, lead status, source, summary, urgency, latest message, dashboard URL (when `PUBLIC_BASE_URL` or `APP_BASE_URL` is set).
+**Body includes:** business name, customer phone, lead status, source, service needed, summary, urgency, AI temperature, latest message, dashboard URL (when `PUBLIC_BASE_URL` or `APP_BASE_URL` is set).
 
 **SMTP env vars (optional):**
 
@@ -39,9 +41,15 @@ If SMTP is not configured, email attempts are logged as `skipped` in `notificati
 
 ## Staff SMS
 
-Template:
+**Inbound SMS reply (compact):**
 
-`LeadCare AI: New lead for {business} from {phone}. {summary}. View dashboard: {url}`
+`LeadCare AI: New reply for {business} from {phone}: '{message}' Urgency: {urgency}. View: {url}`
+
+**Missed call (multi-line):**
+
+`LeadCare AI: {URGENCY} | {service} | {town}` + name, callback, last message, optional recommended action, `View: {url}`
+
+**Urgent:** brand prefix `URGENT LeadCare AI` and email subject `[URGENT]` when urgency is `urgent`/`emergency` or AI temperature is `hot`.
 
 Rules:
 

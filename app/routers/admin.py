@@ -16,6 +16,7 @@ from app.core.database import get_db
 from app.models.business import Business
 from app.models.business_user import BusinessUser
 from app.models.commission import COMMISSION_STATUSES, Commission
+from app.models.commission_payout import CommissionPayout
 from app.models.lead import Lead
 from app.models.notification_log import NotificationLog
 from app.models.user import User
@@ -24,6 +25,7 @@ from app.services import (
     business_lead_checkout_service,
     business_lead_service,
     business_service,
+    commission_payout_service,
     commission_service,
     compliance_service,
     demo_service,
@@ -31,6 +33,7 @@ from app.services import (
     message_service,
     partner_service,
     phone_number_service,
+    system_check_service,
     user_invite_service,
 )
 from app.services.compliance_service import COMPLIANCE_STATUSES
@@ -68,39 +71,6 @@ def _error_summary(value: str | None, max_len: int = 120) -> str:
     return text_value[: max_len - 1] + "…"
 
 
-def _system_checks(db: Session) -> list[dict[str, str]]:
-    settings = get_settings()
-
-    db_status = "no"
-    try:
-        db.execute(text("SELECT 1"))
-        db_status = "yes"
-    except Exception:
-        db_status = "no"
-
-    checks = [
-        {"name": "PUBLIC_BASE_URL configured", "value": "yes" if bool(settings.public_base_url) else "no"},
-        {"name": "TWILIO_ACCOUNT_SID configured", "value": "yes" if bool(settings.twilio_account_sid) else "no"},
-        {"name": "TWILIO_AUTH_TOKEN configured", "value": "yes" if bool(settings.twilio_auth_token) else "no"},
-        {"name": "TWILIO_PHONE_NUMBER configured", "value": "yes" if bool(settings.twilio_phone_number) else "no"},
-        {"name": "TWILIO_WEBHOOK_AUTH_ENABLED", "value": "true" if settings.twilio_webhook_auth_enabled else "false"},
-        {"name": "OPENAI_API_KEY configured", "value": "yes" if bool(settings.openai_api_key) else "no"},
-        {"name": "OPENAI_ENABLED", "value": "true" if settings.openai_enabled else "false"},
-        {"name": "SMTP_HOST configured", "value": "yes" if bool(settings.smtp_host) else "no"},
-        {"name": "SMTP_FROM_EMAIL configured", "value": "yes" if bool(settings.smtp_from_email) else "no"},
-        {"name": "STRIPE_SECRET_KEY configured", "value": "yes" if bool(settings.stripe_secret_key) else "no"},
-        {"name": "STRIPE_WEBHOOK_SECRET configured", "value": "yes" if bool(settings.stripe_webhook_secret) else "no"},
-        {
-            "name": "STRIPE_PRICE_ID_GROWTH_MONTHLY configured",
-            "value": "yes" if bool(settings.stripe_price_id_growth_monthly) else "no",
-        },
-        {
-            "name": "STRIPE_PRICE_ID_SETUP_FEE configured",
-            "value": "yes" if bool(settings.stripe_price_id_setup_fee) else "no",
-        },
-        {"name": "Database reachable", "value": db_status},
-    ]
-    return checks
 
 
 def _demo_business_context(db: Session) -> tuple[Business | None, str | None]:
@@ -247,12 +217,13 @@ def system_check_page(
     auth = _require_admin(request, db)
     if isinstance(auth, RedirectResponse):
         return auth
+    sections = system_check_service.build_system_check_sections(db)
     return templates.TemplateResponse(
         request,
         "admin/system_check.html",
         {
             "user": auth,
-            "checks": _system_checks(db),
+            "sections": sections,
         },
     )
 
@@ -358,12 +329,20 @@ def commissions_page(
         return auth
     status_v = status.strip().lower()
     rows = commission_service.list_commissions(db, status=status_v or None)
+    payout_ids = {commission.payout_id for commission, _, _ in rows if commission.payout_id}
+    payouts_by_id: dict[uuid.UUID, CommissionPayout] = {}
+    if payout_ids:
+        payouts_by_id = {
+            item.id: item
+            for item in db.query(CommissionPayout).filter(CommissionPayout.id.in_(payout_ids)).all()
+        }
     return templates.TemplateResponse(
         request,
         "admin/commissions.html",
         {
             "user": auth,
             "rows": rows,
+            "payouts_by_id": payouts_by_id,
             "filters": {"status": status_v},
             "statuses": sorted(COMMISSION_STATUSES),
             "refund_review_note": commission_service.REFUND_REVIEW_NOTE,
@@ -441,6 +420,204 @@ def mark_commission_clawed_back_submit(
     except ValueError:
         db.rollback()
     return RedirectResponse(url="/admin/commissions", status_code=303)
+
+
+@router.get("/payouts", response_class=HTMLResponse, response_model=None)
+def payouts_page(request: Request, db: Annotated[Session, Depends(get_db)]):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+    rows = commission_payout_service.list_payouts(db)
+    return templates.TemplateResponse(
+        request,
+        "admin/payouts.html",
+        {"user": auth, "rows": rows},
+    )
+
+
+@router.get("/payouts/new", response_class=HTMLResponse, response_model=None)
+def payouts_new_page(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    partner_id: str = "",
+    error: str = "",
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    partner_summaries = commission_payout_service.get_partners_with_approved_unpaid_commissions(db)
+    selected_partner_id: uuid.UUID | None = None
+    if partner_id.strip():
+        try:
+            selected_partner_id = uuid.UUID(partner_id.strip())
+        except ValueError:
+            selected_partner_id = None
+
+    commission_rows: list = []
+    if selected_partner_id is not None:
+        commission_rows = commission_payout_service.list_approved_unpaid_commissions_for_partner(
+            db,
+            partner_id=selected_partner_id,
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "admin/payout_new.html",
+        {
+            "user": auth,
+            "partner_summaries": partner_summaries,
+            "selected_partner_id": selected_partner_id,
+            "commission_rows": commission_rows,
+            "error": error.strip() or None,
+        },
+    )
+
+
+@router.post("/payouts", response_model=None)
+def payouts_create_submit(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    partner_id: str = Form(...),
+    commission_ids: list[str] = Form(default=[]),
+    notes: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    try:
+        partner_uuid = uuid.UUID(partner_id.strip())
+    except ValueError:
+        return RedirectResponse(
+            url="/admin/payouts/new?error=Invalid+partner",
+            status_code=303,
+        )
+
+    commission_uuids: list[uuid.UUID] = []
+    for raw in commission_ids:
+        try:
+            commission_uuids.append(uuid.UUID(raw.strip()))
+        except ValueError:
+            return RedirectResponse(
+                url=f"/admin/payouts/new?partner_id={partner_uuid}&error=Invalid+commission+selection",
+                status_code=303,
+            )
+
+    try:
+        payout = commission_payout_service.create_draft_payout(
+            db,
+            partner_id=partner_uuid,
+            commission_ids=commission_uuids,
+            created_by_user_id=auth.id,
+            notes=notes,
+        )
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        return RedirectResponse(
+            url=(
+                f"/admin/payouts/new?partner_id={partner_uuid}"
+                f"&error={quote_plus(str(exc))}"
+            ),
+            status_code=303,
+        )
+
+    return RedirectResponse(url=f"/admin/payouts/{payout.id}", status_code=303)
+
+
+@router.get("/payouts/{payout_id}", response_class=HTMLResponse, response_model=None)
+def payout_detail_page(
+    request: Request,
+    payout_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    error: str = "",
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    payout = commission_payout_service.get_payout(db, payout_id)
+    if payout is None:
+        return RedirectResponse(url="/admin/payouts", status_code=303)
+
+    from app.services import partner_tax_service
+
+    tax_info_masked = None
+    if payout.partner is not None and payout.partner.application_id is not None:
+        tax_record = partner_tax_service.get_partner_tax_info_for_application(
+            db,
+            payout.partner.application_id,
+        )
+        if tax_record is not None:
+            tax_info_masked = partner_tax_service.mask_partner_tax_info(tax_record)
+
+    business_names: dict[str, str] = {}
+    if payout.commissions:
+        business_ids = {row.business_id for row in payout.commissions}
+        businesses = db.query(Business).filter(Business.id.in_(business_ids)).all()
+        business_names = {str(item.id): item.name for item in businesses}
+
+    return templates.TemplateResponse(
+        request,
+        "admin/payout_detail.html",
+        {
+            "user": auth,
+            "payout": payout,
+            "tax_info": tax_info_masked,
+            "business_names": business_names,
+            "error": error.strip() or None,
+        },
+    )
+
+
+@router.post("/payouts/{payout_id}/mark-paid", response_model=None)
+def payout_mark_paid_submit(
+    request: Request,
+    payout_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    external_reference: str = Form(""),
+    payment_method_note: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+    try:
+        commission_payout_service.mark_payout_paid(
+            db,
+            payout_id=payout_id,
+            external_reference=external_reference,
+            payment_method_note=payment_method_note,
+        )
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        return RedirectResponse(
+            url=f"/admin/payouts/{payout_id}?error={quote_plus(str(exc))}",
+            status_code=303,
+        )
+    return RedirectResponse(url=f"/admin/payouts/{payout_id}", status_code=303)
+
+
+@router.post("/payouts/{payout_id}/cancel", response_model=None)
+def payout_cancel_submit(
+    request: Request,
+    payout_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+    try:
+        commission_payout_service.cancel_draft_payout(db, payout_id=payout_id)
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        return RedirectResponse(
+            url=f"/admin/payouts/{payout_id}?error={quote_plus(str(exc))}",
+            status_code=303,
+        )
+    return RedirectResponse(url=f"/admin/payouts/{payout_id}", status_code=303)
 
 
 @router.post("/users/{user_id}/resend-invite", response_model=None)
@@ -1330,9 +1507,26 @@ def _partner_application_detail_context(
                 purpose=user_invite_service.PARTNER_INVITE,
             )
 
+    from app.services import partner_document_service, partner_tax_service
+
+    tax_info_masked = None
+    tax_record = partner_tax_service.get_partner_tax_info_for_application(db, application_id)
+    if tax_record is not None:
+        tax_info_masked = partner_tax_service.mask_partner_tax_info(tax_record)
+
+    active_doc_count = len(partner_document_service.list_active_document_templates(db))
+    onboarding_checklist = partner_service.partner_onboarding_checklist(
+        db,
+        application,
+        signed_doc_count=len(signed_docs),
+        active_doc_count=active_doc_count,
+    )
+
     return {
         "application": application,
         "signed_docs": signed_docs,
+        "tax_info": tax_info_masked,
+        "onboarding_checklist": onboarding_checklist,
         "partner": partner,
         "linked_user": linked_user,
         "login_active": login_active,
@@ -1340,6 +1534,8 @@ def _partner_application_detail_context(
         "referred_leads": referred_leads,
         "partner_invite_status": partner_invite_status,
         "activation_notice": partner_service.pop_activation_notice(request, application_id),
+        "docs_signing_notice": partner_service.pop_docs_signing_notice(request, application_id),
+        "tax_info_notice": partner_service.pop_tax_info_notice(request, application_id),
         "error": error,
         "reject_error": reject_error,
     }
@@ -1399,6 +1595,108 @@ def partner_application_detail_page(
         "admin/partner_application_detail.html",
         {"user": auth, **ctx},
     )
+
+
+@router.post("/partners/{application_id}/invite-sign-documents", response_model=None)
+def invite_partner_sign_documents_submit(
+    request: Request,
+    application_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    settings = get_settings()
+    try:
+        raw_token, application = partner_service.issue_docs_signing_invite(db, application_id)
+        db.commit()
+        signing_url = (
+            f"{settings.app_base_url.rstrip('/')}/partner/sign-documents?token={raw_token}"
+        )
+        partner_service.store_docs_signing_notice(
+            request,
+            application_id=application_id,
+            signing_url=signing_url,
+        )
+    except ValueError as exc:
+        db.rollback()
+        try:
+            application = partner_service.get_application(db, application_id)
+            signed_docs = partner_service.list_signed_documents_for_application(db, application_id)
+            partner = partner_service.get_partner_by_application(db, application_id)
+        except ValueError:
+            return RedirectResponse(url="/admin/partners", status_code=303)
+
+        ctx = _partner_application_detail_context(
+            request,
+            db,
+            application=application,
+            signed_docs=signed_docs,
+            partner=partner,
+            application_id=application_id,
+            error=str(exc),
+        )
+        ctx["activation_notice"] = None
+        return templates.TemplateResponse(
+            request,
+            "admin/partner_application_detail.html",
+            {"user": auth, **ctx},
+            status_code=400,
+        )
+
+    return RedirectResponse(url=f"/admin/partners/{application_id}", status_code=303)
+
+
+@router.post("/partners/{application_id}/invite-tax-info", response_model=None)
+def invite_partner_tax_info_submit(
+    request: Request,
+    application_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    settings = get_settings()
+    try:
+        raw_token, application = partner_service.issue_tax_info_token(db, application_id)
+        db.commit()
+        tax_info_url = (
+            f"{settings.app_base_url.rstrip('/')}/partner/tax-info?token={raw_token}"
+        )
+        partner_service.store_tax_info_notice(
+            request,
+            application_id=application_id,
+            tax_info_url=tax_info_url,
+        )
+    except ValueError as exc:
+        db.rollback()
+        try:
+            application = partner_service.get_application(db, application_id)
+            signed_docs = partner_service.list_signed_documents_for_application(db, application_id)
+            partner = partner_service.get_partner_by_application(db, application_id)
+        except ValueError:
+            return RedirectResponse(url="/admin/partners", status_code=303)
+
+        ctx = _partner_application_detail_context(
+            request,
+            db,
+            application=application,
+            signed_docs=signed_docs,
+            partner=partner,
+            application_id=application_id,
+            error=str(exc),
+        )
+        ctx["activation_notice"] = None
+        return templates.TemplateResponse(
+            request,
+            "admin/partner_application_detail.html",
+            {"user": auth, **ctx},
+            status_code=400,
+        )
+
+    return RedirectResponse(url=f"/admin/partners/{application_id}", status_code=303)
 
 
 @router.post("/partners/{application_id}/approve", response_model=None)

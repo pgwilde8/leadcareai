@@ -14,7 +14,7 @@ from app.models.partner import Partner
 from app.models.business import Business
 from app.routers.auth import get_current_user, require_partner
 from app.services.partner_service import PARTNER_STATUS_ACTIVE
-from app.services import business_lead_service, commission_service
+from app.services import business_lead_service, commission_payout_service, commission_service
 from app.services.demo_live_service import DEMO_PHONE_DISPLAY
 from app.templates import templates
 
@@ -64,6 +64,27 @@ def partner_dashboard(
     )
 
 
+@router.get("/payouts", response_class=HTMLResponse, response_model=None)
+def partner_payouts(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = require_partner(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    partner: Partner = auth
+    payout_rows = commission_payout_service.list_payouts_for_partner(db, partner_id=partner.id)
+    return templates.TemplateResponse(
+        request,
+        "partner/payouts.html",
+        {
+            "partner": partner,
+            "payout_rows": payout_rows,
+        },
+    )
+
+
 @router.get("/payplan", response_class=HTMLResponse, response_model=None)
 def partner_payplan(
     request: Request,
@@ -86,5 +107,39 @@ def partner_payplan(
             "partner": partner,
             "referral_link": referral_link,
             "referral_example": f"{base}/?ref=YOURCODE",
+        },
+    )
+
+
+def _public_base_url() -> str:
+    settings = get_settings()
+    return settings.effective_public_base_url or settings.app_base_url.rstrip("/")
+
+
+@router.get("/marketing", response_class=HTMLResponse, response_model=None)
+def partner_marketing(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = require_partner(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    partner: Partner = auth
+    base = _public_base_url()
+    code = partner.referral_code
+    demo_link = f"{base}/demo?ref={code}"
+    referral_landing_link = f"{base}/r/{code}"
+    demo_book_link = f"{base}/demo/book?ref={code}"
+
+    return templates.TemplateResponse(
+        request,
+        "partner/marketing.html",
+        {
+            "partner": partner,
+            "referral_code": code,
+            "demo_link": demo_link,
+            "referral_landing_link": referral_landing_link,
+            "demo_book_link": demo_book_link,
         },
     )

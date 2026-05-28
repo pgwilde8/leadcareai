@@ -12,6 +12,7 @@ from app.core.security import hash_password
 from app.services.partner_document_service import seed_default_document_templates
 from app.services.partner_service import approve_application
 from app.services.user_service import create_admin_user
+from tests.partner_fixtures import ensure_partner_application_docs_signed, partner_onboard_form_data
 
 
 def _login_admin(client: TestClient, db_session: Session) -> None:
@@ -33,25 +34,22 @@ def _active_partner(
     db_session.commit()
     client.post(
         "/partner/onboard",
-        data={
-            "first_name": "Ref",
-            "last_name": "Partner",
-            "email": partner_email,
-            "phone": "+15559990001",
-            "city": "Dallas",
-            "state": "TX",
-            "company_name": "",
-            "experience_summary": "",
-            "why_interested": "",
-            "signature_text": "Ref Partner",
-            "electronic_consent": "on",
-        },
+        data=partner_onboard_form_data(
+            first_name="Ref",
+            last_name="Partner",
+            email=partner_email,
+            phone="+15559990001",
+            city="Dallas",
+            state="TX",
+        ),
     )
     application = (
         db_session.query(PartnerApplication)
         .filter(PartnerApplication.email == partner_email)
         .one()
     )
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = create_admin_user(
         db_session,
         email=f"admin-for-{partner_email}",

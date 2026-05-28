@@ -4,13 +4,14 @@ LeadCare AI partners are independent sales contractors who refer or sell the pla
 
 ## Partner lifecycle
 
-1. **Apply** — Public form at `/partner/onboard` collects applicant details.
-2. **Sign documents** — Applicant reviews active `PartnerDocumentTemplate` records and provides a typed signature plus electronic consent checkbox.
-3. **Admin review** — Application status becomes `admin_review`. Admins review at `/admin/partners` and `/admin/partners/{application_id}`.
-4. **Approve or reject**
-   - **Approve** — Creates an `active` `Partner` row with a unique `referral_code`, creates or links a `User` with `role=partner`, and sets `Partner.user_id`.
+1. **Apply** — Public form at `/partner/onboard` collects applicant details only (no tax ID). No IC documents are signed at this step.
+2. **Admin screening** — Admins review at `/admin/partners` and `/admin/partners/{application_id}`, contact the applicant, and may reject.
+3. **Sign documents** — Admin generates a signing link (`docs_pending`). Applicant opens `/partner/sign-documents?token=…`, reviews templates, and signs. Status becomes `docs_signed`.
+4. **W-9 / tax info** — After signing, applicant is redirected to `/partner/tax-info?token=…` to submit encrypted W-9 data (or admin sends a W-9 link later).
+5. **Approve or reject**
+   - **Approve** — Only when `docs_signed`. Creates an `active` `Partner` with `referral_code`, creates or links a `User` with `role=partner`, and sets `Partner.user_id`.
    - **Reject** — Sets application `rejected` with a stored reason (rejected applications cannot be approved).
-5. **Login** — Admin gives the partner their credentials (see Auth below), then partner signs in at `/login`.
+6. **Login** — Partner accepts invite email (or admin resends) and signs in at `/login`.
 6. **Dashboard** — Linked active partners use `/partner/dashboard` (skeleton metrics are placeholders).
 
 Application statuses: `applied`, `docs_pending`, `docs_signed`, `admin_review`, `approved`, `rejected`.
@@ -19,15 +20,19 @@ Partner statuses: `pending`, `active`, `suspended`, `rejected`.
 
 ## Documents collected
 
-Three default templates are seeded (placeholder copy only):
+Five default templates are seeded from markdown files (draft copy — **legal review required**):
 
 | Code | Title |
 |------|--------|
 | `independent_contractor_agreement` | Independent Contractor Agreement |
-| `partner_program_terms` | Partner Program Terms |
 | `commission_schedule_acknowledgment` | Commission Schedule Acknowledgment |
+| `acceptable_marketing_policy` | Acceptable Marketing Policy |
+| `privacy_data_handling` | Privacy / Data Handling |
+| `electronic_signature_notice` | Electronic Signature and Records Notice |
 
-Each signature stores: typed signature, timestamp, IP, user agent, consent text, document version, and a full **document snapshot** at time of signing.
+Each signature stores: typed signature, timestamp, IP, user agent, consent text, document version, and a full **document snapshot** at time of signing. Snapshots for already-signed applications are never overwritten when templates are re-seeded.
+
+See [partner-esign-v1.md](./partner-esign-v1.md) for e-sign architecture, encryption, and admin masking rules.
 
 Seed templates:
 
@@ -35,15 +40,21 @@ Seed templates:
 python scripts/seed_partner_documents.py
 ```
 
+## W-9 / tax information
+
+- Collected on `/partner/tax-info?token=…` after IC documents are signed (not on the public apply form).
+- Stored in `partner_tax_info` with **Fernet-encrypted** TIN (`PARTNER_TAX_ENCRYPTION_KEY` required in production).
+- Admins see masked TIN only on `/admin/partners/{application_id}` — no full TIN in HTML or logs in V1.
+
 **Legal review required** before using placeholder documents with real independent contractors. Placeholders explicitly state they are drafts and not legal advice.
 
 ## Admin approval workflow
 
 1. Open `/admin/partners` (admin login required).
-2. Open an application in `admin_review`.
-3. Verify signed documents, signature metadata, and applicant details.
-4. **Approve** — Creates partner + referral code, creates/links login, shows a **one-time temporary password** on the application detail page when a new user is created.
-5. **Reject** — Requires rejection reason.
+2. Open an application in `admin_review` — review applicant details and W-9 (masked TIN). Generate an IC document signing link when ready.
+3. When status is `docs_signed`, verify signed documents and signature metadata.
+4. **Approve** — Creates partner + referral code, creates/links login, and sends partner invite email when SMTP is configured.
+5. **Reject** — Available from `admin_review`, `docs_pending`, or `docs_signed`; requires a rejection reason.
 
 Copy the temporary password from the admin screen and deliver it to the partner through a secure channel (phone, encrypted message, etc.). Passwords are **not** emailed in V1.
 
@@ -57,18 +68,24 @@ Copy the temporary password from the admin screen and deliver it to the partner 
 
 ## Referral link format (Phase 2C)
 
-```
-https://leadcareai.com/?ref={referral_code}
-```
+Partners share links from **`/partner/marketing`** (active partners only):
 
-(`APP_BASE_URL` in environment for non-production.)
+| Link | URL |
+|------|-----|
+| Referral landing | `{PUBLIC_BASE_URL}/r/{referral_code}` |
+| Live demo | `{PUBLIC_BASE_URL}/demo?ref={referral_code}` |
+| Book demo | `{PUBLIC_BASE_URL}/demo/book?ref={referral_code}` |
+| Homepage with ref | `{PUBLIC_BASE_URL}/?ref={referral_code}` |
+
+(`PUBLIC_BASE_URL` or `APP_BASE_URL` in environment for non-production.)
 
 ### Referral capture behavior
 
-- Any public page with `?ref={referral_code}` validates the code against an **active** partner.
-- Valid codes are stored in the visitor session (`referral_code`, `referral_partner_id`).
-- Invalid or unknown codes are ignored safely (no error page).
-- Attribution persists when the visitor navigates to `/demo` in the same browser session.
+- Any public page with `?ref={referral_code}` stores the code in session and a **30-day** `leadcare_ref` cookie (last click wins).
+- **`GET /r/{referral_code}`** validates an **active** partner, captures attribution, and shows a sales landing page with demo CTAs.
+- Invalid or inactive codes on `/r/{code}` redirect to `/` without attribution (same spirit as invalid `?ref=` on the homepage).
+- **`/demo/book`** resolves the partner from session first, then falls back to the `leadcare_ref` cookie.
+- Attribution persists when the visitor navigates to `/demo` or submits `/demo/book` in the same browser.
 
 ### Business interest / demo form
 
@@ -83,9 +100,10 @@ Business lead statuses (admin-managed): `new`, `contacted`, `qualified`, `conver
 
 ### What partners see
 
-On `/partner/dashboard`:
+On `/partner/dashboard` and `/partner/marketing`:
 
 - Referral link (copyable) and referral code
+- Marketing links page with demo/landing URLs and suggested share copy
 - Count of referred businesses
 - Table: business name, city/state, lead status, payment placeholder (“Not paying yet”)
 

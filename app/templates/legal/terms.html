@@ -18,7 +18,11 @@
     <p>If you do not agree, do not use {{ settings.app_name }}.</p>
 
     <h2>1. Company information</h2>
-    <p>{{ settings.app_name }} is operated by:</p>
+    <p>
+      {{ settings.app_name }} is operated by <strong>Webwise Solutions LLC</strong>, a New Jersey limited liability
+      company.
+    </p>
+    <p><strong>Mailing address</strong></p>
     <p>
       Webwise Solutions LLC<br />
       304 S. Jones Blvd<br />
@@ -26,9 +30,9 @@
       United States
     </p>
     <p>
-      Support:
-      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a><br />
-      Website:
+      <strong>Support:</strong>
+     
+      <strong>Website:</strong>
       <a href="/contact">{{ settings.app_name }} contact</a>
     </p>
 
@@ -171,7 +175,7 @@
     </ul>
     <p>
       To cancel, use the billing portal if available or contact support at
-      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>.
+      <a href="/contact">{{ settings.app_name }} contact</a>
     </p>
 
     <h2>9. Failed payments and non-payment</h2>
@@ -186,11 +190,118 @@
     </p>
 
     <h2>10. SMS, calling, and communications consent</h2>
-    <p><strong>[TO BE FINALIZED]</strong></p>
     <p>
-      This section should address customer responsibility for consent, SMS/text messaging rules, call-forwarding
-      authorization, opt-out handling, STOP/HELP behavior, telemarketing restrictions, and telecommunications
-      compliance. See also our <a href="/sms">SMS Program Terms</a>.
+      {{ settings.app_name }} may send and receive text messages, place or receive calls, and deliver staff alerts as
+      part of the Service. This section describes how those communications work and your responsibilities as a customer.
+      For additional SMS program details, see our <a href="/sms">SMS Program Terms</a>.
+    </p>
+
+    <h3>10.1 Your compliance responsibilities</h3>
+    <p>
+      You are solely responsible for your use of {{ settings.app_name }} and for compliance with laws, regulations,
+      carrier rules, industry requirements, and vendor policies that apply to your business, your customers, and your
+      communications. This includes, without limitation:
+    </p>
+    <ul>
+      <li>Obtaining and documenting any permissions or consents required before you message callers or prospects</li>
+      <li>Using accurate business identification in messages and not misleading recipients</li>
+      <li>Honoring opt-out requests and not messaging people who have opted out or should not be contacted</li>
+      <li>Following rules for your industry (for example, regulated trades, healthcare, finance, or telemarketing)</li>
+      <li>Reviewing message content, AI-assisted replies, and staff notifications before relying on them</li>
+    </ul>
+    <p>
+      {{ settings.app_name }} provides tools to help you respond to missed calls and organize leads. We do not
+      guarantee that your use of the Service satisfies any particular legal, regulatory, or carrier requirement, and
+      we do not provide legal compliance advice.
+    </p>
+
+    <h3>10.2 Missed-call text-back and lead messaging</h3>
+    <p>
+      When you enable missed-call recovery, {{ settings.app_name }} may send automated text messages to people who
+      called your business line or a recovery number you use with the Service, such as after a missed, unanswered,
+      busy, or after-hours call. If the caller replies, the Service may send follow-up messages to help qualify the
+      inquiry (for example, service needed, location, or urgency) using automation and, where enabled, AI-assisted
+      responses.
+    </p>
+    <p>
+      You authorize {{ settings.app_name }} to send and receive these service-related messages on your behalf in
+      connection with calls and inquiries routed through the Service. You represent that you have a lawful basis to
+      contact those individuals and that your messages relate to the inquiry that prompted the communication.
+    </p>
+    <p>
+      You agree not to use {{ settings.app_name }} to send unlawful messages, spam, deceptive content, harassment,
+      unrelated marketing blasts, or messages to purchased lists without proper consent.
+    </p>
+
+    <h3>10.3 Staff notifications</h3>
+    <p>
+      You may configure staff notification destinations (such as email addresses or mobile numbers) to receive alerts
+      about new leads, inbound replies, missed calls, or other Service events. You are responsible for:
+    </p>
+    <ul>
+      <li>Providing accurate notification contact information and keeping it current</li>
+      <li>Ensuring recipients are authorized to receive those alerts</li>
+      <li>Any message and data rates that apply to SMS alerts sent to mobile numbers you provide</li>
+    </ul>
+    <p>
+      Staff notifications are operational alerts for your team, not a promise that every event will generate an alert
+      or that every alert will be delivered without delay.
+    </p>
+
+    <h3>10.4 Opt-out handling</h3>
+    <p>
+      Where supported by the Service and applicable carriers, recipients may opt out of further SMS from your business
+      thread by replying with recognized opt-out keywords such as <strong>STOP</strong>, or other standard opt-out
+      language supported by the platform or carrier.
+    </p>
+    <p>
+      You are responsible for honoring opt-outs promptly, not sending further promotional or non-essential messages to
+      opted-out recipients through {{ settings.app_name }}, and maintaining your own records of opt-outs where required
+      by law. You agree not to use the Service to circumvent opt-outs or re-contact individuals in violation of law or
+      carrier rules.
+    </p>
+    <p>
+      After an opt-out, a confirming message may be sent where permitted. Recipients may reply <strong>HELP</strong> for
+      assistance information where that feature is supported. See our <a href="/sms">SMS Program Terms</a> for more detail.
+    </p>
+
+    <h3>10.5 Call forwarding and phone routing</h3>
+    <p>
+      You may configure your phone system or carrier to forward missed, unanswered, busy, or after-hours calls to a
+      {{ settings.app_name }} recovery number or related routing we provide. By enabling or maintaining that routing,
+      you represent that you are authorized to configure call forwarding for the numbers involved and that forwarding
+      reflects your business choices.
+    </p>
+    <p>
+      You are responsible for configuring forwarding correctly, testing that it works as intended, and updating or
+      disabling forwarding when you stop using the Service, cancel your account, or change phone providers. We do not
+      provide carrier-specific forwarding instructions; consult your phone provider for how to enable or remove
+      forwarding on your lines.
+    </p>
+    <p>
+      {{ settings.app_name }} is not responsible for calls or messages that are misrouted, duplicated, delayed, or lost
+      because of your forwarding settings, carrier limitations, number changes, cancellation, or third-party telecom
+      issues.
+    </p>
+
+    <h3>10.6 Third-party telecom and delivery limitations</h3>
+    <p>
+      SMS, voice, and related communications are delivered through third-party telecommunications providers, carriers,
+      and messaging networks. Message and call delivery may be delayed, filtered, blocked, or fail for many reasons
+      outside our control, including carrier policies, spam filters, network congestion, recipient device settings,
+      incorrect phone numbers, and compliance reviews.
+    </p>
+    <p>
+      {{ settings.app_name }} does not guarantee that any SMS, call, or notification will be sent, received, read, or
+      delivered within a particular time frame. Wireless carriers are not liable for delayed or undelivered messages.
+      Message and data rates may apply to recipients and to notification numbers you provide.
+    </p>
+
+    <h3>10.7 No telemarketing guarantee</h3>
+    <p>
+      Unless we expressly agree otherwise in writing, {{ settings.app_name }} is intended for service-related follow-up
+      to inbound calls and inquiries, not for unsolicited telemarketing campaigns. You remain responsible for telemarketing,
+      do-not-call, and similar rules that may apply to your business and your message programs.
     </p>
 
     <h2>11. AI features and limitations</h2>
@@ -371,7 +482,7 @@
     <p>
       Support may be provided by email, dashboard tools, documentation, onboarding assistance, or other methods we
       choose. Contact:
-      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>.
+      <a href="/contact">{{ settings.app_name }} contact form</a><br />
     </p>
     <p>We may modify, suspend, or discontinue features at any time.</p>
 
@@ -449,7 +560,7 @@
     <p>For questions about these Terms, contact us at:</p>
     <p>
       <a href="/contact">{{ settings.app_name }} contact form</a><br />
-      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
+      
     </p>
     <p>
       Webwise Solutions LLC<br />

@@ -14,6 +14,7 @@ from app.models.user_invite_token import UserInviteToken
 from app.services.business_service import create_business
 from app.services.partner_service import approve_application
 from app.services.partner_document_service import seed_default_document_templates
+from tests.partner_fixtures import ensure_partner_application_docs_signed, partner_onboard_form_data
 from app.services.user_invite_service import (
     BUSINESS_INVITE,
     PARTNER_INVITE,
@@ -123,19 +124,12 @@ def test_partner_approval_creates_invite_token_and_no_duplicate_on_repeat(
     db_session.commit()
     client.post(
         "/partner/onboard",
-        data={
-            "first_name": "Inv",
-            "last_name": "Partner",
-            "email": "inv.partner@example.com",
-            "phone": "+15550000111",
-            "city": "Austin",
-            "state": "TX",
-            "company_name": "",
-            "experience_summary": "",
-            "why_interested": "",
-            "signature_text": "Inv Partner",
-            "electronic_consent": "on",
-        },
+        data=partner_onboard_form_data(
+            first_name="Inv",
+            last_name="Partner",
+            email="inv.partner@example.com",
+            phone="+15550000111",
+        ),
     )
     from app.models.partner_application import PartnerApplication
 
@@ -144,6 +138,8 @@ def test_partner_approval_creates_invite_token_and_no_duplicate_on_repeat(
         .filter(PartnerApplication.email == "inv.partner@example.com")
         .one()
     )
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = create_admin_user(db_session, email="admin-invite@example.com", password="admin-secret")
     db_session.commit()
 
@@ -191,7 +187,7 @@ def test_admin_email_not_convertible_to_partner_or_business(db_session: Session)
         phone="+15550001111",
         city="Austin",
         state="TX",
-        status="admin_review",
+        status="docs_signed",
     )
     db_session.add(app)
     db_session.flush()

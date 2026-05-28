@@ -56,7 +56,21 @@ State flow:
 
 Admin may also mark `pending` or `approved` rows as `canceled`.
 
-No automated payout, bank transfer, W-9 collection, or disbursement is included in V1.
+### Payout batches (Phase 2J)
+
+Group approved commissions into manual payout batches:
+
+- List: `/admin/payouts`
+- Create: `/admin/payouts/new`
+- Detail / mark paid: `/admin/payouts/{id}`
+
+See [partner-payouts-v1.md](./partner-payouts-v1.md) for batch statuses, tax display on payout detail, and partner `/partner/payouts` history.
+
+Individual **Mark paid** on `/admin/commissions` still works for approved commissions not in a draft batch.
+
+No automated payout, bank transfer, or disbursement is included in V1.
+
+Before production launch, run **`/admin/system-check`** and **`docs/production-launch-checklist-v1.md`**.
 
 ## Partner dashboard behavior
 

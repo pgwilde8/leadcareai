@@ -1,0 +1,63 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Payout batches — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Payout batches</h1>
+    <p class="lc-admin-header__lead">
+      Manual off-platform payout bookkeeping. Group approved commissions, then mark paid after transfer.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Payouts">
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/commissions">Commissions</a>
+    <a href="/admin/payouts/new" class="lc-btn lc-btn--primary lc-btn--sm">New payout batch</a>
+  </nav>
+
+  {% if rows %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th>Partner</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Commissions</th>
+            <th>Paid at</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td>{{ row.payout.created_at }}</td>
+              <td>{{ row.partner.display_name }}</td>
+              <td>{{ status_badge(row.payout.status) }}</td>
+              <td>${{ "%.2f"|format(row.payout.total_amount_cents / 100) }} {{ row.payout.currency }}</td>
+              <td>{{ row.commission_count }}</td>
+              <td>{{ row.payout.paid_at or "—" }}</td>
+              <td><a href="/admin/payouts/{{ row.payout.id }}">View</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="lc-empty">
+      <p class="lc-empty__title">No payout batches yet</p>
+      <p class="lc-empty__text">Create a batch from approved, unpaid commissions.</p>
+    </div>
+  {% endif %}
+{% endblock %}

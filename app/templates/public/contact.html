@@ -8,26 +8,59 @@
   <header class="lc-page-header">
     <h1 class="lc-page-header__title">Contact</h1>
     <p class="lc-page-header__lead">
-      Questions about {{ settings.app_name }}, partnerships, or getting started? We're here to help.
+      Questions about {{ settings.app_name }}, partnerships, or getting started? Send us a message and we'll get back to you.
     </p>
   </header>
 
-  <div class="lc-grid lc-grid--2">
-    <div class="lc-card">
-      <h2 class="lc-card__title">General inquiries</h2>
-      <div class="lc-card__body">
-        <p class="lc-mb-0">
-          Email
-          <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
-        </p>
-      </div>
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="lc-card">
+    <div class="lc-card__body">
+      <form method="post" action="/contact" class="lc-form lc-form--wide">
+        <div class="lc-field" aria-hidden="true" style="position: absolute; left: -9999px;">
+          <label for="website">Website</label>
+          <input id="website" type="text" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+        <div class="lc-field">
+          <label for="name">Your name</label>
+          <input id="name" type="text" name="name" value="{{ form.name or '' }}" required autocomplete="name" />
+        </div>
+        <div class="lc-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" value="{{ form.email or '' }}" required autocomplete="email" />
+        </div>
+        <div class="lc-field">
+          <label for="phone">Phone <span class="lc-text-muted">(optional)</span></label>
+          <input id="phone" type="tel" name="phone" value="{{ form.phone or '' }}" autocomplete="tel" />
+        </div>
+        <div class="lc-field">
+          <label for="subject">Topic</label>
+          <select id="subject" name="subject" required>
+            {% for option in subjects %}
+              <option value="{{ option }}" {% if form.subject == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="lc-field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="6" required placeholder="How can we help?">{{ form.message or '' }}</textarea>
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Send message</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="lc-grid lc-grid--2" style="margin-top: var(--lc-space-6);">
+
     </div>
     <div class="lc-card">
       <h2 class="lc-card__title">Product demo</h2>
       <div class="lc-card__body">
         <p>
           <a href="/demo/book">Request a demo</a> or try the
-          <a href="/demo">live missed-call demo</a> (call 1-833-669-1335).
+          <a href="/demo">live missed-call demo</a>.
         </p>
         <p class="lc-mb-0">
           Partners: <a href="/partner/onboard">apply here</a>.
@@ -36,7 +69,7 @@
     </div>
   </div>
 
-  <p class="lc-text-muted">
+  <p class="lc-text-muted" style="text-align: center;">
     <a href="/">← Back to home</a>
     · <a href="/#faq">FAQ on homepage</a>
   </p>

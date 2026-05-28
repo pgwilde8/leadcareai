@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Signing link unavailable — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Signing link unavailable</h1>
+  {% if error %}
+    <p>{{ error }}</p>
+  {% else %}
+    <p>
+      This document signing link is invalid or has expired.
+      Contact {{ settings.app_name }} support or your onboarding contact for a new link.
+    </p>
+  {% endif %}
+  <p><a href="/">Return home</a></p>
+{% endblock %}

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.business import Business
 from app.models.commission import Commission
+from app.models.commission_payout import CommissionPayout
 from app.models.partner import Partner
 from app.models.partner_customer import PartnerCustomer
 
@@ -439,11 +440,23 @@ def update_commission_status(db: Session, *, commission_id: uuid.UUID, action: s
         row.status = "approved"
         row.approved_at = now
     elif action == "mark_paid":
+        if row.payout_id is not None:
+            payout = db.get(CommissionPayout, row.payout_id)
+            if payout is not None and payout.status == "draft":
+                raise ValueError(
+                    "Commission is in a draft payout batch; mark the payout paid instead."
+                )
         if row.status != "approved":
             raise ValueError("Only approved commissions can be marked paid")
         row.status = "paid"
         row.paid_at = now
     elif action == "cancel":
+        if row.payout_id is not None:
+            payout = db.get(CommissionPayout, row.payout_id)
+            if payout is not None and payout.status == "draft":
+                raise ValueError(
+                    "Commission is in a draft payout batch; cancel the payout batch first."
+                )
         if row.status not in {"pending", "approved"}:
             raise ValueError("Only pending or approved commissions can be canceled")
         row.status = "canceled"

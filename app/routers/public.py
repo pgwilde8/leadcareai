@@ -10,8 +10,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.services import business_lead_service, demo_live_service
-from app.services.referral_service import get_referral_from_session, resolve_referral_partner
+from app.services import business_lead_service, contact_service, demo_live_service
+from app.services.referral_service import (
+    capture_referral_code,
+    get_active_partner_by_referral_code,
+    get_referral_from_session,
+    resolve_referral_partner,
+)
 from app.templates import templates
 
 router = APIRouter(tags=["public"])
@@ -38,9 +43,106 @@ def about_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/about.html", {})
 
 
+def _client_ip(request: Request) -> str | None:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()[:64] or None
+    if request.client:
+        return request.client.host
+    return None
+
+
 @router.get("/contact", response_class=HTMLResponse, response_model=None)
 def contact_page(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(request, "public/contact.html", {})
+    return templates.TemplateResponse(
+        request,
+        "public/contact.html",
+        {
+            "error": None,
+            "form": contact_service.contact_form_defaults(),
+            "subjects": sorted(contact_service.CONTACT_SUBJECTS),
+        },
+    )
+
+
+@router.post("/contact", response_model=None)
+def contact_submit(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    name: str = Form(""),
+    email: str = Form(""),
+    phone: str = Form(""),
+    subject: str = Form("General inquiry"),
+    message: str = Form(""),
+    website: str = Form(""),
+):
+    """Honeypot field `website` must stay empty."""
+    form = {
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "subject": subject,
+        "message": message,
+    }
+    if website.strip():
+        return RedirectResponse(url="/contact/success", status_code=303)
+
+    try:
+        contact_service.submit_contact_message(
+            db,
+            name=name,
+            email=email,
+            phone=phone or None,
+            subject=subject,
+            message=message,
+            ip_address=_client_ip(request),
+            user_agent=request.headers.get("user-agent"),
+        )
+    except ValueError as exc:
+        return templates.TemplateResponse(
+            request,
+            "public/contact.html",
+            {
+                "error": str(exc),
+                "form": form,
+                "subjects": sorted(contact_service.CONTACT_SUBJECTS),
+            },
+            status_code=400,
+        )
+
+    return RedirectResponse(url="/contact/success", status_code=303)
+
+
+@router.get("/contact/success", response_class=HTMLResponse, response_model=None)
+def contact_success(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "public/contact_success.html", {})
+
+
+@router.get("/r/{referral_code}", response_class=HTMLResponse, response_model=None)
+def referral_landing_page(
+    request: Request,
+    referral_code: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    partner = get_active_partner_by_referral_code(db, referral_code)
+    if partner is None:
+        return RedirectResponse(url="/", status_code=302)
+
+    settings = get_settings()
+    base = settings.effective_public_base_url or settings.app_base_url.rstrip("/")
+    code = partner.referral_code
+    response = templates.TemplateResponse(
+        request,
+        "public/referral_landing.html",
+        {
+            "partner": partner,
+            "referral_code": code,
+            "demo_link": f"{base}/demo?ref={code}",
+            "demo_book_link": f"{base}/demo/book?ref={code}",
+        },
+    )
+    capture_referral_code(db, request, response, code)
+    return response
 
 
 @router.get("/", response_class=HTMLResponse, response_model=None)

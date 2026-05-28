@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     demo_enabled: bool = False
     demo_business_id: str | None = None
     demo_twilio_number: str | None = None
+    partner_tax_encryption_key: str | None = None
 
     @property
     def effective_public_base_url(self) -> str | None:

@@ -1,0 +1,12 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Tax information link unavailable — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Tax information link unavailable</h1>
+  <p>
+    This W-9 link is invalid or has expired.
+    Contact {{ settings.app_name }} support or your onboarding contact for a new link.
+  </p>
+  <p><a href="/">Return home</a></p>
+{% endblock %}

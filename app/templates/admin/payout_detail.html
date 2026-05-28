@@ -1,0 +1,137 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Payout batch — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Payout batch</h1>
+    <p class="lc-admin-header__lead">
+      {{ payout.partner.display_name }} —
+      ${{ "%.2f"|format(payout.total_amount_cents / 100) }} {{ payout.currency }}
+      {{ status_badge(payout.status) }}
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Payouts">
+    <a href="/admin/payouts">← Payout batches</a>
+    <a href="/admin/commissions">Commissions</a>
+  </nav>
+
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="lc-card" style="margin-bottom: var(--lc-space-4);">
+    <div class="lc-card__body">
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <tbody>
+            <tr><th>Status</th><td>{{ status_badge(payout.status) }}</td></tr>
+            <tr><th>Total</th><td>${{ "%.2f"|format(payout.total_amount_cents / 100) }} {{ payout.currency }}</td></tr>
+            <tr><th>Created</th><td>{{ payout.created_at }}</td></tr>
+            <tr><th>Paid at</th><td>{{ payout.paid_at or "—" }}</td></tr>
+            <tr><th>External reference</th><td>{{ payout.external_reference or "—" }}</td></tr>
+            <tr><th>Payment method note</th><td>{{ payout.payment_method_note or "—" }}</td></tr>
+            {% if payout.notes %}
+              <tr><th>Admin notes</th><td>{{ payout.notes }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">W-9 / tax information</h2>
+    {% if tax_info %}
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <table class="lc-table">
+            <tbody>
+              <tr><th>Legal name</th><td>{{ tax_info.legal_name }}</td></tr>
+              <tr><th>Business name</th><td>{{ tax_info.business_name or "—" }}</td></tr>
+              <tr>
+                <th>Address</th>
+                <td>
+                  {{ tax_info.address_line1 }}<br />
+                  {% if tax_info.address_line2 %}{{ tax_info.address_line2 }}<br />{% endif %}
+                  {{ tax_info.city }}, {{ tax_info.state }} {{ tax_info.postal_code }}
+                </td>
+              </tr>
+              <tr><th>Tax classification</th><td>{{ tax_info.tax_classification }}</td></tr>
+              <tr><th>TIN type</th><td>{{ tax_info.tin_type|upper }}</td></tr>
+              <tr><th>TIN (masked)</th><td><code>{{ tax_info.tin_masked }}</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">No W-9 / tax information on file for this partner.</p>
+    {% endif %}
+  </section>
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Included commissions</h2>
+    {% if payout.commissions %}
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for commission in payout.commissions %}
+              <tr>
+                <td>{{ business_names.get(commission.business_id|string, "—") }}</td>
+                <td>{{ commission.commission_type }}</td>
+                <td>${{ "%.2f"|format(commission.amount_cents / 100) }} {{ commission.currency }}</td>
+                <td>{{ status_badge(commission.status) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">No commissions linked to this batch.</p>
+    {% endif %}
+  </section>
+
+  {% if payout.status == "draft" %}
+    <section class="lc-admin-section">
+      <h2 class="lc-admin-section__title">Mark paid (off-platform)</h2>
+      <p class="lc-text-muted">Record how you paid the partner outside LeadCare AI. At least one field is required.</p>
+      <form method="post" action="/admin/payouts/{{ payout.id }}/mark-paid" class="lc-form lc-form--wide">
+        <div class="lc-field">
+          <label for="external_reference">External reference</label>
+          <input id="external_reference" type="text" name="external_reference" placeholder="Check #, ACH ref, PayPal ID…" />
+        </div>
+        <div class="lc-field">
+          <label for="payment_method_note">Payment method note</label>
+          <input id="payment_method_note" type="text" name="payment_method_note" placeholder="ACH, check, PayPal…" />
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Mark payout paid</button>
+      </form>
+    </section>
+
+    <section class="lc-admin-section">
+      <h2 class="lc-admin-section__title">Cancel draft</h2>
+      <form method="post" action="/admin/payouts/{{ payout.id }}/cancel">
+        <button type="submit" class="lc-btn lc-btn--ghost">Cancel payout batch</button>
+      </form>
+      <p class="lc-text-muted">Commissions will return to approved (unpaid) and can be batched again.</p>
+    </section>
+  {% endif %}
+{% endblock %}

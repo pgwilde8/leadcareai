@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 
 from fastapi.testclient import TestClient
@@ -12,9 +13,18 @@ from app.models.partner_application import PartnerApplication
 from app.models.partner_signed_document import PartnerSignedDocument
 from app.models.user import User
 from app.models.user_invite_token import UserInviteToken
-from app.services.partner_document_service import seed_default_document_templates
+from app.models.partner_tax_info import PartnerTaxInfo
+from app.services.partner_document_service import load_document_body, seed_default_document_templates
+from app.core.field_encryption import decrypt_field
 from app.services.partner_service import approve_application, get_partner_by_application
 from app.services.user_service import create_admin_user, create_user, get_user_by_email
+from tests.partner_fixtures import (
+    ensure_partner_application_docs_signed,
+    ensure_partner_application_tax_info,
+    partner_onboard_form_data,
+    partner_sign_documents_form_data,
+    partner_tax_info_form_data,
+)
 
 
 def _login_admin(client: TestClient, db_session: Session) -> User:
@@ -27,28 +37,8 @@ def _login_admin(client: TestClient, db_session: Session) -> User:
     return admin
 
 
-def _onboard_form_data(**overrides: str) -> dict[str, str]:
-    data = {
-        "first_name": "Pat",
-        "last_name": "Ner",
-        "email": "pat.ner@example.com",
-        "phone": "+15551230001",
-        "city": "Austin",
-        "state": "TX",
-        "company_name": "",
-        "experience_summary": "Sold SaaS to local businesses.",
-        "why_interested": "Help home service companies.",
-        "signature_text": "Pat Ner",
-        "electronic_consent": "on",
-    }
-    data.update(overrides)
-    return data
-
-
 def _submit_and_get_application(client: TestClient, db_session: Session, email: str) -> PartnerApplication:
-    seed_default_document_templates(db_session)
-    db_session.commit()
-    client.post("/partner/onboard", data=_onboard_form_data(email=email))
+    client.post("/partner/onboard", data=partner_onboard_form_data(email=email))
     return (
         db_session.query(PartnerApplication)
         .filter(PartnerApplication.email == email)
@@ -56,16 +46,51 @@ def _submit_and_get_application(client: TestClient, db_session: Session, email: 
     )
 
 
-def test_get_partner_onboard_returns_200(client: TestClient, db_session: Session) -> None:
+def _submit_sign_and_get_application(
+    client: TestClient, db_session: Session, email: str
+) -> PartnerApplication:
+    application = _submit_and_get_application(client, db_session, email)
+    ensure_partner_application_docs_signed(db_session, application.id)
+    ensure_partner_application_tax_info(db_session, application.id)
+    db_session.commit()
+    db_session.refresh(application)
+    return application
+
+
+def test_seed_loads_markdown_document_content(db_session: Session) -> None:
+    body = load_document_body("independent_contractor_agreement")
+    assert "DRAFT PLACEHOLDER" in body
+    assert "Independent Contractor Sales Partner Agreement" in body
+
     seed_default_document_templates(db_session)
     db_session.commit()
+    from app.services.partner_document_service import get_document_template_by_code
+
+    template = get_document_template_by_code(db_session, "independent_contractor_agreement")
+    assert template is not None
+    assert "Independent Contractor Sales Partner Agreement" in template.body
+
+
+def test_get_partner_onboard_returns_200(client: TestClient) -> None:
     response = client.get("/partner/onboard")
     assert response.status_code == 200
     assert "Partner application" in response.text
-    assert "Independent Contractor Agreement" in response.text
+    assert "separate link" in response.text.lower()
+    assert "Independent Contractor Agreement" not in response.text
 
 
-def test_post_partner_onboard_creates_application_and_signed_docs(
+def test_partner_onboard_page_has_no_tax_form_fields(client: TestClient) -> None:
+    response = client.get("/partner/onboard")
+    assert response.status_code == 200
+    text = response.text.lower()
+    assert 'name="tax_legal_name"' not in text
+    assert 'name="tax_tin"' not in text
+    assert 'name="tax_certification"' not in text
+    assert "federal tax classification" not in text
+    assert "taxpayer id" not in text
+
+
+def test_post_partner_onboard_creates_application_without_signed_docs(
     client: TestClient,
     db_session: Session,
 ) -> None:
@@ -84,14 +109,109 @@ def test_post_partner_onboard_creates_application_and_signed_docs(
         .filter(PartnerSignedDocument.application_id == application.id)
         .all()
     )
-    assert len(signed) == 3
+    assert signed == []
+
+    tax_count = (
+        db_session.query(PartnerTaxInfo)
+        .filter(PartnerTaxInfo.application_id == application.id)
+        .count()
+    )
+    assert tax_count == 0
+
+
+def test_admin_invite_shows_signing_link_once(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    application = _submit_and_get_application(client, db_session, "signlink@example.com")
+    _login_admin(client, db_session)
+
+    invite = client.post(
+        f"/admin/partners/{application.id}/invite-sign-documents",
+        follow_redirects=False,
+    )
+    assert invite.status_code == 303
+
+    first = client.get(f"/admin/partners/{application.id}")
+    assert first.status_code == 200
+    assert "IC document signing link" in first.text
+    match = re.search(r"/partner/sign-documents\?token=([A-Za-z0-9_-]+)", first.text)
+    assert match is not None
+
+    second = client.get(f"/admin/partners/{application.id}")
+    assert "IC document signing link" not in second.text
+
+    db_session.refresh(application)
+    assert application.status == "docs_pending"
+
+
+def test_partner_sign_documents_via_invite_token(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    application = _submit_and_get_application(client, db_session, "signflow@example.com")
+    from app.services import partner_service
+
+    raw, _ = partner_service.issue_docs_signing_invite(db_session, application.id)
+    db_session.commit()
+
+    sign_get = client.get(f"/partner/sign-documents?token={raw}")
+    assert sign_get.status_code == 200
+    assert "Independent Contractor" in sign_get.text or "Documents to sign" in sign_get.text
+
+    sign_post = client.post(
+        f"/partner/sign-documents?token={raw}",
+        data=partner_sign_documents_form_data(signature_text="Sign Flow"),
+        follow_redirects=False,
+    )
+    assert sign_post.status_code == 303
+    assert sign_post.headers["location"].startswith("/partner/tax-info?token=")
+
+    tax_token = sign_post.headers["location"].split("token=", 1)[1]
+    tax_post = client.post(
+        f"/partner/tax-info?token={tax_token}",
+        data=partner_tax_info_form_data(
+            tax_legal_name="Sign Flow",
+            tax_tin="987654321",
+        ),
+        follow_redirects=False,
+    )
+    assert tax_post.status_code == 303
+    assert tax_post.headers["location"] == "/partner/tax-info/success"
+
+    db_session.expire_all()
+    db_session.refresh(application)
+    assert application.status == "docs_signed"
+
+    signed = (
+        db_session.query(PartnerSignedDocument)
+        .filter(PartnerSignedDocument.application_id == application.id)
+        .all()
+    )
+    assert len(signed) == 5
     for doc in signed:
         assert doc.document_snapshot
-        assert doc.document_version == "1.0"
-        assert doc.signature_text == "Pat Ner"
-        assert doc.signed_at is not None
-        assert doc.consent_text
-        assert "electronic" in doc.consent_text.lower()
+        assert doc.signature_text == "Sign Flow"
+
+    tax = (
+        db_session.query(PartnerTaxInfo)
+        .filter(PartnerTaxInfo.application_id == application.id)
+        .one()
+    )
+    assert tax.legal_name == "Sign Flow"
+    assert decrypt_field(tax.tin_encrypted) == "987654321"
+
+
+def test_admin_cannot_approve_before_docs_signed(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    application = _submit_and_get_application(client, db_session, "nosign@example.com")
+    _login_admin(client, db_session)
+
+    response = client.post(f"/admin/partners/{application.id}/approve")
+    assert response.status_code == 400
+    assert "document signing" in response.text.lower()
 
 
 def test_admin_partners_list_shows_application(
@@ -111,7 +231,7 @@ def test_admin_approve_creates_active_partner_with_referral_code(
     client: TestClient,
     db_session: Session,
 ) -> None:
-    application = _submit_and_get_application(client, db_session, "approve@example.com")
+    application = _submit_sign_and_get_application(client, db_session, "approve@example.com")
     _login_admin(client, db_session)
 
     response = client.post(
@@ -136,6 +256,8 @@ def test_approve_creates_partner_user_with_role_partner(
     db_session: Session,
 ) -> None:
     application = _submit_and_get_application(client, db_session, "login@example.com")
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = _login_admin(client, db_session)
 
     result = approve_application(
@@ -167,7 +289,7 @@ def test_approve_shows_invite_status_notice(
     client: TestClient,
     db_session: Session,
 ) -> None:
-    application = _submit_and_get_application(client, db_session, "temppw@example.com")
+    application = _submit_sign_and_get_application(client, db_session, "temppw@example.com")
     _login_admin(client, db_session)
 
     client.post(f"/admin/partners/{application.id}/approve", follow_redirects=False)
@@ -186,7 +308,7 @@ def test_admin_detail_shows_linked_user_and_referral_code(
     client: TestClient,
     db_session: Session,
 ) -> None:
-    application = _submit_and_get_application(client, db_session, "detail@example.com")
+    application = _submit_sign_and_get_application(client, db_session, "detail@example.com")
     _login_admin(client, db_session)
     client.post(f"/admin/partners/{application.id}/approve")
 
@@ -268,6 +390,8 @@ def test_partner_dashboard_after_approval_with_invite_acceptance(
     db_session: Session,
 ) -> None:
     application = _submit_and_get_application(client, db_session, "dash@example.com")
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = _login_admin(client, db_session)
 
     result = approve_application(
@@ -300,7 +424,7 @@ def test_duplicate_approve_does_not_create_duplicate_partner_or_user(
     client: TestClient,
     db_session: Session,
 ) -> None:
-    application = _submit_and_get_application(client, db_session, "dup@example.com")
+    application = _submit_sign_and_get_application(client, db_session, "dup@example.com")
     _login_admin(client, db_session)
 
     client.post(f"/admin/partners/{application.id}/approve")

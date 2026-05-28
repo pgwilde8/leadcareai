@@ -1,62 +1,75 @@
 # Admin System Check (V1)
 
-This page helps admins quickly confirm production readiness without exposing secrets.
+Production readiness audit for admins. **No secrets are displayed** and **no test SMS/email/API calls** are made from this page.
 
-## URLs
+## URL
 
-- `/admin/notification-logs`
-- `/admin/notification-logs/{id}`
-- `/admin/system-check`
+- **`/admin/system-check`** (admin session required)
 
-## What each system check means
+Also see **`docs/production-launch-checklist-v1.md`** for the full pre-launch checklist.
 
-- **PUBLIC_BASE_URL configured**: required for links in staff alerts and emails.
-- **TWILIO_ACCOUNT_SID configured**: Twilio REST/webhook account identifier present.
-- **TWILIO_AUTH_TOKEN configured**: Twilio signature validation + API auth token present.
-- **TWILIO_PHONE_NUMBER configured**: sender number set for outbound SMS.
-- **TWILIO_WEBHOOK_AUTH_ENABLED**: should be `true` in production.
-- **OPENAI_API_KEY configured**: AI provider credentials available.
-- **OPENAI_ENABLED**: AI enrichment enabled/disabled flag.
-- **SMTP_HOST configured**: SMTP server host present.
-- **SMTP_FROM_EMAIL configured**: sender email configured.
-- **STRIPE_SECRET_KEY configured**: Stripe API key present.
-- **STRIPE_WEBHOOK_SECRET configured**: Stripe webhook signature secret present.
-- **STRIPE_PRICE_ID_GROWTH_MONTHLY configured**: recurring plan price configured.
-- **STRIPE_PRICE_ID_SETUP_FEE configured**: setup fee price configured.
-- **Database reachable**: app can execute a basic DB query.
+## Sections
 
-## Required env vars (core)
+### Core
 
-- `PUBLIC_BASE_URL`
-- `TWILIO_ACCOUNT_SID`
-- `TWILIO_AUTH_TOKEN`
-- `TWILIO_PHONE_NUMBER`
-- `TWILIO_WEBHOOK_AUTH_ENABLED=true` (production)
-- `OPENAI_API_KEY` (if AI is enabled)
-- `OPENAI_ENABLED`
-- `SMTP_HOST`
-- `SMTP_FROM_EMAIL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PRICE_ID_GROWTH_MONTHLY`
-- `STRIPE_PRICE_ID_SETUP_FEE`
+- **APP_ENV** — `production` expected on prod hosts
+- **APP_BASE_URL / PUBLIC_BASE_URL** — HTTPS base for links in notifications and webhooks
+- **DATABASE_URL** — masked (`***` credentials); not the raw secret
+- **Database reachable** — `SELECT 1` against app DB
+- **Alembic revision** — compares DB revision to migration head; suggests `alembic upgrade head` if behind
 
-## Debugging skipped email
+### Twilio
 
-1. Open `/admin/notification-logs`.
-2. Filter `channel=email`, `status=skipped`.
-3. Check error summary/detail for messages like `SMTP not configured`.
-4. Verify `SMTP_HOST` and `SMTP_FROM_EMAIL` in environment.
+- Account SID, auth token, phone number — configured yes/no only
+- **TWILIO_WEBHOOK_AUTH_ENABLED** — should be `true` in production
+- Webhook URL reminders (full URLs when base URL is set):
+  - `/webhooks/twilio/sms`
+  - `/webhooks/twilio/voice`
+  - `/webhooks/twilio/voice/status`
 
-## Debugging failed staff SMS
+### OpenAI
 
-1. Open `/admin/notification-logs`.
-2. Filter `channel=sms`, `status=failed`.
-3. Open log detail to inspect full provider error.
-4. Validate Twilio env vars and that sender number belongs to the active Twilio account.
+- **OPENAI_ENABLED** — flag only
+- **OPENAI_API_KEY** — configured yes/no; last 4 characters only when set
+- **OPENAI_MODEL** — model name (not secret)
 
-## Security notes
+### Stripe
 
-- System Check does not print secret values.
-- Notification Logs masks recipients in list views.
-- Keep `TWILIO_WEBHOOK_AUTH_ENABLED=true` in production.
+- **STRIPE_SECRET_KEY** — test vs live from key prefix (`sk_test_` / `sk_live_`)
+- Webhook secret and price IDs — configured yes/no
+- **STRIPE_PRICE_ID_SETUP_FEE** — or notes fallback `STRIPE_SETUP_AMOUNT_CENTS`
+- Webhook path reminder: `/webhooks/stripe`
+
+### Email / SMTP
+
+- Host, port, username, password (masked), from address
+- SPF/DKIM/DMARC reminder — no live DNS check
+
+### Partner tax (W-9)
+
+- **PARTNER_TAX_ENCRYPTION_KEY** — configured yes/no (suffix only); **error in production if missing**
+
+### Security / admin
+
+- **SECRET_KEY** — warns if default `change-me` in production
+- **ADMIN_EMAIL** — configured yes/no
+
+## Status colors
+
+| Status | Meaning |
+|--------|---------|
+| ok | Ready or acceptable |
+| warn | Review before launch (e.g. test Stripe key, webhook auth off) |
+| error | Likely blocking for production |
+| info | Informational only |
+
+## Related admin tools
+
+- `/admin/notification-logs` — debug skipped/failed staff alerts
+- `/admin/commissions` — commission ledger
+- `/admin/payouts` — manual payout batches
+
+## Security
+
+- Auth tokens, API keys, encryption keys, and passwords are never rendered.
+- Use environment/secrets manager for values; system check only reports presence and safe metadata.

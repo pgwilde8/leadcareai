@@ -91,6 +91,7 @@ def test_missed_call_triggers_email_and_staff_sms(
     assert "Name:" in staff_body
     assert "Callback:" in staff_body
     assert "Last message:" in staff_body
+    assert "URGENT LeadCare AI" not in staff_body
 
     logs = db_session.query(NotificationLog).all()
     assert len(logs) >= 2
@@ -124,11 +125,55 @@ def test_inbound_sms_triggers_notification_once(
     )
     assert response.status_code == 200
     assert mock_email.call_count == 1
-    assert "New SMS reply" in mock_email.call_args.kwargs["subject"]
+    assert "New customer reply" in mock_email.call_args.kwargs["subject"]
+    assert "[URGENT]" not in mock_email.call_args.kwargs["subject"]
     assert "Need a plumber today" in mock_email.call_args.kwargs["body"]
+    assert "AI temperature:" in mock_email.call_args.kwargs["body"]
 
     logs = db_session.query(NotificationLog).filter_by(event_type="inbound_sms").all()
     assert len(logs) == 1
+
+
+@patch("app.services.notification_service._send_notification_email")
+@patch("app.services.notification_service.send_sms")
+def test_inbound_sms_triggers_staff_sms(
+    mock_staff_sms,
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    from app.services.twilio_service import SendSmsResult
+
+    mock_email.return_value = ("sent", None, None)
+    mock_staff_sms.return_value = SendSmsResult(sid="SM_STAFF_INBOUND", status="queued")
+
+    _setup_business_with_notifications(db_session, name="Joe's Plumbing")
+
+    response = client.post(
+        SMS_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": BUSINESS_PHONE,
+            "Body": "Water is coming through the ceiling",
+            "MessageSid": "SM_NOTIFY_STAFF_001",
+        },
+    )
+    assert response.status_code == 200
+
+    staff_calls = [
+        c
+        for c in mock_staff_sms.call_args_list
+        if (c.kwargs.get("to_phone") or c[1].get("to_phone")) == "+15559990001"
+    ]
+    assert len(staff_calls) == 1
+    body = staff_calls[0].kwargs.get("body") or staff_calls[0][1].get("body")
+    assert "LeadCare AI: New reply for Joe's Plumbing" in body
+    assert CALLER_PHONE in body
+    assert "ceiling" in body
+
+    logs = db_session.query(NotificationLog).filter_by(event_type="inbound_sms").all()
+    assert len(logs) == 2
+    assert {log.channel for log in logs} == {"email", "sms"}
 
 
 @patch("app.services.notification_service._send_notification_email")
@@ -315,6 +360,7 @@ def test_staff_sms_includes_dashboard_link_when_public_base_url_set(
     assert staff_calls
     body = staff_calls[-1].kwargs.get("body") or staff_calls[-1][1].get("body")
     assert "https://leadcareai.example.com/business/leads/" in body
+    assert "View:" in body
     assert "Name:" in body
     assert "Callback:" in body
     assert "Last message:" in body
@@ -341,13 +387,95 @@ def test_staff_sms_includes_recommended_action_when_ai_fields_exist(
     db_session.commit()
 
     body = _build_staff_sms_body(
-        event_prefix="New lead",
+        event_type="missed_call",
         business=business,
         lead=lead,
         message="No heat at home right now",
     )
-    assert "LeadCare AI: URGENT | furnace repair | Reno, NV" in body
+    assert "URGENT LeadCare AI: URGENT | furnace repair | Reno, NV" in body
     assert "Recommended: Call immediately" in body
+
+
+@patch("app.services.sms_service.analyze_inbound_sms_for_lead")
+@patch("app.services.notification_service._send_notification_email")
+@patch("app.services.notification_service.send_sms")
+def test_urgent_inbound_sms_uses_urgent_wording(
+    mock_staff_sms,
+    mock_email,
+    mock_ai,
+    client: TestClient,
+    db_session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.schemas.lead_ai import LeadAIAnalysis
+    from app.services.twilio_service import SendSmsResult
+
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://leadcareai.example.com")
+    get_settings.cache_clear()
+
+    mock_ai.return_value = LeadAIAnalysis(
+        summary="Major leak through ceiling",
+        urgency="emergency",
+        lead_temperature="hot",
+        service_needed="plumbing",
+        location="Brick, NJ",
+        confidence=0.95,
+    )
+    mock_email.return_value = ("sent", None, None)
+    mock_staff_sms.return_value = SendSmsResult(sid="SM_URGENT", status="queued")
+
+    business = _setup_business_with_notifications(db_session, name="Joe's Plumbing")
+
+    client.post(
+        SMS_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": BUSINESS_PHONE,
+            "Body": "Water is coming through the ceiling",
+            "MessageSid": "SM_URGENT_001",
+        },
+    )
+
+    subject = mock_email.call_args.kwargs["subject"]
+    assert subject.startswith("[URGENT]")
+    assert "New customer reply" in subject
+
+    staff_body = mock_staff_sms.call_args.kwargs.get("body") or mock_staff_sms.call_args[1].get("body")
+    assert staff_body.startswith("URGENT LeadCare AI:")
+    assert "Urgency: emergency" in staff_body
+    assert "/business/leads/" in staff_body
+    assert "Joe's Plumbing" in staff_body
+
+
+@patch("app.services.notification_service._send_notification_email")
+@patch("app.services.notification_service.send_sms")
+def test_inbound_sms_dashboard_link_in_email(
+    mock_staff_sms,
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.services.twilio_service import SendSmsResult
+
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://leadcareai.example.com")
+    get_settings.cache_clear()
+    mock_email.return_value = ("sent", None, None)
+    mock_staff_sms.return_value = SendSmsResult(sid="SM_LINK_IN", status="queued")
+
+    _setup_business_with_notifications(db_session, notification_phone=None)
+
+    client.post(
+        SMS_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": BUSINESS_PHONE,
+            "Body": "Need help today",
+            "MessageSid": "SM_LINK_IN_001",
+        },
+    )
+
+    assert "https://leadcareai.example.com/business/leads/" in mock_email.call_args.kwargs["body"]
 
 
 @patch("app.services.notification_service.send_sms")
@@ -378,4 +506,215 @@ def test_staff_sms_omits_url_when_public_base_url_missing(
     )
 
     body = mock_staff_sms.call_args.kwargs.get("body") or mock_staff_sms.call_args[1].get("body")
-    assert "View dashboard" not in body
+    assert "/business/leads/" not in body
+
+
+@pytest.fixture
+def demo_and_real_business_setup(
+    monkeypatch: pytest.MonkeyPatch,
+    db_session: Session,
+):
+    """Demo business (no staff notify) + real business (Joe's Plumbing) with separate numbers."""
+    from app.models.lead import Lead
+
+    demo = create_business(db_session, name="LeadCare AI Demo", industry="Plumbing")
+    real = create_business(db_session, name="Joe's Plumbing", industry="Plumbing")
+    real.notification_email = "joe-alerts@example.com"
+    real.notification_phone = "+15559990001"
+
+    demo_phone = "+18336691335"
+    real_phone = "+15558765432"
+
+    create_phone_number(
+        db_session,
+        demo.id,
+        phone_number=demo_phone,
+        provider="twilio",
+        status="active",
+    )
+    create_phone_number(
+        db_session,
+        real.id,
+        phone_number=real_phone,
+        provider="twilio",
+        status="active",
+    )
+    db_session.commit()
+
+    monkeypatch.setenv("DEMO_ENABLED", "true")
+    monkeypatch.setenv("DEMO_BUSINESS_ID", str(demo.id))
+    monkeypatch.setenv("DEMO_TWILIO_NUMBER", demo_phone)
+    get_settings.cache_clear()
+    yield {
+        "demo": demo,
+        "real": real,
+        "demo_phone": demo_phone,
+        "real_phone": real_phone,
+        "Lead": Lead,
+    }
+    get_settings.cache_clear()
+
+
+@patch("app.services.notification_service._send_notification_email")
+def test_demo_business_inbound_sms_skips_staff_notification(
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+    demo_and_real_business_setup,
+) -> None:
+    mock_email.return_value = ("sent", None, None)
+    setup = demo_and_real_business_setup
+
+    response = client.post(
+        SMS_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": setup["demo_phone"],
+            "Body": "Demo leak message",
+            "MessageSid": "SM_DEMO_NO_NOTIFY",
+        },
+    )
+    assert response.status_code == 200
+    assert mock_email.call_count == 0
+
+    logs = db_session.query(NotificationLog).filter_by(event_type="inbound_sms").all()
+    assert logs == []
+
+
+@patch("app.services.notification_service._send_notification_email")
+@patch("app.services.notification_service.send_sms")
+def test_real_business_notifies_when_demo_also_configured(
+    mock_staff_sms,
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+    demo_and_real_business_setup,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.services.twilio_service import SendSmsResult
+
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://leadcareai.example.com")
+    get_settings.cache_clear()
+
+    mock_email.return_value = ("sent", None, None)
+    mock_staff_sms.return_value = SendSmsResult(sid="SM_REAL_JOE", status="queued")
+    setup = demo_and_real_business_setup
+
+    response = client.post(
+        SMS_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": setup["real_phone"],
+            "Body": "Water is coming through the ceiling",
+            "MessageSid": "SM_REAL_JOE_001",
+        },
+    )
+    assert response.status_code == 200
+    assert mock_email.call_count == 1
+    assert mock_email.call_args.kwargs["to_email"] == "joe-alerts@example.com"
+    assert "Joe's Plumbing" in mock_email.call_args.kwargs["subject"]
+
+    lead = (
+        db_session.query(setup["Lead"])
+        .filter(setup["Lead"].business_id == setup["real"].id)
+        .one()
+    )
+    assert str(lead.id) in mock_email.call_args.kwargs["body"]
+
+    logs = db_session.query(NotificationLog).filter_by(event_type="inbound_sms").all()
+    assert len(logs) == 2
+    assert all(log.business_id == setup["real"].id for log in logs)
+
+
+@patch("app.services.notification_service._send_notification_email")
+def test_demo_business_missed_call_skips_staff_notification(
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+    demo_and_real_business_setup,
+) -> None:
+    mock_email.return_value = ("sent", None, None)
+    setup = demo_and_real_business_setup
+
+    response = client.post(
+        VOICE_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": setup["demo_phone"],
+            "CallSid": "CA_DEMO_NO_NOTIFY",
+            "CallStatus": "ringing",
+            "Direction": "inbound",
+        },
+    )
+    assert response.status_code == 200
+    assert mock_email.call_count == 0
+
+    logs = db_session.query(NotificationLog).filter_by(event_type="missed_call").all()
+    assert logs == []
+
+
+@patch("app.services.notification_service._send_notification_email")
+def test_real_business_missed_call_notifies_when_demo_configured(
+    mock_email,
+    client: TestClient,
+    db_session: Session,
+    demo_and_real_business_setup,
+) -> None:
+    mock_email.return_value = ("sent", None, None)
+    setup = demo_and_real_business_setup
+
+    response = client.post(
+        VOICE_URL,
+        data={
+            "From": CALLER_PHONE,
+            "To": setup["real_phone"],
+            "CallSid": "CA_REAL_JOE_001",
+            "CallStatus": "ringing",
+            "Direction": "inbound",
+        },
+    )
+    assert response.status_code == 200
+    assert mock_email.call_count == 1
+    assert "New missed-call lead" in mock_email.call_args.kwargs["subject"]
+
+    logs = db_session.query(NotificationLog).filter_by(event_type="missed_call").all()
+    assert len(logs) >= 1
+    assert all(log.business_id == setup["real"].id for log in logs)
+
+
+def test_phone_routing_assigns_inbound_sms_to_correct_business(
+    client: TestClient,
+    db_session: Session,
+    demo_and_real_business_setup,
+) -> None:
+    setup = demo_and_real_business_setup
+
+    client.post(
+        SMS_URL,
+        data={
+            "From": "+15551110001",
+            "To": setup["demo_phone"],
+            "Body": "To demo",
+            "MessageSid": "SM_ROUTE_DEMO",
+        },
+    )
+    client.post(
+        SMS_URL,
+        data={
+            "From": "+15551110002",
+            "To": setup["real_phone"],
+            "Body": "To Joe",
+            "MessageSid": "SM_ROUTE_REAL",
+        },
+    )
+
+    demo_leads = (
+        db_session.query(setup["Lead"]).filter(setup["Lead"].business_id == setup["demo"].id).all()
+    )
+    real_leads = (
+        db_session.query(setup["Lead"]).filter(setup["Lead"].business_id == setup["real"].id).all()
+    )
+    assert len(demo_leads) == 1
+    assert demo_leads[0].phone == "+15551110001"
+    assert len(real_leads) == 1
+    assert real_leads[0].phone == "+15551110002"

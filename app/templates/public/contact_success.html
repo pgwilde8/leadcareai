@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Message sent — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <div class="lc-empty">
+    <p class="lc-empty__title">Thank you</p>
+    <p class="lc-empty__text">
+      We received your message and will reply to the email you provided as soon as we can.
+    </p>
+    <a class="lc-btn lc-btn--primary" href="/">Return home</a>
+    <a class="lc-btn lc-btn--ghost" href="/contact">Send another message</a>
+  </div>
+{% endblock %}

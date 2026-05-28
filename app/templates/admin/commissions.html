@@ -21,6 +21,8 @@
 
   <nav class="lc-page-nav lc-admin-nav" aria-label="Commissions">
     <a href="/admin">← Back to admin dashboard</a>
+    <a href="/admin/payouts">Payout batches</a>
+    <a href="/admin/payouts/new">New payout batch</a>
   </nav>
 
   <form method="get" action="/admin/commissions" class="lc-admin-filter-bar">
@@ -46,6 +48,7 @@
             <th>Type</th>
             <th>Amount</th>
             <th>Status</th>
+            <th>Payout batch</th>
             <th>Eligible</th>
             <th>Stripe ref</th>
             <th>Notes</th>
@@ -64,6 +67,14 @@
                 {{ status_badge(commission.status) }}
                 {% if commission.status == "canceled" %}
                   <br><em>canceled</em>
+                {% endif %}
+              </td>
+              <td>
+                {% if commission.payout_id and payouts_by_id.get(commission.payout_id) %}
+                  {% set payout = payouts_by_id[commission.payout_id] %}
+                  <a href="/admin/payouts/{{ payout.id }}">{{ payout.status }}</a>
+                {% else %}
+                  —
                 {% endif %}
               </td>
               <td>{{ commission.eligible_at }}</td>
@@ -85,12 +96,14 @@
                       <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Approve</button>
                     </form>
                   {% endif %}
-                  {% if commission.status == "approved" %}
+                  {% if commission.status == "approved" and not commission.payout_id %}
                     <form method="post" action="/admin/commissions/{{ commission.id }}/mark-paid">
                       <button type="submit" class="lc-btn lc-btn--secondary lc-btn--sm">Mark paid</button>
                     </form>
+                  {% elif commission.status == "approved" and commission.payout_id %}
+                    <span class="lc-text-muted">In payout batch</span>
                   {% endif %}
-                  {% if commission.status in ["pending", "approved"] %}
+                  {% if commission.status in ["pending", "approved"] and not commission.payout_id %}
                     <form method="post" action="/admin/commissions/{{ commission.id }}/cancel">
                       <button type="submit" class="lc-btn lc-btn--ghost lc-btn--sm">Cancel</button>
                     </form>

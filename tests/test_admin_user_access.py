@@ -16,6 +16,7 @@ from app.services.partner_document_service import seed_default_document_template
 from app.services.partner_service import approve_application
 from app.services.user_invite_service import BUSINESS_INVITE, PARTNER_INVITE, create_invite_token
 from app.services.user_service import create_admin_user, create_user
+from tests.partner_fixtures import ensure_partner_application_docs_signed, partner_onboard_form_data
 
 
 def _login_admin(client: TestClient, db_session: Session, email: str = "admin@example.com") -> User:
@@ -70,19 +71,12 @@ def test_table_shows_partner_with_referral_code(
     db_session.commit()
     client.post(
         "/partner/onboard",
-        data={
-            "first_name": "Access",
-            "last_name": "Partner",
-            "email": "partner-access@example.com",
-            "phone": "+15550000222",
-            "city": "Austin",
-            "state": "TX",
-            "company_name": "",
-            "experience_summary": "",
-            "why_interested": "",
-            "signature_text": "Access Partner",
-            "electronic_consent": "on",
-        },
+        data=partner_onboard_form_data(
+            first_name="Access",
+            last_name="Partner",
+            email="partner-access@example.com",
+            phone="+15550000222",
+        ),
     )
     from app.models.partner_application import PartnerApplication
 
@@ -91,6 +85,8 @@ def test_table_shows_partner_with_referral_code(
         .filter(PartnerApplication.email == "partner-access@example.com")
         .one()
     )
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = _login_admin(client, db_session, email="admin-partner-access@example.com")
     approve_application(db_session, application.id, reviewed_by_user_id=admin.id)
     db_session.commit()
@@ -172,19 +168,12 @@ def test_resend_invite_for_partner_creates_token(
     db_session.commit()
     client.post(
         "/partner/onboard",
-        data={
-            "first_name": "Resend",
-            "last_name": "Partner",
-            "email": "resend-partner@example.com",
-            "phone": "+15550000333",
-            "city": "Austin",
-            "state": "TX",
-            "company_name": "",
-            "experience_summary": "",
-            "why_interested": "",
-            "signature_text": "Resend Partner",
-            "electronic_consent": "on",
-        },
+        data=partner_onboard_form_data(
+            first_name="Resend",
+            last_name="Partner",
+            email="resend-partner@example.com",
+            phone="+15550000333",
+        ),
     )
     from app.models.partner_application import PartnerApplication
 
@@ -193,6 +182,8 @@ def test_resend_invite_for_partner_creates_token(
         .filter(PartnerApplication.email == "resend-partner@example.com")
         .one()
     )
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = _login_admin(client, db_session, email="admin-resend-partner@example.com")
     approved = approve_application(db_session, application.id, reviewed_by_user_id=admin.id)
     db_session.commit()

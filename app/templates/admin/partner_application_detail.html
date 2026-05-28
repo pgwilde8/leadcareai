@@ -31,6 +31,73 @@
     <div class="lc-alert lc-alert--error" role="alert">{{ reject_error }}</div>
   {% endif %}
 
+  <div class="lc-card lc-admin-section">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Onboarding progress</h2>
+    </div>
+    <div class="lc-card__body">
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <tbody>
+            <tr>
+              <th>Application</th>
+              <td>{{ status_badge(onboarding_checklist.application) }}</td>
+            </tr>
+            <tr>
+              <th>IC documents</th>
+              <td>{{ status_badge(onboarding_checklist.ic_documents) }}</td>
+            </tr>
+            <tr>
+              <th>W-9 / tax info</th>
+              <td>{{ status_badge(onboarding_checklist.tax_info) }}</td>
+            </tr>
+            <tr>
+              <th>Commission payouts</th>
+              <td>
+                {% if onboarding_checklist.payouts == 'eligible' %}
+                  {{ status_badge('eligible') }}
+                {% else %}
+                  {{ status_badge('blocked') }}
+                  <span class="lc-text-muted"> — W-9 required before any payout</span>
+                {% endif %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% if tax_info_notice %}
+    <div class="lc-card lc-admin-section">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">W-9 collection link</h2>
+        <span class="lc-badge lc-badge--status-docs_pending">Copy now</span>
+      </div>
+      <div class="lc-card__body">
+        <p>Send this link after IC documents are signed. It expires in 14 days.</p>
+        <p><code style="word-break: break-all;">{{ tax_info_notice.tax_info_url }}</code></p>
+        <p class="lc-text-muted lc-mb-0">Shown once. Regenerate if the applicant loses the link.</p>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if docs_signing_notice %}
+    <div class="lc-card lc-admin-section">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">IC document signing link</h2>
+        <span class="lc-badge lc-badge--status-docs_pending">Copy now</span>
+      </div>
+      <div class="lc-card__body">
+        <p>Send this link to the applicant after your screening call. It expires in 14 days.</p>
+        <p><code style="word-break: break-all;">{{ docs_signing_notice.signing_url }}</code></p>
+        <p class="lc-text-muted lc-mb-0">
+          This link is shown once. Generate a new link if needed (previous link will stop working).
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
   {% if activation_notice and activation_notice.invite_status != "not needed" %}
     <div class="lc-card lc-admin-section">
       <div class="lc-card__header">
@@ -91,6 +158,45 @@
       {% endif %}
     </div>
   </div>
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">W-9 / tax information</h2>
+    {% if tax_info %}
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <div class="lc-table-wrap">
+            <table class="lc-table">
+              <tbody>
+                <tr><th>Legal name</th><td>{{ tax_info.legal_name }}</td></tr>
+                <tr><th>Business name</th><td>{{ tax_info.business_name or '—' }}</td></tr>
+                <tr>
+                  <th>Address</th>
+                  <td>
+                    {{ tax_info.address_line1 }}<br />
+                    {% if tax_info.address_line2 %}{{ tax_info.address_line2 }}<br />{% endif %}
+                    {{ tax_info.city }}, {{ tax_info.state }} {{ tax_info.postal_code }}
+                  </td>
+                </tr>
+                <tr><th>Tax classification</th><td>{{ tax_info.tax_classification }}</td></tr>
+                <tr><th>TIN type</th><td>{{ tax_info.tin_type|upper }}</td></tr>
+                <tr><th>TIN (masked)</th><td><code>{{ tax_info.tin_masked }}</code></td></tr>
+                <tr><th>Certified at</th><td>{{ tax_info.certified_at }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">
+        W-9 / tax information not yet submitted. Partners cannot receive commission payouts until this is complete.
+      </p>
+      {% if application.status in ['docs_signed', 'approved'] %}
+        <form method="post" action="/admin/partners/{{ application.id }}/invite-tax-info">
+          <button type="submit" class="lc-btn lc-btn--secondary">Generate W-9 collection link</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </section>
 
   <section class="lc-admin-section">
     <h2 class="lc-admin-section__title">Signed documents</h2>
@@ -163,6 +269,52 @@
         <span class="lc-badge lc-badge--status-admin_review">Needs review</span>
       </div>
       <div class="lc-card__body">
+        <p class="lc-text-muted">
+          Review the application and contact the applicant. When you are ready for them to sign IC documents,
+          generate a signing link below. Approval is available after documents are signed.
+        </p>
+        <form method="post" action="/admin/partners/{{ application.id }}/invite-sign-documents">
+          <button type="submit" class="lc-btn lc-btn--secondary">Generate IC document signing link</button>
+        </form>
+        <form method="post" action="/admin/partners/{{ application.id }}/reject" style="margin-top: 1rem;">
+          <label>Rejection reason
+            <textarea name="rejection_reason" rows="3" required></textarea>
+          </label>
+          <button type="submit" class="lc-btn lc-btn--danger">Reject application</button>
+        </form>
+      </div>
+    </div>
+  {% elif application.status == 'docs_pending' %}
+    <div class="lc-card lc-admin-section">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Awaiting signatures</h2>
+        <span class="lc-badge lc-badge--status-docs_pending">Documents pending</span>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted">The applicant has been invited to sign IC documents. Regenerate the link if it expired or was lost.</p>
+        <form method="post" action="/admin/partners/{{ application.id }}/invite-sign-documents">
+          <button type="submit" class="lc-btn lc-btn--secondary">Regenerate signing link</button>
+        </form>
+        <form method="post" action="/admin/partners/{{ application.id }}/reject" style="margin-top: 1rem;">
+          <label>Rejection reason
+            <textarea name="rejection_reason" rows="3" required></textarea>
+          </label>
+          <button type="submit" class="lc-btn lc-btn--danger">Reject application</button>
+        </form>
+      </div>
+    </div>
+  {% elif application.status == 'docs_signed' %}
+    <div class="lc-card lc-admin-section">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Review actions</h2>
+        <span class="lc-badge lc-badge--status-docs_signed">Ready to approve</span>
+      </div>
+      <div class="lc-card__body">
+        {% if not tax_info %}
+          <div class="lc-alert lc-alert--info" role="note">
+            You may approve without W-9 on file, but commission payouts stay blocked until tax information is submitted.
+          </div>
+        {% endif %}
         <form method="post" action="/admin/partners/{{ application.id }}/approve">
           <button type="submit" class="lc-btn lc-btn--primary">Approve application</button>
         </form>

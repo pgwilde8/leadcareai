@@ -25,11 +25,11 @@ def mock_stripe_checkout(request: pytest.FixtureRequest, monkeypatch: pytest.Mon
     monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_mock_key_for_pytest")
     monkeypatch.setenv("STRIPE_PRICE_ID_GROWTH_MONTHLY", "price_growth_test")
     monkeypatch.setenv("STRIPE_PRICE_ID_SETUP_FEE", "price_setup_test")
-    from app.core.config import get_settings
+    from tests.settings_helpers import clear_settings_cache
 
-    get_settings.cache_clear()
+    clear_settings_cache()
     yield None
-    get_settings.cache_clear()
+    clear_settings_cache()
 
 
 @pytest.fixture(autouse=True)
@@ -39,11 +39,11 @@ def openai_disabled_in_tests(request: pytest.FixtureRequest, monkeypatch: pytest
         yield None
         return
     monkeypatch.setenv("OPENAI_ENABLED", "false")
-    from app.core.config import get_settings
+    from tests.settings_helpers import clear_settings_cache
 
-    get_settings.cache_clear()
+    clear_settings_cache()
     yield None
-    get_settings.cache_clear()
+    clear_settings_cache()
 
 
 @pytest.fixture(autouse=True)
@@ -54,11 +54,26 @@ def smtp_disabled_in_tests(request: pytest.FixtureRequest, monkeypatch: pytest.M
         return
     monkeypatch.setenv("SMTP_HOST", "")
     monkeypatch.setenv("SMTP_FROM_EMAIL", "")
-    from app.core.config import get_settings
+    from tests.settings_helpers import clear_settings_cache
 
-    get_settings.cache_clear()
+    clear_settings_cache()
     yield None
-    get_settings.cache_clear()
+    clear_settings_cache()
+
+
+@pytest.fixture(autouse=True)
+def partner_tax_encryption_key(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Fernet key for partner W-9 tests; isolated from repo `.env` via patched get_settings."""
+    if request.node.get_closest_marker("no_partner_tax_encryption_key"):
+        yield
+        return
+    from cryptography.fernet import Fernet
+
+    from tests.settings_helpers import clear_settings_cache, patch_get_settings
+
+    patch_get_settings(monkeypatch, partner_tax_encryption_key=Fernet.generate_key().decode())
+    yield
+    clear_settings_cache()
 
 
 @pytest.fixture(autouse=True)

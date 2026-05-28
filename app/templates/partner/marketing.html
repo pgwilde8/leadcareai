@@ -1,0 +1,105 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Marketing links — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Marketing links</h1>
+    <p class="lc-page-header__lead">
+      Share these links with local service businesses. When they book a demo or sign up through your link,
+      you receive referral credit.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav" aria-label="Partner">
+    <a href="/partner/dashboard">← Partner dashboard</a>
+  </nav>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Your referral code</h2>
+    </div>
+    <div class="lc-card__body">
+      <p><strong><code>{{ referral_code }}</code></strong></p>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Copyable links</h2>
+    </div>
+    <div class="lc-card__body">
+      <div class="lc-field">
+        <label for="referral-landing-link">Referral landing page (best for social posts)</label>
+        <input id="referral-landing-link" type="text" readonly value="{{ referral_landing_link }}" style="width: 100%; font-family: monospace;" onclick="this.select()" />
+      </div>
+      <div class="lc-field">
+        <label for="demo-link">Live missed-call demo</label>
+        <input id="demo-link" type="text" readonly value="{{ demo_link }}" style="width: 100%; font-family: monospace;" onclick="this.select()" />
+      </div>
+      <div class="lc-field">
+        <label for="demo-book-link">Book a demo form</label>
+        <input id="demo-book-link" type="text" readonly value="{{ demo_book_link }}" style="width: 100%; font-family: monospace;" onclick="this.select()" />
+      </div>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Suggested Facebook / social post</h2>
+    </div>
+    <div class="lc-card__body">
+      <pre class="lc-pre-block" style="white-space: pre-wrap; font-family: inherit;">Own a local service business? Stop losing jobs when you miss calls.
+
+{{ settings.app_name }} texts missed callers instantly, qualifies the lead by SMS, and alerts your team before the prospect moves on.
+
+Try the demo or book a walkthrough:
+{{ referral_landing_link }}</pre>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Suggested SMS / text pitch</h2>
+    </div>
+    <div class="lc-card__body">
+      <pre class="lc-pre-block" style="white-space: pre-wrap; font-family: inherit;">Hi — quick tip for {{ settings.app_name }}: when you miss a call, we can auto-text the caller and capture what they need so your team can follow up fast. Free demo here: {{ referral_landing_link }}</pre>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Suggested email pitch</h2>
+    </div>
+    <div class="lc-card__body">
+      <pre class="lc-pre-block" style="white-space: pre-wrap; font-family: inherit;">Subject: Recover missed calls before customers call the next company
+
+Hi [Name],
+
+Many local service businesses lose revenue when calls go unanswered — especially after hours.
+
+{{ settings.app_name }} sends an instant SMS when a call is missed, asks a few qualifying questions, and alerts your staff by text, email, or dashboard.
+
+You can try the live demo or book a short walkthrough here:
+{{ referral_landing_link }}
+
+Happy to answer questions if helpful.
+
+Best,
+{{ partner.display_name }}</pre>
+    </div>
+  </div>
+
+  <div class="lc-alert lc-alert--info" role="note">
+    <h2 class="lc-card__title" style="margin-top: 0;">Compliance reminders</h2>
+    <ul>
+      <li>Do not promise guaranteed income or specific commission amounts beyond the published pay plan.</li>
+      <li>Do not promise guaranteed leads, appointments, or revenue for the business.</li>
+      <li>Do not claim {{ settings.app_name }} is emergency dispatch or will send a technician immediately.</li>
+      <li>Do not claim the product fully replaces every answering service or call center in all situations.</li>
+      <li>Follow TCPA and consent rules for any outreach you send on behalf of prospects.</li>
+    </ul>
+  </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Payout history — {{ settings.app_name }}{% endblock %}
+
+{% block content %}
+  <h1>Payout history</h1>
+  <p>Off-platform payout batches recorded by {{ settings.app_name }} admin. Transfers are not automated in V1.</p>
+  <p><a href="/partner/dashboard">← Partner dashboard</a></p>
+
+  {% if payout_rows %}
+    <table>
+      <thead>
+        <tr>
+          <th>Created</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Commissions</th>
+          <th>Paid at</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in payout_rows %}
+          <tr>
+            <td>{{ row.payout.created_at }}</td>
+            <td><strong>{{ row.payout.status }}</strong></td>
+            <td>${{ "%.2f"|format(row.payout.total_amount_cents / 100) }} {{ row.payout.currency }}</td>
+            <td>{{ row.commission_count }}</td>
+            <td>{{ row.payout.paid_at or "—" }}</td>
+            <td>
+              {% for commission_type, amount_cents, count in row.commission_summaries %}
+                {{ commission_type }}: {{ count }} × ${{ "%.2f"|format(amount_cents / 100) }}<br />
+              {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No payout batches on file yet. Approved commissions appear here after admin groups them into a payout.</p>
+  {% endif %}
+{% endblock %}

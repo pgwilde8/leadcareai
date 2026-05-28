@@ -1,0 +1,102 @@
+{% extends "layout/base.html" %}
+
+{% block title %}W-9 / tax information — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">W-9 / tax information</h1>
+    <p class="lc-page-header__lead">
+      Hi {{ application.first_name }}, your independent contractor documents are on file.
+      Complete this step so {{ settings.app_name }} can issue commission payouts when you are approved.
+    </p>
+  </header>
+
+  <div class="lc-alert lc-alert--info" role="note">
+    Your tax ID is encrypted at rest and is not shown in full to administrators.
+    This page is only available through your private onboarding link.
+  </div>
+
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/partner/tax-info?token={{ token }}" class="lc-form lc-form--wide">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Taxpayer information</h2>
+      </div>
+      <div class="lc-card__body">
+        <div class="lc-field">
+          <label for="tax_legal_name">Legal name (as shown on tax return)</label>
+          <input id="tax_legal_name" type="text" name="tax_legal_name" value="{{ form.tax_legal_name or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="tax_business_name">Business name <span class="lc-text-muted">(optional)</span></label>
+          <input id="tax_business_name" type="text" name="tax_business_name" value="{{ form.tax_business_name or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="tax_address_line1">Address line 1</label>
+          <input id="tax_address_line1" type="text" name="tax_address_line1" value="{{ form.tax_address_line1 or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="tax_address_line2">Address line 2 <span class="lc-text-muted">(optional)</span></label>
+          <input id="tax_address_line2" type="text" name="tax_address_line2" value="{{ form.tax_address_line2 or '' }}" />
+        </div>
+        <div class="lc-grid lc-grid--3">
+          <div class="lc-field">
+            <label for="tax_city">City</label>
+            <input id="tax_city" type="text" name="tax_city" value="{{ form.tax_city or '' }}" required />
+          </div>
+          <div class="lc-field">
+            <label for="tax_state">State</label>
+            <input id="tax_state" type="text" name="tax_state" value="{{ form.tax_state or '' }}" required maxlength="64" />
+          </div>
+          <div class="lc-field">
+            <label for="tax_postal_code">Postal code</label>
+            <input id="tax_postal_code" type="text" name="tax_postal_code" value="{{ form.tax_postal_code or '' }}" required />
+          </div>
+        </div>
+        <div class="lc-field">
+          <label for="tax_classification">Federal tax classification</label>
+          <select id="tax_classification" name="tax_classification" required>
+            <option value="">Select…</option>
+            {% for option in tax_classifications %}
+              <option value="{{ option }}" {% if form.tax_classification == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="tax_tin_type">TIN type</label>
+            <select id="tax_tin_type" name="tax_tin_type" required>
+              <option value="">Select…</option>
+              <option value="ssn" {% if form.tax_tin_type == 'ssn' %}selected{% endif %}>SSN (individual)</option>
+              <option value="ein" {% if form.tax_tin_type == 'ein' %}selected{% endif %}>EIN (business)</option>
+            </select>
+          </div>
+          <div class="lc-field">
+            <label for="tax_tin">Taxpayer ID (9 digits)</label>
+            <input
+              id="tax_tin"
+              type="password"
+              name="tax_tin"
+              inputmode="numeric"
+              autocomplete="off"
+              required
+              placeholder="Numbers only — encrypted at rest"
+            />
+          </div>
+        </div>
+        <div class="lc-field">
+          <label>
+            <input type="checkbox" name="tax_certification" value="on" required />
+            I certify that the tax information provided is accurate.
+          </label>
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Submit W-9 information</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

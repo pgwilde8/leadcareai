@@ -96,30 +96,26 @@ def test_partner_dashboard_includes_demo_script(
     from app.models.partner_application import PartnerApplication
     from app.services.partner_document_service import seed_default_document_templates
     from app.services.partner_service import approve_application
+    from tests.partner_fixtures import ensure_partner_application_docs_signed, partner_onboard_form_data
 
     seed_default_document_templates(db_session)
     db_session.commit()
     client.post(
         "/partner/onboard",
-        data={
-            "first_name": "Demo",
-            "last_name": "Partner",
-            "email": "demo-script-partner@example.com",
-            "phone": "+15550003333",
-            "city": "Austin",
-            "state": "TX",
-            "company_name": "",
-            "experience_summary": "",
-            "why_interested": "",
-            "signature_text": "Demo Partner",
-            "electronic_consent": "on",
-        },
+        data=partner_onboard_form_data(
+            first_name="Demo",
+            last_name="Partner",
+            email="demo-script-partner@example.com",
+            phone="+15550003333",
+        ),
     )
     application = (
         db_session.query(PartnerApplication)
         .filter(PartnerApplication.email == "demo-script-partner@example.com")
         .one()
     )
+    ensure_partner_application_docs_signed(db_session, application.id)
+    db_session.commit()
     admin = create_admin_user(db_session, email="admin-for-script@example.com", password="admin-secret")
     db_session.commit()
     result = approve_application(db_session, application.id, reviewed_by_user_id=admin.id)

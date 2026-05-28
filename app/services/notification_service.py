@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 STAFF_SMS_MAX_LEN = 320
 SUMMARY_SNIPPET_LEN = 100
+INBOUND_QUOTE_MAX_LEN = 80
 _NON_DIGIT = re.compile(r"\D+")
+_URGENT_LEVELS = frozenset({"urgent", "emergency"})
 
 
 def _normalize_phone_digits(phone: str | None) -> str:
@@ -41,6 +43,23 @@ def _phones_match(a: str | None, b: str | None) -> bool:
     return da == db or da.endswith(db) or db.endswith(da)
 
 
+def is_urgent_lead(lead: Lead) -> bool:
+    """True when urgency or AI temperature indicates an emergency-style lead."""
+    urgency = (lead.urgency or "").strip().lower()
+    if urgency in _URGENT_LEVELS:
+        return True
+    temperature = (lead.ai_temperature or "").strip().lower()
+    return temperature == "hot"
+
+
+def _urgent_email_prefix(lead: Lead) -> str:
+    return "[URGENT] " if is_urgent_lead(lead) else ""
+
+
+def _staff_sms_brand(lead: Lead) -> str:
+    return "URGENT LeadCare AI" if is_urgent_lead(lead) else "LeadCare AI"
+
+
 def _short_summary(lead: Lead, message: Message | str | None) -> str:
     if isinstance(message, Message):
         text = (message.body or "").strip()
@@ -53,6 +72,15 @@ def _short_summary(lead: Lead, message: Message | str | None) -> str:
     if len(text) > SUMMARY_SNIPPET_LEN:
         return text[:SUMMARY_SNIPPET_LEN] + "…"
     return text
+
+
+def _quote_snippet(text: str, *, max_len: int = INBOUND_QUOTE_MAX_LEN) -> str:
+    cleaned = re.sub(r"\s+", " ", text.strip())
+    if not cleaned:
+        return "''"
+    if len(cleaned) > max_len:
+        cleaned = cleaned[: max_len - 1].rstrip() + "…"
+    return f"'{cleaned}'"
 
 
 def _lead_detail_url(lead_id: uuid.UUID) -> str | None:
@@ -81,13 +109,16 @@ def build_lead_notification_summary(
         "missed_call": "Missed call",
     }.get(lead.source, lead.source)
 
+    temperature = (lead.ai_temperature or "").strip()
     return {
         "business_name": business.name,
         "customer_phone": lead.phone or "—",
         "lead_status": lead.status,
         "source": source_label,
         "summary": lead.summary or _short_summary(lead, message),
+        "service_needed": (lead.service_needed or "—").strip() or "—",
         "urgency": lead.urgency or "—",
+        "ai_temperature": temperature or "—",
         "latest_message": latest or lead.summary or "—",
         "dashboard_url": detail_url or "",
     }
@@ -99,16 +130,18 @@ def _build_email_body(
     summary: dict[str, str],
 ) -> str:
     lines = [
-        f"{event_label}",
+        event_label,
         "",
         f"Business: {summary['business_name']}",
         f"Customer phone: {summary['customer_phone']}",
         f"Status: {summary['lead_status']}",
         f"Source: {summary['source']}",
+        f"Service needed: {summary['service_needed']}",
         f"Summary: {summary['summary']}",
         f"Urgency: {summary['urgency']}",
+        f"AI temperature: {summary['ai_temperature']}",
         "",
-        f"Latest message:",
+        "Latest message:",
         summary["latest_message"],
     ]
     if summary["dashboard_url"]:
@@ -116,13 +149,35 @@ def _build_email_body(
     return "\n".join(lines)
 
 
-def _build_staff_sms_body(
-    *,
-    event_prefix: str,
+def _build_inbound_reply_staff_sms(
     business: Business,
     lead: Lead,
     message: Message | str | None,
 ) -> str:
+    """Compact staff SMS for live customer SMS replies."""
+    brand = _staff_sms_brand(lead)
+    phone = lead.phone or "unknown"
+    quoted = _quote_snippet(_short_summary(lead, message))
+    parts = [f"{brand}: New reply for {business.name} from {phone}: {quoted}"]
+    urgency = (lead.urgency or "").strip()
+    if urgency and urgency.lower() not in {"normal", "low", "unknown", "—", "-"}:
+        parts.append(f" Urgency: {urgency}.")
+    detail_url = _lead_detail_url(lead.id)
+    if detail_url:
+        parts.append(f" View: {detail_url}")
+    body = "".join(parts)
+    if len(body) > STAFF_SMS_MAX_LEN:
+        body = body[: STAFF_SMS_MAX_LEN - 1] + "…"
+    return body
+
+
+def _build_missed_call_staff_sms(
+    business: Business,
+    lead: Lead,
+    message: Message | str | None,
+) -> str:
+    """Staff SMS for new missed-call leads (multi-line detail)."""
+    brand = _staff_sms_brand(lead)
     urgency = (lead.urgency or "normal").strip().upper() or "NORMAL"
     service = (lead.service_needed or "Unknown service").strip()
     town = (lead.location or "Unknown town").strip()
@@ -130,7 +185,7 @@ def _build_staff_sms_body(
     callback = (lead.preferred_contact_time or "Not provided").strip()
     last_message = _short_summary(lead, message)
     parts = [
-        f"LeadCare AI: {urgency} | {service} | {town}\n"
+        f"{brand}: {urgency} | {service} | {town}\n"
         f"Name: {name}\n"
         f"Callback: {callback}\n"
         f"Last message: {last_message}"
@@ -139,11 +194,23 @@ def _build_staff_sms_body(
         parts.append(f"\nRecommended: {recommended_action_for_lead(lead)}")
     detail_url = _lead_detail_url(lead.id)
     if detail_url:
-        parts.append(f"\nView dashboard: {detail_url}")
+        parts.append(f"\nView: {detail_url}")
     body = "".join(parts)
     if len(body) > STAFF_SMS_MAX_LEN:
         body = body[: STAFF_SMS_MAX_LEN - 1] + "…"
     return body
+
+
+def _build_staff_sms_body(
+    *,
+    event_type: str,
+    business: Business,
+    lead: Lead,
+    message: Message | str | None,
+) -> str:
+    if event_type == "inbound_sms":
+        return _build_inbound_reply_staff_sms(business, lead, message)
+    return _build_missed_call_staff_sms(business, lead, message)
 
 
 def list_recent_notifications_for_lead(
@@ -278,12 +345,11 @@ def _dispatch_notifications(
     message: Message | str | None,
     event_type: str,
     email_subject: str,
-    staff_event_prefix: str,
 ) -> None:
     summary = build_lead_notification_summary(business, lead, message)
     email_body = _build_email_body(event_label=email_subject, summary=summary)
     staff_body = _build_staff_sms_body(
-        event_prefix=staff_event_prefix,
+        event_type=event_type,
         business=business,
         lead=lead,
         message=message,
@@ -350,14 +416,14 @@ def notify_new_missed_call_lead(
 ) -> None:
     """Alert business staff after a new missed-call lead event. Never raises."""
     try:
+        db.refresh(lead)
         _dispatch_notifications(
             db,
             business=business,
             lead=lead,
             message=voice_message,
             event_type="missed_call",
-            email_subject=f"New missed-call lead: {business.name}",
-            staff_event_prefix="New lead",
+            email_subject=f"{_urgent_email_prefix(lead)}New missed-call lead: {business.name}",
         )
     except Exception:
         logger.exception(
@@ -372,16 +438,16 @@ def notify_inbound_sms_reply(
     lead: Lead,
     inbound_message: Message | str,
 ) -> None:
-    """Alert business staff after a new inbound SMS. Never raises."""
+    """Alert business staff after a new inbound SMS (post AI analysis). Never raises."""
     try:
+        db.refresh(lead)
         _dispatch_notifications(
             db,
             business=business,
             lead=lead,
             message=inbound_message,
             event_type="inbound_sms",
-            email_subject=f"New SMS reply: {business.name}",
-            staff_event_prefix="New SMS reply",
+            email_subject=f"{_urgent_email_prefix(lead)}New customer reply: {business.name}",
         )
     except Exception:
         logger.exception(

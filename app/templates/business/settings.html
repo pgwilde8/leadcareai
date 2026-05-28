@@ -77,8 +77,10 @@
 
     <h2>Notifications</h2>
     <p class="hint">
-      <strong>notification_email</strong> receives email alerts when a new missed-call lead or inbound SMS reply arrives.<br />
-      <strong>notification_phone</strong> receives staff SMS alerts (separate from customer text-backs).<br />
+      <strong>notification_email</strong> and <strong>notification_phone</strong> alert your team when a new missed-call lead arrives
+      or when a customer sends another SMS reply (live conversation updates).<br />
+      Staff SMS is separate from customer text-backs. Urgent or emergency leads may be prefixed
+      <strong>[URGENT]</strong> in email and <strong>URGENT LeadCare AI</strong> in staff texts.<br />
       Alerts are best-effort. Delivery may fail silently if email or Twilio is not configured.<br />
       Customer-facing missed-call text-back is configured above and is not the same as staff SMS alerts.
     </p>

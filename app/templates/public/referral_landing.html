@@ -1,0 +1,60 @@
+{% extends "layout/base.html" %}
+
+{% block title %}{{ settings.app_name }} — Stop losing customers when you miss calls{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block content %}
+  <section class="lc-hero" aria-labelledby="referral-hero-title">
+    <p class="lc-hero__eyebrow">Missed-call recovery for local service businesses</p>
+    <h1 id="referral-hero-title" class="lc-hero__title">Stop losing customers when you miss calls</h1>
+    <p class="lc-hero__lead">
+      {{ settings.app_name }} instantly texts missed callers, qualifies the lead by SMS, and alerts your team
+      by text, email, or dashboard — before they call your competitor.
+    </p>
+    <div class="lc-hero__actions">
+      <a class="lc-btn lc-btn--accent" href="{{ demo_link }}">Try the demo</a>
+      <a class="lc-btn lc-btn--secondary" href="{{ demo_book_link }}">Book a demo</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="problem-title">
+    <h2 id="problem-title">The missed-call problem</h2>
+    <p>
+      When your team is on a job, at lunch, or closed for the day, unanswered calls often mean lost revenue.
+      Many callers will not leave a voicemail — they simply hire the next company that responds.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="flow-title">
+    <h2 id="flow-title">How {{ settings.app_name }} works</h2>
+    <ol class="lc-steps">
+      <li><strong>Missed call</strong> — A customer calls and no one answers in time.</li>
+      <li><strong>Instant SMS</strong> — {{ settings.app_name }} sends a friendly text asking what they need.</li>
+      <li><strong>Qualification</strong> — Simple SMS questions capture name, need, and urgency.</li>
+      <li><strong>Team alert</strong> — Your staff gets an SMS, email, or dashboard alert with the lead details.</li>
+    </ol>
+  </section>
+
+  <section class="lc-section" aria-labelledby="number-title">
+    <h2 id="number-title">Keep your number — add smart follow-up</h2>
+    <p>
+      Many businesses keep their existing phone number and use call forwarding (missed or unanswered calls forwarded
+      to {{ settings.app_name }}) so callers still see your brand. Setup varies by carrier; we help you configure it
+      during onboarding.
+    </p>
+    <p class="lc-text-muted">
+      {{ settings.app_name }} is not emergency dispatch and does not replace every traditional answering service,
+      but it helps you recover more missed-call opportunities with fast SMS follow-up.
+    </p>
+  </section>
+
+  <section class="lc-cta-band" aria-labelledby="cta-title">
+    <h2 id="cta-title">See it in action</h2>
+    <p>Try the live missed-call demo or book a short walkthrough for your business.</p>
+    <div class="lc-hero__actions" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="{{ demo_link }}">Try the demo</a>
+      <a class="lc-btn lc-btn--secondary" href="{{ demo_book_link }}">Book a demo</a>
+    </div>
+  </section>
+{% endblock %}

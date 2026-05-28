@@ -1,0 +1,111 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
+
+{% block title %}New payout batch — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">New payout batch</h1>
+    <p class="lc-admin-header__lead">Select a partner and approved commissions to include in a draft batch.</p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Payouts">
+    <a href="/admin/payouts">← Payout batches</a>
+  </nav>
+
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">1. Choose partner</h2>
+    {% if partner_summaries %}
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Partner</th>
+              <th>Approved unpaid</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in partner_summaries %}
+              <tr>
+                <td>{{ item.partner.display_name }}</td>
+                <td>{{ item.approved_count }}</td>
+                <td>${{ "%.2f"|format(item.approved_total_cents / 100) }}</td>
+                <td>
+                  <a
+                    href="/admin/payouts/new?partner_id={{ item.partner.id }}"
+                    class="lc-btn lc-btn--secondary lc-btn--sm"
+                  >Select</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">No partners have approved, unpaid commissions.</p>
+    {% endif %}
+  </section>
+
+  {% if selected_partner_id %}
+    <section class="lc-admin-section">
+      <h2 class="lc-admin-section__title">2. Select commissions</h2>
+      {% if commission_rows %}
+        <form method="post" action="/admin/payouts" class="lc-form">
+          <input type="hidden" name="partner_id" value="{{ selected_partner_id }}" />
+          <div class="lc-table-wrap">
+            <table class="lc-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Business</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Approved</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for commission, business in commission_rows %}
+                  <tr>
+                    <td>
+                      <input
+                        type="checkbox"
+                        name="commission_ids"
+                        value="{{ commission.id }}"
+                        checked
+                      />
+                    </td>
+                    <td>{{ business.name if business else "—" }}</td>
+                    <td>{{ commission.commission_type }}</td>
+                    <td>${{ "%.2f"|format(commission.amount_cents / 100) }} {{ commission.currency }}</td>
+                    <td>{{ commission.approved_at or commission.created_at }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="lc-field" style="margin-top: var(--lc-space-4);">
+            <label for="notes">Batch notes <span class="lc-text-muted">(optional, admin only)</span></label>
+            <textarea id="notes" name="notes" rows="2"></textarea>
+          </div>
+          <button type="submit" class="lc-btn lc-btn--primary">Create draft payout batch</button>
+        </form>
+      {% else %}
+        <p class="lc-text-muted">This partner has no approved unpaid commissions available.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

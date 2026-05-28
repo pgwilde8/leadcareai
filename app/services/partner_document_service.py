@@ -3,47 +3,42 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from app.models.partner_document_template import PartnerDocumentTemplate
 from app.models.partner_signed_document import ELECTRONIC_CONSENT_TEXT, PartnerSignedDocument
 
-DEFAULT_DOCUMENT_SPECS: tuple[tuple[str, str, str], ...] = (
-    (
-        "independent_contractor_agreement",
-        "Independent Contractor Agreement",
-        (
-            "DRAFT PLACEHOLDER — NOT LEGAL ADVICE.\n\n"
-            "This Independent Contractor Agreement placeholder must be reviewed and replaced "
-            "by qualified legal counsel before use with real independent contractors.\n\n"
-            "LeadCare AI engages partners as non-employee sales contractors. Partners may refer "
-            "paying business customers only. Partners do not earn commissions for recruiting other partners."
-        ),
-    ),
-    (
-        "partner_program_terms",
-        "Partner Program Terms",
-        (
-            "DRAFT PLACEHOLDER — NOT LEGAL ADVICE.\n\n"
-            "These Partner Program Terms are a draft placeholder. Do not rely on this text for "
-            "production partner relationships until reviewed by legal counsel.\n\n"
-            "Partners must comply with applicable laws, represent LeadCare AI accurately, and "
-            "must not operate multi-level or downline compensation structures."
-        ),
-    ),
-    (
-        "commission_schedule_acknowledgment",
-        "Commission Schedule Acknowledgment",
-        (
-            "DRAFT PLACEHOLDER — NOT LEGAL ADVICE.\n\n"
-            "This acknowledgment confirms the partner understands that commissions apply only "
-            "to real paying business customers referred by the partner, not to partner recruitment. "
-            "Payout timing and amounts will be defined in a future commission schedule after legal review.\n\n"
-            "No automated payouts are provided in V1."
-        ),
-    ),
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DOCUMENTS_DIR = PROJECT_ROOT / "app" / "templates" / "partner" / "documents"
+
+LEGAL_REVIEW_BANNER = (
+    "DRAFT PLACEHOLDER — NOT LEGAL ADVICE. Must be reviewed by legal counsel before production use."
 )
+
+DOCUMENT_CATALOG: dict[str, str] = {
+    "independent_contractor_agreement": "Independent Contractor Agreement",
+    "commission_schedule_acknowledgment": "Commission Schedule Acknowledgment",
+    "acceptable_marketing_policy": "Acceptable Marketing Policy",
+    "privacy_data_handling": "Privacy / Data Handling",
+    "electronic_signature_notice": "Electronic Signature and Records Notice",
+}
+
+LEGACY_INACTIVE_CODES = frozenset({"partner_program_terms"})
+
+
+def load_document_body(code: str) -> str:
+    """Load markdown body for a document code from app/templates/partner/documents/{code}.md."""
+    if code not in DOCUMENT_CATALOG:
+        raise ValueError(f"Unknown partner document code: {code!r}")
+    path = DOCUMENTS_DIR / f"{code}.md"
+    if not path.is_file():
+        raise FileNotFoundError(f"Partner document file not found: {path}")
+    body = path.read_text(encoding="utf-8").strip()
+    if LEGAL_REVIEW_BANNER not in body:
+        body = f"{LEGAL_REVIEW_BANNER}\n\n---\n\n{body}"
+    return body
 
 
 def list_active_document_templates(db: Session) -> list[PartnerDocumentTemplate]:
@@ -63,10 +58,44 @@ def get_document_template_by_code(db: Session, code: str) -> PartnerDocumentTemp
     )
 
 
+def template_has_signed_documents(db: Session, template_id) -> bool:
+    return (
+        db.query(PartnerSignedDocument.id)
+        .filter(PartnerSignedDocument.document_template_id == template_id)
+        .limit(1)
+        .first()
+        is not None
+    )
+
+
+def _bump_version(version: str) -> str:
+    parts = version.strip().split(".")
+    try:
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+    except (ValueError, IndexError):
+        return "1.1"
+    return f"{major}.{minor + 1}"
+
+
+def _deactivate_legacy_templates(db: Session) -> None:
+    for code in LEGACY_INACTIVE_CODES:
+        existing = get_document_template_by_code(db, code)
+        if existing is not None:
+            existing.is_active = False
+
+
 def seed_default_document_templates(db: Session) -> list[PartnerDocumentTemplate]:
-    """Create or refresh default active partner document templates (idempotent by code)."""
+    """
+    Create or refresh active partner document templates from markdown files.
+
+    Does not overwrite template body when signed documents already reference the template
+    (preserves snapshots for existing applicants).
+    """
+    _deactivate_legacy_templates(db)
     results: list[PartnerDocumentTemplate] = []
-    for code, title, body in DEFAULT_DOCUMENT_SPECS:
+    for code, title in DOCUMENT_CATALOG.items():
+        body = load_document_body(code)
         existing = get_document_template_by_code(db, code)
         if existing is None:
             template = PartnerDocumentTemplate(
@@ -79,11 +108,15 @@ def seed_default_document_templates(db: Session) -> list[PartnerDocumentTemplate
             db.add(template)
             db.flush()
             results.append(template)
-        else:
-            existing.title = title
-            existing.body = body
-            existing.is_active = True
-            results.append(existing)
+            continue
+
+        existing.title = title
+        existing.is_active = True
+        if not template_has_signed_documents(db, existing.id):
+            if existing.body != body:
+                existing.body = body
+                existing.version = _bump_version(existing.version)
+        results.append(existing)
     return results
 
 

@@ -1,0 +1,60 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Sign partner documents — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Independent contractor documents</h1>
+    <p class="lc-page-header__lead">
+      Hi {{ application.first_name }}, please review and sign the documents below to continue your
+      {{ settings.app_name }} partner onboarding.
+    </p>
+  </header>
+
+  <div class="lc-alert lc-alert--info" role="note">
+    <strong>Legal review required.</strong> Documents below are drafts and are not legal advice.
+    Have qualified counsel review all partner agreements before production use.
+  </div>
+
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/partner/sign-documents?token={{ token }}" class="lc-form lc-form--wide">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Documents to sign</h2>
+      </div>
+      <div class="lc-card__body">
+        <p>Review each document below. You will sign all active documents with one typed signature.</p>
+        {% for doc in documents %}
+          <details class="lc-doc-panel" style="margin: var(--lc-space-4) 0; border: 1px solid var(--lc-border); border-radius: var(--lc-radius); padding: var(--lc-space-3);">
+            <summary style="cursor: pointer; font-weight: 600;">{{ doc.title }} (v{{ doc.version }})</summary>
+            <pre class="lc-pre-block" style="margin-top: var(--lc-space-3); white-space: pre-wrap; font-family: inherit; font-size: 0.9rem;">{{ doc.body }}</pre>
+          </details>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Electronic signature</h2>
+      </div>
+      <div class="lc-card__body">
+        <div class="lc-field">
+          <label>
+            <input type="checkbox" name="electronic_consent" value="on" required />
+            {{ consent_text }}
+          </label>
+        </div>
+        <div class="lc-field">
+          <label for="signature_text">Type your full legal name as your signature</label>
+          <input id="signature_text" type="text" name="signature_text" value="{{ signature_text or '' }}" required />
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Sign documents and continue</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

@@ -14,6 +14,7 @@ from app.core.database import Base
 if TYPE_CHECKING:
     from app.models.partner import Partner
     from app.models.partner_signed_document import PartnerSignedDocument
+    from app.models.partner_tax_info import PartnerTaxInfo
     from app.models.user import User
 
 APPLICATION_STATUSES = frozenset({
@@ -51,6 +52,26 @@ class PartnerApplication(Base):
         nullable=True,
     )
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    docs_signing_token_hash: Mapped[str | None] = mapped_column(
+        String(128),
+        nullable=True,
+        unique=True,
+        index=True,
+    )
+    docs_signing_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    tax_info_token_hash: Mapped[str | None] = mapped_column(
+        String(128),
+        nullable=True,
+        unique=True,
+        index=True,
+    )
+    tax_info_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -66,5 +87,9 @@ class PartnerApplication(Base):
     partner: Mapped[Partner | None] = relationship(back_populates="application", uselist=False)
     signed_documents: Mapped[list[PartnerSignedDocument]] = relationship(
         back_populates="application",
+    )
+    tax_info: Mapped[PartnerTaxInfo | None] = relationship(
+        back_populates="application",
+        uselist=False,
     )
     reviewed_by: Mapped[User | None] = relationship(foreign_keys=[reviewed_by_user_id])
