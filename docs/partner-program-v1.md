@@ -2,9 +2,14 @@
 
 LeadCare AI partners are independent sales contractors who refer or sell the platform to local businesses. This document describes the V1 onboarding workflow implemented in code — not legal advice.
 
+## Public partner opportunity
+
+- **`GET /partners`** — Public sales partner opportunity page (pay plan summary, compliance guardrails, how it works, apply CTA).
+- **`GET /partner/onboard`** — Lightweight application only (no W-9, no IC signing, no tax ID on first submit).
+
 ## Partner lifecycle
 
-1. **Apply** — Public form at `/partner/onboard` collects applicant details only (no tax ID). No IC documents are signed at this step.
+1. **Apply** — Public form at `/partner/onboard` collects name, contact, market area, sales background, and IC/commission acknowledgment only. No tax ID or document signing on this step.
 2. **Admin screening** — Admins review at `/admin/partners` and `/admin/partners/{application_id}`, contact the applicant, and may reject.
 3. **Sign documents** — Admin generates a signing link (`docs_pending`). Applicant opens `/partner/sign-documents?token=…`, reviews templates, and signs. Status becomes `docs_signed`.
 4. **W-9 / tax info** — After signing, applicant is redirected to `/partner/tax-info?token=…` to submit encrypted W-9 data (or admin sends a W-9 link later).
@@ -100,10 +105,11 @@ Business lead statuses (admin-managed): `new`, `contacted`, `qualified`, `conver
 
 ### What partners see
 
-On `/partner/dashboard` and `/partner/marketing`:
+On `/partner/dashboard`, `/partner/marketing`, and `/partner/resources`:
 
 - Referral link (copyable) and referral code
 - Marketing links page with demo/landing URLs and suggested share copy
+- Resources & training playbook (quick start, pitch, demo script, objections, compliance)
 - Count of referred businesses
 - Table: business name, city/state, lead status, payment placeholder (“Not paying yet”)
 
@@ -146,7 +152,8 @@ Admins use existing session auth (`role=admin`).
 
 | Page | URL |
 |------|-----|
-| Partner onboarding | `https://leadcareai.com/partner/onboard` |
+| Partner opportunity | `https://leadcareai.com/partners` |
+| Partner application | `https://leadcareai.com/partner/onboard` |
 | Admin partner list | `https://leadcareai.com/admin/partners` |
 | Admin application review | `https://leadcareai.com/admin/partners/{application_id}` |
 | Partner dashboard | `https://leadcareai.com/partner/dashboard` |

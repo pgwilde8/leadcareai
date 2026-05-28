@@ -118,6 +118,11 @@ def contact_success(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/contact_success.html", {})
 
 
+@router.get("/partners", response_class=HTMLResponse, response_model=None)
+def partners_opportunity_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "public/partners.html", {})
+
+
 @router.get("/r/{referral_code}", response_class=HTMLResponse, response_model=None)
 def referral_landing_page(
     request: Request,

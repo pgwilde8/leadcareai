@@ -38,6 +38,47 @@ def test_active_partner_can_view_marketing_page(
     assert "guaranteed income" in response.text.lower()
 
 
+def test_active_partner_can_view_resources_playbook(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    code, email, password = _active_partner(client, db_session, "resources@example.com")
+    assert password
+    client.post("/login", data={"email": email, "password": password})
+
+    response = client.get("/partner/resources")
+    assert response.status_code == 200
+    assert "Partner resources" in response.text or "resources &amp; training" in response.text.lower()
+    assert "Quick start" in response.text
+    assert "30-second pitch" in response.text
+    assert "Demo script" in response.text
+    assert "Objection answers" in response.text
+    assert "Compliance reminders" in response.text
+    assert "stop losing customers when they miss calls" in response.text
+    assert f"/r/{code}" in response.text
+    assert f"/demo?ref={code}" in response.text
+    assert "Do I have to change my number" in response.text
+    assert "carrier" in response.text.lower()
+
+
+def test_non_partner_cannot_access_resources(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    create_user(
+        db_session,
+        email="biz-resources@example.com",
+        password="biz-secret",
+        role="business_user",
+    )
+    db_session.commit()
+    client.post("/login", data={"email": "biz-resources@example.com", "password": "biz-secret"})
+
+    response = client.get("/partner/resources", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"
+
+
 def test_non_partner_cannot_access_marketing(
     client: TestClient,
     db_session: Session,

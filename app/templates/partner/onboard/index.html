@@ -6,18 +6,19 @@
 
 {% block content %}
   <header class="lc-page-header">
-    <h1 class="lc-page-header__title">Partner application</h1>
+    <h1 class="lc-page-header__title">Sales Partner application</h1>
     <p class="lc-page-header__lead">
-      Apply to become an independent sales partner for {{ settings.app_name }}.
-      Commissions apply only to paying business customers you refer — not to recruiting other partners.
-      <a href="/partner/payplan">Read the Sales Partner Pay Plan</a>.
+      Lightweight application only — no tax ID, no document signing on this page.
+      <a href="/partners">Learn about the opportunity</a>
+      ·
+      <a href="/partner/payplan">Pay plan</a>
     </p>
   </header>
 
   <div class="lc-alert lc-alert--info" role="note">
-    After you apply, our team will review your submission and contact you.
-    If we move forward, you will receive a separate link to review and sign independent contractor documents.
-    W-9 / tax information is collected later, only after you sign those documents.
+    After you apply, our team reviews your submission. If we move forward, we may contact you for a short
+    screening call and send a <strong>separate</strong> link to sign independent contractor documents.
+    W-9 / tax information is collected later, before any commission payout.
   </div>
 
   {% if error %}
@@ -27,18 +28,12 @@
   <form method="post" action="/partner/onboard" class="lc-form lc-form--wide">
     <div class="lc-card">
       <div class="lc-card__header">
-        <h2 class="lc-card__title">Your information</h2>
+        <h2 class="lc-card__title">About you</h2>
       </div>
       <div class="lc-card__body">
-        <div class="lc-grid lc-grid--2">
-          <div class="lc-field">
-            <label for="first_name">First name</label>
-            <input id="first_name" type="text" name="first_name" value="{{ form.first_name or '' }}" required />
-          </div>
-          <div class="lc-field">
-            <label for="last_name">Last name</label>
-            <input id="last_name" type="text" name="last_name" value="{{ form.last_name or '' }}" required />
-          </div>
+        <div class="lc-field">
+          <label for="full_name">Full name</label>
+          <input id="full_name" type="text" name="full_name" value="{{ form.full_name or '' }}" required autocomplete="name" />
         </div>
         <div class="lc-field">
           <label for="email">Email</label>
@@ -46,29 +41,37 @@
         </div>
         <div class="lc-field">
           <label for="phone">Phone</label>
-          <input id="phone" type="tel" name="phone" value="{{ form.phone or '' }}" required />
-        </div>
-        <div class="lc-grid lc-grid--2">
-          <div class="lc-field">
-            <label for="city">City</label>
-            <input id="city" type="text" name="city" value="{{ form.city or '' }}" required />
-          </div>
-          <div class="lc-field">
-            <label for="state">State</label>
-            <input id="state" type="text" name="state" value="{{ form.state or '' }}" required maxlength="64" />
-          </div>
+          <input id="phone" type="tel" name="phone" value="{{ form.phone or '' }}" required autocomplete="tel" />
         </div>
         <div class="lc-field">
-          <label for="company_name">Company name <span class="lc-text-muted">(optional)</span></label>
-          <input id="company_name" type="text" name="company_name" value="{{ form.company_name or '' }}" />
+          <label for="market_area">Market area <span class="lc-text-muted">(city / region — e.g. Austin, TX or DFW metro)</span></label>
+          <input id="market_area" type="text" name="market_area" value="{{ form.market_area or '' }}" required />
+        </div>
+      </div>
+    </div>
+
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Sales background</h2>
+      </div>
+      <div class="lc-card__body">
+        <div class="lc-field">
+          <label for="sales_experience">Sales experience</label>
+          <textarea id="sales_experience" name="sales_experience" rows="3" required placeholder="B2B outreach, field sales, phone sales, agency work, etc.">{{ form.sales_experience or '' }}</textarea>
         </div>
         <div class="lc-field">
-          <label for="experience_summary">Experience summary <span class="lc-text-muted">(optional)</span></label>
-          <textarea id="experience_summary" name="experience_summary" rows="3">{{ form.experience_summary or '' }}</textarea>
+          <label for="target_industries">Businesses or industries you would contact first</label>
+          <textarea id="target_industries" name="target_industries" rows="3" required placeholder="e.g. HVAC companies in north Austin, roofing contractors, med spas">{{ form.target_industries or '' }}</textarea>
         </div>
         <div class="lc-field">
-          <label for="why_interested">Why are you interested? <span class="lc-text-muted">(optional)</span></label>
-          <textarea id="why_interested" name="why_interested" rows="3">{{ form.why_interested or '' }}</textarea>
+          <label for="why_interested">Why are you interested in {{ settings.app_name }}?</label>
+          <textarea id="why_interested" name="why_interested" rows="3" required>{{ form.why_interested or '' }}</textarea>
+        </div>
+        <div class="lc-field">
+          <label>
+            <input type="checkbox" name="ic_understanding" value="on" required {% if form.ic_understanding %}checked{% endif %} />
+            I understand this is commission-based independent contractor work and no income is guaranteed.
+          </label>
         </div>
         <button type="submit" class="lc-btn lc-btn--primary">Submit application</button>
       </div>

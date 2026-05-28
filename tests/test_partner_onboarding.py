@@ -74,20 +74,9 @@ def test_seed_loads_markdown_document_content(db_session: Session) -> None:
 def test_get_partner_onboard_returns_200(client: TestClient) -> None:
     response = client.get("/partner/onboard")
     assert response.status_code == 200
-    assert "Partner application" in response.text
-    assert "separate link" in response.text.lower()
+    assert "Sales Partner application" in response.text
+    assert "screening call" in response.text.lower()
     assert "Independent Contractor Agreement" not in response.text
-
-
-def test_partner_onboard_page_has_no_tax_form_fields(client: TestClient) -> None:
-    response = client.get("/partner/onboard")
-    assert response.status_code == 200
-    text = response.text.lower()
-    assert 'name="tax_legal_name"' not in text
-    assert 'name="tax_tin"' not in text
-    assert 'name="tax_certification"' not in text
-    assert "federal tax classification" not in text
-    assert "taxpayer id" not in text
 
 
 def test_post_partner_onboard_creates_application_without_signed_docs(

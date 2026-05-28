@@ -25,28 +25,49 @@ def _client_ip(request: Request) -> str | None:
     return None
 
 
+def _split_full_name(full_name: str) -> tuple[str, str]:
+    parts = full_name.strip().split()
+    if not parts:
+        raise ValueError("Full name is required.")
+    if len(parts) == 1:
+        return parts[0], parts[0]
+    return parts[0], " ".join(parts[1:])
+
+
+def _parse_market_area(market_area: str) -> tuple[str, str]:
+    text = market_area.strip()
+    if not text:
+        raise ValueError("Market area is required.")
+    if "," in text:
+        city_part, state_part = text.rsplit(",", 1)
+        city = city_part.strip()
+        state = state_part.strip()
+        if not city:
+            raise ValueError("Market area is required.")
+        return city[:120], (state or "—")[:64]
+    return text[:120], "—"
+
+
 def _form_context(
     *,
-    first_name: str = "",
-    last_name: str = "",
+    full_name: str = "",
     email: str = "",
     phone: str = "",
-    city: str = "",
-    state: str = "",
-    company_name: str = "",
-    experience_summary: str = "",
+    market_area: str = "",
+    sales_experience: str = "",
+    target_industries: str = "",
     why_interested: str = "",
+    ic_understanding: bool = False,
 ) -> dict:
     return {
-        "first_name": first_name,
-        "last_name": last_name,
+        "full_name": full_name,
         "email": email,
         "phone": phone,
-        "city": city,
-        "state": state,
-        "company_name": company_name,
-        "experience_summary": experience_summary,
+        "market_area": market_area,
+        "sales_experience": sales_experience,
+        "target_industries": target_industries,
         "why_interested": why_interested,
+        "ic_understanding": ic_understanding,
     }
 
 
@@ -102,29 +123,42 @@ def partner_onboard_form(
 def partner_onboard_submit(
     request: Request,
     db: Annotated[Session, Depends(get_db)],
-    first_name: str = Form(""),
-    last_name: str = Form(""),
+    full_name: str = Form(""),
     email: str = Form(""),
     phone: str = Form(""),
-    city: str = Form(""),
-    state: str = Form(""),
-    company_name: str = Form(""),
-    experience_summary: str = Form(""),
+    market_area: str = Form(""),
+    sales_experience: str = Form(""),
+    target_industries: str = Form(""),
     why_interested: str = Form(""),
+    ic_understanding: str = Form(""),
 ):
     form = _form_context(
-        first_name=first_name,
-        last_name=last_name,
+        full_name=full_name,
         email=email,
         phone=phone,
-        city=city,
-        state=state,
-        company_name=company_name,
-        experience_summary=experience_summary,
+        market_area=market_area,
+        sales_experience=sales_experience,
+        target_industries=target_industries,
         why_interested=why_interested,
+        ic_understanding=ic_understanding == "on",
     )
 
     try:
+        if ic_understanding != "on":
+            raise ValueError(
+                "You must confirm that you understand this is commission-based work "
+                "and no income is guaranteed."
+            )
+        if not sales_experience.strip():
+            raise ValueError("Sales experience is required.")
+        if not target_industries.strip():
+            raise ValueError("Please describe businesses or industries you would contact first.")
+        if not why_interested.strip():
+            raise ValueError("Please tell us why you are interested.")
+
+        first_name, last_name = _split_full_name(full_name)
+        city, state = _parse_market_area(market_area)
+
         application = partner_service.create_application(
             db,
             first_name=first_name,
@@ -133,9 +167,9 @@ def partner_onboard_submit(
             phone=phone,
             city=city,
             state=state,
-            company_name=company_name or None,
-            experience_summary=experience_summary or None,
-            why_interested=why_interested or None,
+            company_name=target_industries.strip(),
+            experience_summary=sales_experience.strip(),
+            why_interested=why_interested.strip(),
         )
         partner_service.mark_application_admin_review(db, application.id)
         db.commit()

@@ -143,3 +143,30 @@ def partner_marketing(
             "demo_book_link": demo_book_link,
         },
     )
+
+
+@router.get("/resources", response_class=HTMLResponse, response_model=None)
+def partner_resources(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = require_partner(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    partner: Partner = auth
+    base = _public_base_url()
+    code = partner.referral_code
+
+    return templates.TemplateResponse(
+        request,
+        "partner/resources.html",
+        {
+            "partner": partner,
+            "referral_code": code,
+            "demo_link": f"{base}/demo?ref={code}",
+            "referral_landing_link": f"{base}/r/{code}",
+            "demo_book_link": f"{base}/demo/book?ref={code}",
+            "demo_phone_display": DEMO_PHONE_DISPLAY,
+        },
+    )

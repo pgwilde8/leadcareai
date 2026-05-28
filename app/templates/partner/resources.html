@@ -1,0 +1,145 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Partner resources &amp; training — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Partner resources &amp; training</h1>
+    <p class="lc-page-header__lead">
+      A short playbook for sharing your links, running the live demo, and answering common questions.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav" aria-label="Partner">
+    <a href="/partner/dashboard">← Partner dashboard</a>
+    ·
+    <a href="/partner/marketing">Marketing links</a>
+    ·
+    <a href="/partner/payplan">Pay plan</a>
+  </nav>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Quick start</h2>
+    </div>
+    <div class="lc-card__body">
+      <ol>
+        <li>
+          Copy your referral landing link from
+          <a href="/partner/marketing">Marketing links</a>:
+          <code>{{ referral_landing_link }}</code>
+        </li>
+        <li>Share that link with local service businesses (Facebook, email, text, in person).</li>
+        <li>
+          For warmer prospects who want to try the live demo first, send
+          <a href="{{ demo_link }}">Try the demo</a> (<code>/demo?ref={{ referral_code }}</code>).
+        </li>
+        <li>
+          When you are booking a demo call or following up after interest, use
+          <a href="{{ demo_book_link }}">Book a demo</a> (<code>/demo/book?ref={{ referral_code }}</code>).
+        </li>
+      </ol>
+      <p class="lc-text-muted lc-mb-0">
+        Your referral code: <strong><code>{{ referral_code }}</code></strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">30-second pitch</h2>
+    </div>
+    <div class="lc-card__body">
+      <blockquote class="lc-pre-block" style="white-space: pre-wrap; font-family: inherit; margin: 0;">
+        {{ settings.app_name }} helps local businesses stop losing customers when they miss calls. It texts missed callers instantly, qualifies the lead by SMS, and sends the business owner a HOT lead summary by text, email, and dashboard.
+      </blockquote>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Demo script</h2>
+      {% if demo_phone_display %}
+        <span class="lc-badge lc-badge--status-active">{{ demo_phone_display }}</span>
+      {% endif %}
+    </div>
+    <div class="lc-card__body">
+      <p>Run this live demo in about two minutes with the business owner watching.</p>
+      <ol>
+        <li>
+          Ask the business owner to <strong>call the demo number and hang up</strong>:
+          <a href="tel:+18336691335">{{ demo_phone_display or "1-833-669-1335" }}</a>
+        </li>
+        <li>
+          Have them <strong>reply to the text like a customer</strong> — for example:
+          “Kitchen sink backing up, need someone today.”
+        </li>
+        <li>
+          Open the <a href="/demo/dashboard" target="_blank" rel="noopener">demo dashboard</a> and show the
+          <strong>HOT</strong> or <strong>URGENT</strong> lead, plus the recommended follow-up action.
+        </li>
+        <li>
+          Explain that they <strong>keep their main number</strong>. Missed or unanswered calls can
+          <strong>forward to {{ settings.app_name }}</strong> using carrier-specific call forwarding.
+          Setup varies by carrier — we help configure it during onboarding; do not quote exact dial codes in public posts.
+        </li>
+      </ol>
+      <p class="lc-mb-0">
+        Public demo page: <a href="{{ demo_link }}">{{ demo_link }}</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Objection answers</h2>
+    </div>
+    <div class="lc-card__body">
+      <dl class="lc-faq">
+        <dt>Do I have to change my number?</dt>
+        <dd>
+          No. Most businesses keep their existing customer-facing number and forward missed or unanswered calls
+          to a {{ settings.app_name }} recovery line. We help with forwarding setup during onboarding.
+        </dd>
+
+        <dt>Is this an answering service?</dt>
+        <dd>
+          It is missed-call recovery by SMS and lead qualification — not a live call center answering every ring.
+          It helps you respond faster to people who already tried to reach you.
+        </dd>
+
+        <dt>What happens if I cancel?</dt>
+        <dd>
+          They can cancel per the customer terms. Forwarding can be removed with their carrier. Point them to
+          <a href="/terms">Terms</a> and <a href="/refund-policy">Refund policy</a> for specifics; do not promise custom terms.
+        </dd>
+
+        <dt>Does AI answer the phone?</dt>
+        <dd>
+          {{ settings.app_name }} focuses on <strong>text follow-up after a missed call</strong>, not replacing a human
+          who picks up live calls. Staff still call the customer back; the system captures and qualifies the lead first.
+        </dd>
+
+        <dt>What industries is this for?</dt>
+        <dd>
+          Local service businesses that live on the phone — HVAC, plumbing, electrical, roofing, restoration,
+          landscaping, cleaning, and similar trades where a missed call often means a lost job.
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="lc-alert lc-alert--info" role="note">
+    <h2 class="lc-card__title" style="margin-top: 0;">Compliance reminders</h2>
+    <ul>
+      <li>Do not promise guaranteed income or specific commission amounts beyond the published pay plan.</li>
+      <li>Do not promise guaranteed leads, appointments, or revenue for the business.</li>
+      <li>Do not claim {{ settings.app_name }} is emergency dispatch or will send a technician immediately.</li>
+      <li>Do not say the product fully replaces every answering service or call center in all situations.</li>
+      <li>Do not publish exact carrier forwarding dial codes in social posts — say setup varies and we help configure it.</li>
+      <li>Use approved share copy and links from <a href="/partner/marketing">Marketing links</a>.</li>
+    </ul>
+  </div>
+{% endblock %}

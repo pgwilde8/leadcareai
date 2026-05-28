@@ -86,6 +86,7 @@ def test_partner_onboard_post_does_not_accept_tax_fields(
         .filter(PartnerApplication.email == "tax.reject@example.com")
         .one()
     )
+    assert application.status == "admin_review"
     assert (
         db_session.query(PartnerTaxInfo)
         .filter(PartnerTaxInfo.application_id == application.id)

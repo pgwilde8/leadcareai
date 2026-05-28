@@ -135,7 +135,7 @@
             <tr><th>Email</th><td>{{ application.email }}</td></tr>
             <tr><th>Phone</th><td>{{ application.phone }}</td></tr>
             <tr><th>Location</th><td>{{ application.city }}, {{ application.state }}</td></tr>
-            <tr><th>Company</th><td>{{ application.company_name or '—' }}</td></tr>
+            <tr><th>Target industries / businesses to contact</th><td>{{ application.company_name or '—' }}</td></tr>
             <tr><th>Status</th><td>{{ status_badge(application.status) }}</td></tr>
             <tr><th>Submitted</th><td>{{ application.created_at }}</td></tr>
             {% if application.reviewed_at %}

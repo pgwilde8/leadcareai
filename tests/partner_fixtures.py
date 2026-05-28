@@ -10,19 +10,21 @@ from app.services import partner_document_service, partner_service, partner_tax_
 
 
 def partner_onboard_form_data(**overrides: str) -> dict[str, str]:
-    """Minimal valid partner apply POST (application fields only, no tax)."""
+    """Minimal valid partner apply POST (application-only, no tax or IC signing)."""
     data = {
-        "first_name": "Pat",
-        "last_name": "Ner",
+        "full_name": "Pat Ner",
         "email": "pat.ner@example.com",
         "phone": "+15551230001",
-        "city": "Austin",
-        "state": "TX",
-        "company_name": "",
-        "experience_summary": "",
-        "why_interested": "",
+        "market_area": "Austin, TX",
+        "sales_experience": "Two years B2B outreach to local HVAC companies.",
+        "target_industries": "HVAC and plumbing contractors in Austin metro",
+        "why_interested": "Interested in recurring commissions from real paying customers.",
+        "ic_understanding": "on",
     }
     data.update(overrides)
+    if overrides.get("first_name") and overrides.get("last_name"):
+        if "full_name" not in overrides:
+            data["full_name"] = f"{overrides['first_name']} {overrides['last_name']}"
     return data
 
 

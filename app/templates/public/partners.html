@@ -1,0 +1,208 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Sales Partner opportunity — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .lc-partner-hero {
+      text-align: center;
+      padding: var(--lc-space-8) 0 var(--lc-space-6);
+    }
+    .lc-industry-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: var(--lc-space-3);
+    }
+    .lc-industry-grid li {
+      padding: var(--lc-space-3);
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-radius: var(--lc-radius);
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .lc-fit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: var(--lc-space-6);
+    }
+    .lc-steps-partner {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: partner-step;
+    }
+    .lc-steps-partner li {
+      position: relative;
+      padding-left: 3rem;
+      margin-bottom: var(--lc-space-4);
+    }
+    .lc-steps-partner li::before {
+      counter-increment: partner-step;
+      content: counter(partner-step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      background: var(--lc-primary);
+      color: var(--lc-text-on-primary);
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+    .lc-cta-band {
+      background: linear-gradient(135deg, var(--lc-primary-dark), #0a4a5c);
+      color: var(--lc-text-inverse);
+      border-radius: var(--lc-radius-lg);
+      padding: var(--lc-space-8);
+      text-align: center;
+      margin-top: var(--lc-space-8);
+    }
+    .lc-cta-band h2 { color: inherit; margin-top: 0; }
+    .lc-cta-band p { color: rgba(248, 250, 252, 0.9); }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="lc-partner-hero" aria-labelledby="partner-hero-title">
+    <h1 id="partner-hero-title">Build recurring commissions helping local businesses recover missed calls</h1>
+    <p class="lc-page-header__lead" style="max-width: 42rem; margin: var(--lc-space-4) auto;">
+      {{ settings.app_name }} helps local businesses text missed callers instantly, qualify leads by SMS,
+      and alert the owner before hot prospects go cold.
+    </p>
+    <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply to become a Sales Partner</a>
+  </section>
+
+  <section class="lc-section" aria-labelledby="what-title">
+    <h2 id="what-title">What {{ settings.app_name }} does</h2>
+    <ul>
+      <li><strong>Missed-call text-back</strong> — When a call is missed, the caller gets an immediate SMS.</li>
+      <li><strong>SMS lead qualification</strong> — Simple questions capture name, need, and urgency.</li>
+      <li><strong>HOT / URGENT lead summaries</strong> — Owners see priority at a glance.</li>
+      <li><strong>Staff SMS, email, and dashboard alerts</strong> — Your team knows who to call back first.</li>
+      <li><strong>Dashboard lead card</strong> — One place to track follow-up status.</li>
+      <li><strong>Setup support</strong> — We help configure missed-call forwarding where supported (varies by carrier).</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="who-title">
+    <h2 id="who-title">Who you can help</h2>
+    <ul class="lc-industry-grid">
+      <li>Plumbers</li>
+      <li>Roofers</li>
+      <li>HVAC companies</li>
+      <li>Contractors</li>
+      <li>Med spas</li>
+      <li>Insurance agencies</li>
+      <li>Real estate teams</li>
+      <li>Local service businesses</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="pay-title">
+    <h2 id="pay-title">Partner pay plan</h2>
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Commission</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Activation bonus</td>
+            <td>$100 per activated paid customer</td>
+          </tr>
+          <tr>
+            <td>Monthly recurring</td>
+            <td>$25/month per active paid customer</td>
+          </tr>
+          <tr>
+            <td>Retention bonus</td>
+            <td>$100 after 6 paid months</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="lc-alert lc-alert--info" role="note" style="margin-top: var(--lc-space-4);">
+      <strong>Important:</strong>
+      Commissions are paid only on real paying business customers. No commission is paid for recruiting alone,
+      free trials, unpaid accounts, refunds, disputes, cancelled customers, fake accounts, or internal/test accounts.
+    </div>
+    <p><a href="/partner/payplan">Read the full Sales Partner Pay Plan</a></p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="how-title">
+    <h2 id="how-title">How it works</h2>
+    <ol class="lc-steps-partner">
+      <li><strong>Apply</strong> — Short application; no tax ID or document signing on day one.</li>
+      <li><strong>Admin review</strong> — We review your background and market fit.</li>
+      <li><strong>Sign IC documents</strong> — If accepted, you receive a separate link to sign partner agreements.</li>
+      <li><strong>Dashboard access</strong> — Approved partners get referral links, resources, and training.</li>
+      <li><strong>Share &amp; demo</strong> — Share your landing page and run the live missed-call demo with prospects.</li>
+      <li><strong>Earn commissions</strong> — When referred businesses pay and stay active, eligible commissions are recorded.</li>
+    </ol>
+  </section>
+
+  <section class="lc-section" aria-labelledby="fit-title">
+    <h2 id="fit-title">Good fit / not a good fit</h2>
+    <div class="lc-fit-grid">
+      <div class="lc-card">
+        <div class="lc-card__header">
+          <h3 class="lc-card__title">Good fit</h3>
+        </div>
+        <div class="lc-card__body">
+          <ul>
+            <li>Comfortable contacting local businesses</li>
+            <li>Understands commission-based independent contractor work</li>
+            <li>Can follow approved scripts and compliance rules</li>
+            <li>Wants recurring commissions from real paying customers</li>
+          </ul>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-card__header">
+          <h3 class="lc-card__title">Not a good fit</h3>
+        </div>
+        <div class="lc-card__body">
+          <ul>
+            <li>Wants a guaranteed salary</li>
+            <li>Wants passive income with no selling effort</li>
+            <li>Only wants to recruit other partners</li>
+            <li>Plans to make exaggerated income or performance claims</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="compliance-title">
+    <h2 id="compliance-title">Compliance reminder</h2>
+    <p>When promoting {{ settings.app_name }}, do <strong>not</strong> claim:</p>
+    <ul>
+      <li>Guaranteed income</li>
+      <li>Guaranteed leads or revenue for businesses</li>
+      <li>Passive income with no work</li>
+      <li>Emergency dispatch or guaranteed immediate service</li>
+      <li>That the product fully replaces every answering service</li>
+      <li>Exact carrier forwarding codes in public social posts</li>
+    </ul>
+  </section>
+
+  <section class="lc-cta-band" aria-labelledby="apply-cta-title">
+    <h2 id="apply-cta-title">Ready to apply?</h2>
+    <p>Independent contractor. Commission-based. No income is guaranteed.</p>
+    <a class="lc-btn lc-btn--accent" href="/partner/onboard">Apply now</a>
+  </section>
+{% endblock %}
