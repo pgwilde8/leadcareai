@@ -1,0 +1,42 @@
+<section class="lc-admin-section" aria-labelledby="demo-readiness-title">
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 id="demo-readiness-title" class="lc-card__title">Sales demo readiness</h2>
+      {% if readiness_checklist %}
+        {% set ready_count = readiness_checklist | selectattr('ok') | list | length %}
+        <span class="lc-badge {% if ready_count == readiness_checklist|length %}lc-badge--admin-active{% else %}lc-badge--status-needs_review{% endif %}">
+          {{ ready_count }} / {{ readiness_checklist|length }} ready
+        </span>
+      {% endif %}
+    </div>
+    <div class="lc-card__body">
+      <p class="lc-text-muted">Confirm environment and demo business before owner or partner meetings.</p>
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Check</th>
+              <th>Status</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in readiness_checklist %}
+              <tr>
+                <td>{{ item.label }}</td>
+                <td>
+                  {% if item.ok %}
+                    <span class="lc-badge lc-badge--admin-active">Ready</span>
+                  {% else %}
+                    <span class="lc-badge lc-badge--status-needs_review">Needs attention</span>
+                  {% endif %}
+                </td>
+                <td>{{ item.detail }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

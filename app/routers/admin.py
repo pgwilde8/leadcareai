@@ -482,6 +482,7 @@ def demo_control_panel(
         if demo_business is not None
         else []
     )
+    readiness = demo_service.build_demo_readiness_checklist(db, settings=settings)
     warning = None
     if demo_business and not (demo_business.notification_email or demo_business.notification_phone):
         warning = "Demo business has no staff notification destination configured."
@@ -496,6 +497,7 @@ def demo_control_panel(
             "demo_rows": rows,
             "demo_config_error": config_error,
             "warning": warning,
+            "readiness_checklist": readiness,
             "clear_result": request.query_params.get("cleared") or "",
         },
     )

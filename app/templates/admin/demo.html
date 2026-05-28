@@ -23,6 +23,10 @@
     <a href="/demo/dashboard">Public demo dashboard</a>
   </nav>
 
+  {% set demo_phone_display = demo_number if demo_number and demo_number != "—" else "1-833-669-1335" %}
+
+  {% include "admin/_demo_readiness_checklist.html" %}
+
   {% if not demo_enabled %}
     <div class="lc-alert lc-alert--warning">
       <strong>Demo mode is disabled.</strong> Set <code>DEMO_ENABLED=true</code> to use this page.
@@ -123,4 +127,7 @@
       {% endif %}
     </section>
   {% endif %}
+
+  {% include "shared/_demo_sales_script.html" %}
+  {% include "shared/_sales_copy_internal.html" %}
 {% endblock %}

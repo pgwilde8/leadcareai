@@ -14,6 +14,7 @@ from app.models.partner import Partner
 from app.models.business import Business
 from app.routers.auth import require_partner
 from app.services import business_lead_service, commission_service
+from app.services.demo_live_service import DEMO_PHONE_DISPLAY
 from app.templates import templates
 
 router = APIRouter(prefix="/partner", tags=["partner"])
@@ -57,5 +58,6 @@ def partner_dashboard(
                 "approved_commissions": commission_stats["approved"],
                 "paid_commissions": commission_stats["paid"],
             },
+            "demo_phone_display": DEMO_PHONE_DISPLAY,
         },
     )

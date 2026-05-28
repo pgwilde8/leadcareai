@@ -1,0 +1,38 @@
+{# Live demo + partner sales script — include on admin demo and partner dashboard #}
+<section class="lc-admin-section" id="demo-sales-script" aria-labelledby="demo-script-title">
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 id="demo-script-title" class="lc-card__title">Live demo script</h2>
+      {% if demo_phone_display %}
+        <span class="lc-badge lc-badge--admin-active">{{ demo_phone_display }}</span>
+      {% endif %}
+    </div>
+    <div class="lc-card__body">
+      <p class="lc-text-muted">Use this flow when showing a business owner or training a sales partner.</p>
+
+      <h3 class="lc-admin-section__title">Run the demo (about 2 minutes)</h3>
+      <ol class="lc-steps">
+        <li><strong>Call this number and hang up:</strong> <a href="tel:+18336691335">{{ demo_phone_display or "1-833-669-1335" }}</a></li>
+        <li><strong>Reply to the text like a customer</strong> — e.g. “Kitchen sink backing up, need someone today in Round Rock.”</li>
+        <li><strong>Show the lead in the dashboard</strong> — open <a href="/demo/dashboard" target="_blank" rel="noopener">public demo dashboard</a> or admin demo leads below. Point out <strong>HOT</strong> / <strong>URGENT</strong> when intake captures urgency.</li>
+      </ol>
+
+      <h3 class="lc-admin-section__title">What to say to the business owner</h3>
+      <p>
+        “When you miss a call, most customers won’t leave a voicemail — they call the next company.
+        LeadCare AI texts them immediately, collects what they need, and alerts your team so you can call back
+        while the job is still yours.”
+      </p>
+
+      <h3 class="lc-admin-section__title">Setup (they keep their number)</h3>
+      <p>
+        Businesses <strong>do not have to change their main number</strong>. Their existing line can
+        <strong>forward missed or unanswered calls</strong> to a LeadCare AI recovery number we provision.
+        We configure SMS follow-up and staff alerts on that recovery line during onboarding.
+      </p>
+      <p class="lc-mb-0">
+        Public instructions: <a href="/demo">/demo</a> · Partner referral link uses <code>?ref=</code> on the homepage.
+      </p>
+    </div>
+  </div>
+</section>
