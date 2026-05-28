@@ -1,0 +1,27 @@
+<header class="lc-header site-header">
+  <div class="lc-container site-container lc-header__inner site-header__inner">
+    <a class="lc-brand site-brand" href="/">
+      <span class="lc-brand__mark" aria-hidden="true">LC</span>
+      <span>{{ settings.app_name }}</span>
+    </a>
+
+    <input type="checkbox" id="lc-nav-toggle" class="lc-nav-toggle" aria-hidden="true" tabindex="-1" />
+    <nav class="lc-nav site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/demo">Live demo</a>
+      <span class="lc-nav__group site-nav__group">
+        <a href="/login" class="lc-nav__cta site-nav__login">Log in</a>
+        <span class="lc-nav__submenu site-nav__submenu" role="menu">
+          <a href="/login/business" role="menuitem">Business login</a>
+          <a href="/login/admin" role="menuitem">Admin login</a>
+          <a href="/partner/onboard" role="menuitem">Partner apply</a>
+        </span>
+      </span>
+    </nav>
+    <label for="lc-nav-toggle" class="lc-nav-toggle-btn" aria-label="Open menu">
+      <span aria-hidden="true">☰</span>
+    </label>
+  </div>
+</header>

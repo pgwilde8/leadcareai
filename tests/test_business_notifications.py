@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.models.notification_log import NotificationLog
+from app.services import lead_service
 from app.services.business_service import create_business, link_user_to_business
 from app.services.phone_number_service import create_phone_number
 from app.services.user_service import create_user
@@ -86,8 +87,10 @@ def test_missed_call_triggers_email_and_staff_sms(
     ]
     assert len(staff_calls) >= 1
     staff_body = staff_calls[0].kwargs.get("body") or staff_calls[0][1].get("body")
-    assert "New lead" in staff_body
-    assert CALLER_PHONE in staff_body
+    assert "LeadCare AI:" in staff_body
+    assert "Name:" in staff_body
+    assert "Callback:" in staff_body
+    assert "Last message:" in staff_body
 
     logs = db_session.query(NotificationLog).all()
     assert len(logs) >= 2
@@ -312,6 +315,39 @@ def test_staff_sms_includes_dashboard_link_when_public_base_url_set(
     assert staff_calls
     body = staff_calls[-1].kwargs.get("body") or staff_calls[-1][1].get("body")
     assert "https://leadcareai.example.com/business/leads/" in body
+    assert "Name:" in body
+    assert "Callback:" in body
+    assert "Last message:" in body
+
+
+def test_staff_sms_includes_recommended_action_when_ai_fields_exist(
+    db_session: Session,
+) -> None:
+    from app.services.notification_service import _build_staff_sms_body
+
+    business = _setup_business_with_notifications(db_session, notification_email=None)
+    lead = lead_service.create_lead(
+        db_session,
+        business.id,
+        phone=CALLER_PHONE,
+        source="missed_call",
+        summary="No heat and needs same-day help.",
+        service_needed="furnace repair",
+        location="Reno, NV",
+        urgency="urgent",
+    )
+    lead.ai_temperature = "hot"
+    lead.ai_confidence = 0.92
+    db_session.commit()
+
+    body = _build_staff_sms_body(
+        event_prefix="New lead",
+        business=business,
+        lead=lead,
+        message="No heat at home right now",
+    )
+    assert "LeadCare AI: URGENT | furnace repair | Reno, NV" in body
+    assert "Recommended: Call immediately" in body
 
 
 @patch("app.services.notification_service.send_sms")

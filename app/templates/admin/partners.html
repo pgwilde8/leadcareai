@@ -1,83 +1,109 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
 
 {% block title %}Partners — Admin{% endblock %}
 
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
 {% block content %}
-  <h1>Partners</h1>
-  <nav>
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Partners</h1>
+    <p class="lc-admin-header__lead">Review applications and manage active referral partners.</p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Partners">
     <a href="/admin">Dashboard</a>
     <a href="/admin/businesses">Businesses</a>
+    <a href="/admin/business-leads">Prospect pipeline</a>
   </nav>
 
-  <h2>Filter applications</h2>
-  <form method="get" action="/admin/partners">
-    <label>Status
-      <select name="status">
-        <option value="" {% if not status_filter %}selected{% endif %}>All</option>
-        <option value="admin_review" {% if status_filter == 'admin_review' %}selected{% endif %}>admin_review</option>
-        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>approved</option>
-        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>rejected</option>
-        <option value="applied" {% if status_filter == 'applied' %}selected{% endif %}>applied</option>
-      </select>
-    </label>
-    <button type="submit">Filter</button>
-  </form>
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Filter applications</h2>
+    <form method="get" action="/admin/partners" class="lc-admin-filter-bar">
+      <span class="lc-admin-filter-bar__label">Status</span>
+      <label>Status
+        <select name="status">
+          <option value="" {% if not status_filter %}selected{% endif %}>All</option>
+          <option value="admin_review" {% if status_filter == 'admin_review' %}selected{% endif %}>admin_review</option>
+          <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>approved</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>rejected</option>
+          <option value="applied" {% if status_filter == 'applied' %}selected{% endif %}>applied</option>
+        </select>
+      </label>
+      <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Filter</button>
+    </form>
+  </section>
 
-  <h2>Applications</h2>
-  {% if applications %}
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Submitted</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in applications %}
-          <tr>
-            <td>{{ app.first_name }} {{ app.last_name }}</td>
-            <td>{{ app.email }}</td>
-            <td>{{ app.status }}</td>
-            <td>{{ app.created_at }}</td>
-            <td><a href="/admin/partners/{{ app.id }}">Review</a></td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No applications found.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Applications</h2>
+    {% if applications %}
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+              <tr>
+                <td>{{ app.first_name }} {{ app.last_name }}</td>
+                <td>{{ app.email }}</td>
+                <td>{{ status_badge(app.status) }}</td>
+                <td>{{ app.created_at }}</td>
+                <td>
+                  <a class="lc-btn lc-btn--primary lc-btn--sm" href="/admin/partners/{{ app.id }}">Review</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="lc-empty">
+        <p class="lc-empty__title">No applications found</p>
+        <p class="lc-empty__text">Adjust the status filter or wait for new partner signups.</p>
+      </div>
+    {% endif %}
+  </section>
 
-  <h2>Active partners</h2>
-  {% if partners %}
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Referral code</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in partners %}
-          <tr>
-            <td>{{ p.display_name }}</td>
-            <td>{{ p.email }}</td>
-            <td>{{ p.referral_code }}</td>
-            <td>{{ p.status }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No partners yet.</p>
-  {% endif %}
-
-  <form method="post" action="/logout">
-    <button type="submit">Log out</button>
-  </form>
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Active partners</h2>
+    {% if partners %}
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Referral code</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in partners %}
+              <tr>
+                <td>{{ p.display_name }}</td>
+                <td>{{ p.email }}</td>
+                <td><code>{{ p.referral_code }}</code></td>
+                <td>{{ status_badge(p.status) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">No partners yet.</p>
+    {% endif %}
+  </section>
 {% endblock %}

@@ -96,10 +96,13 @@ def test_business_user_sees_own_leads_list(
         db_session,
         business.id,
         phone="+15552223333",
-        source="sms",
+        source="missed_call",
         summary="Roof repair inquiry",
-        urgency="Today",
+        urgency="urgent",
     )
+    lead.ai_temperature = "hot"
+    lead.service_needed = "Roof repair"
+    lead.location = "Brick, NJ"
     message_service.create_message(
         db_session,
         business.id,
@@ -117,7 +120,13 @@ def test_business_user_sees_own_leads_list(
     assert "+15552223333" in response.text
     assert "Roof repair inquiry" in response.text
     assert "Latest inbound text" in response.text
-    assert "SMS" in response.text
+    assert "HOT" in response.text
+    assert "URGENT" in response.text
+    assert "Roof repair · Brick, NJ" in response.text
+    assert "Missed call" in response.text
+
+    db_session.expire_all()
+    assert lead_service.get_lead(db_session, lead.id).source == "missed_call"
 
 
 def test_business_user_cannot_view_other_business_lead(
@@ -204,6 +213,7 @@ def test_lead_detail_shows_ai_fields_and_messages(
     lead.ai_temperature = "hot"
     lead.ai_next_question = "What service do you need?"
     lead.ai_confidence = 0.82
+    lead.urgency = "urgent"
     lead.service_needed = "Plumbing"
     lead.location = "Brick, NJ"
     message_service.create_voice_message(
@@ -234,6 +244,10 @@ def test_lead_detail_shows_ai_fields_and_messages(
     assert "Brick, NJ" in response.text
     assert "hot" in response.text
     assert "What service do you need?" in response.text
+    assert "AI Lead Summary" in response.text
+    assert "Recommended action:" in response.text
+    assert "Call immediately" in response.text
+    assert "No staff notification logged." in response.text
     assert "Voice call" in response.text
     assert "Outbound SMS" in response.text
 

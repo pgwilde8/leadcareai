@@ -20,6 +20,7 @@ REFERRAL_STATUSES = frozenset({
     "referred",
     "signed_up",
     "paying",
+    "payment_failed",
     "canceled",
 })
 

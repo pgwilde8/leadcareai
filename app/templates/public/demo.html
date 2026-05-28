@@ -1,46 +1,54 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
-{% block title %}Book a demo — {{ settings.app_name }}{% endblock %}
+{% block title %}Try the missed-call demo — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
 
 {% block content %}
-  <h1>Book a demo</h1>
-  <p>Tell us about your business. We'll follow up about missed-call recovery and SMS lead follow-up.</p>
+  <header class="lc-page-header">
+    <p class="lc-hero__eyebrow" style="color: var(--lc-secondary);">Live demo</p>
+    <h1 class="lc-page-header__title">Try the missed-call demo</h1>
+    <p class="lc-page-header__lead">
+      Call the demo number, let it go unanswered, reply to the text, then see your lead on the public demo dashboard.
+    </p>
+  </header>
 
-  {% if referral_partner_name %}
-    <p><em>Referred by partner: {{ referral_partner_name }}{% if referral_code %} ({{ referral_code }}){% endif %}</em></p>
-  {% endif %}
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Steps</h2>
+      <span class="lc-badge lc-badge--admin-active">Live</span>
+    </div>
+    <div class="lc-card__body">
+      <ol class="lc-steps">
+        <li>
+          Call <strong><a href="tel:+18336691335">{{ demo_phone_display }}</a></strong>
+        </li>
+        <li>Let it go unanswered.</li>
+        <li>Reply to the text message from <strong>{{ demo_business_name }}</strong>.</li>
+        <li>
+          <a href="/demo/dashboard">Open the demo dashboard</a> and see your masked lead.
+        </li>
+      </ol>
+    </div>
+  </div>
 
-  {% if error %}
-    <p class="error">{{ error }}</p>
-  {% endif %}
+  <div class="lc-btn-group">
+    <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call {{ demo_phone_display }}</a>
+    <a class="lc-btn lc-btn--primary" href="/demo/dashboard">View demo dashboard</a>
+  </div>
 
-  <form method="post" action="/demo">
-    <label>Business name
-      <input type="text" name="business_name" value="{{ form.business_name or '' }}" required />
-    </label>
-    <label>Your name
-      <input type="text" name="contact_name" value="{{ form.contact_name or '' }}" required />
-    </label>
-    <label>Email
-      <input type="email" name="email" value="{{ form.email or '' }}" required />
-    </label>
-    <label>Phone
-      <input type="text" name="phone" value="{{ form.phone or '' }}" required />
-    </label>
-    <label>Industry
-      <input type="text" name="industry" value="{{ form.industry or '' }}" placeholder="e.g. HVAC, plumbing" />
-    </label>
-    <label>City
-      <input type="text" name="city" value="{{ form.city or '' }}" required />
-    </label>
-    <label>State
-      <input type="text" name="state" value="{{ form.state or '' }}" required maxlength="64" />
-    </label>
-    <label>What happens when you miss calls?
-      <textarea name="notes" rows="4" placeholder="Optional — how you handle voicemails, after-hours, etc.">{{ form.notes or '' }}</textarea>
-    </label>
-    <button type="submit">Submit</button>
-  </form>
+  <div class="lc-alert lc-alert--info" style="margin-top: var(--lc-space-6);">
+    <strong>Sample data only.</strong> Phone numbers are masked in the demo dashboard (last 4 digits). No login required.
+  </div>
 
-  <p><a href="/">← Back</a></p>
+  <div class="lc-alert lc-alert--warning">
+  <strong>Demo SMS consent.</strong>
+  By calling or texting the demo number, you agree to receive demo SMS messages from LeadCare AI.
+  Message and data rates may apply.
+  </div>
+
+  <p class="lc-text-muted">
+    <a href="/">← Back to home</a>
+    · <a href="/demo/book">Book a sales demo</a>
+  </p>
 {% endblock %}

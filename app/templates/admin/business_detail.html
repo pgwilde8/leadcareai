@@ -1,161 +1,289 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
 
 {% block title %}{{ business.name }} — LeadCare AI Admin{% endblock %}
 
-{% block content %}
-  <h1>{{ business.name }}</h1>
+{% block container_class %}lc-container--wide{% endblock %}
 
-  <nav>
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">{{ business.name }}</h1>
+    <p class="lc-admin-header__lead">
+      Status: {{ status_badge(business.status) }}
+      {% if business.industry %} · {{ business.industry }}{% endif %}
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Business">
     <a href="/admin">Dashboard</a>
     <a href="/admin/businesses">Businesses</a>
     <a href="/admin/businesses/{{ business.id }}/leads">All leads</a>
+    <a href="/admin/businesses/{{ business.id }}/compliance">Compliance</a>
+    <a href="/admin/businesses/{{ business.id }}/phone-numbers/new">Add phone number</a>
   </nav>
 
-  <p><strong>Status:</strong> {{ business.status }}</p>
-  <p><strong>Industry:</strong> {{ business.industry or "—" }}</p>
-  <p><strong>Website:</strong> {{ business.website_url or "—" }}</p>
-  <p><strong>Phone:</strong> {{ business.main_phone or "—" }}</p>
-  <p><strong>Timezone:</strong> {{ business.timezone }}</p>
-  <p><strong>Contact email:</strong> {{ business.contact_email or "—" }}</p>
-  <p><strong>Notification email:</strong> {{ business.notification_email or "—" }}</p>
-  <p><strong>Notification phone:</strong> {{ business.notification_phone or "—" }}</p>
-  <p><strong>SMS signature:</strong> {{ business.sms_signature or "—" }}</p>
-  <p><strong>Missed-call text-back:</strong></p>
-  <p>{{ business.missed_call_textback_message or "— (platform default)" }}</p>
-  {% if business.lead_intake_prompt %}
-    <p><strong>Lead intake notes:</strong> {{ business.lead_intake_prompt }}</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Business profile</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Website</dt>
+            <dd>{{ business.website_url or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Main phone</dt>
+            <dd>{{ business.main_phone or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Timezone</dt>
+            <dd>{{ business.timezone }}</dd>
+          </div>
+          <div>
+            <dt>Contact email</dt>
+            <dd>{{ business.contact_email or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Notification email</dt>
+            <dd>{{ business.notification_email or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Notification phone</dt>
+            <dd>{{ business.notification_phone or "—" }}</dd>
+          </div>
+          <div>
+            <dt>SMS signature</dt>
+            <dd>{{ business.sms_signature or "—" }}</dd>
+          </div>
+          <div class="lc-meta-grid__wide">
+            <dt>Missed-call text-back</dt>
+            <dd>{{ business.missed_call_textback_message or "— (platform default)" }}</dd>
+          </div>
+          {% if business.lead_intake_prompt %}
+            <div class="lc-meta-grid__wide">
+              <dt>Lead intake notes</dt>
+              <dd>{{ business.lead_intake_prompt }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+  </section>
 
-  <h2>SMS compliance (A2P 10DLC)</h2>
-  <p><em>A2P 10DLC submission coming later.</em></p>
-  <p>
-    <a href="/admin/businesses/{{ business.id }}/compliance">Edit compliance profile</a>
-  </p>
-  {% if compliance_profile %}
-    <p><strong>Compliance status:</strong> {{ compliance_profile.status }}</p>
-    <p><strong>Legal business name:</strong> {{ compliance_profile.legal_business_name or "—" }}</p>
-    <p><strong>Twilio brand SID:</strong> {{ compliance_profile.twilio_brand_sid or "—" }}</p>
-    <p><strong>Twilio campaign SID:</strong> {{ compliance_profile.twilio_campaign_sid or "—" }}</p>
-    {% if compliance_profile.status == "rejected" and compliance_profile.rejection_reason %}
-      <p><strong>Rejection reason:</strong> {{ compliance_profile.rejection_reason }}</p>
-    {% endif %}
-  {% else %}
-    <p>No compliance profile yet. <a href="/admin/businesses/{{ business.id }}/compliance">Start setup</a>.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">SMS compliance (A2P 10DLC)</h2>
+        <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/businesses/{{ business.id }}/compliance">Edit compliance profile</a>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted"><em>A2P 10DLC submission coming later.</em></p>
+        {% if compliance_profile %}
+          <dl class="lc-meta-grid">
+            <div>
+              <dt>Compliance status</dt>
+              <dd>{{ status_badge(compliance_profile.status) }}</dd>
+            </div>
+            <div>
+              <dt>Legal business name</dt>
+              <dd>{{ compliance_profile.legal_business_name or "—" }}</dd>
+            </div>
+            <div>
+              <dt>Twilio brand SID</dt>
+              <dd><code>{{ compliance_profile.twilio_brand_sid or "—" }}</code></dd>
+            </div>
+            <div>
+              <dt>Twilio campaign SID</dt>
+              <dd><code>{{ compliance_profile.twilio_campaign_sid or "—" }}</code></dd>
+            </div>
+          </dl>
+          {% if compliance_profile.status == "rejected" and compliance_profile.rejection_reason %}
+            <div class="lc-alert lc-alert--error">
+              <strong>Rejection reason:</strong> {{ compliance_profile.rejection_reason }}
+            </div>
+          {% endif %}
+        {% else %}
+          <p>No compliance profile yet. <a href="/admin/businesses/{{ business.id }}/compliance">Start setup</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-  <h2>Phone numbers</h2>
-  <p><em>Active numbers receive inbound SMS via Twilio webhook.</em></p>
-  <p><a href="/admin/businesses/{{ business.id }}/phone-numbers/new">Add phone number</a></p>
-  {% if phone_numbers %}
-    <table>
-      <thead>
-        <tr>
-          <th>Number</th>
-          <th>Label</th>
-          <th>Provider</th>
-          <th>Status</th>
-          <th>Forward to</th>
-          <th>Set status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for pn in phone_numbers %}
-          <tr>
-            <td>{{ pn.phone_number }}</td>
-            <td>{{ pn.label or "—" }}</td>
-            <td>{{ pn.provider }}</td>
-            <td>{{ pn.status }}</td>
-            <td>{{ pn.forward_to_number or "—" }}</td>
-            <td>
-              <form method="post" action="/admin/phone-numbers/{{ pn.id }}/status">
-                <select name="status">
-                  <option value="pending" {% if pn.status == 'pending' %}selected{% endif %}>pending</option>
-                  <option value="active" {% if pn.status == 'active' %}selected{% endif %}>active</option>
-                  <option value="inactive" {% if pn.status == 'inactive' %}selected{% endif %}>inactive</option>
-                </select>
-                <button type="submit">Update</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No phone numbers on file yet.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Phone numbers</h2>
+        <a class="lc-btn lc-btn--primary lc-btn--sm" href="/admin/businesses/{{ business.id }}/phone-numbers/new">Add phone number</a>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted"><em>Active numbers receive inbound SMS via Twilio webhook.</em></p>
+        {% if phone_numbers %}
+          <div class="lc-table-wrap">
+            <table class="lc-table">
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Label</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                  <th>Forward to</th>
+                  <th>Set status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pn in phone_numbers %}
+                  <tr>
+                    <td><code>{{ pn.phone_number }}</code></td>
+                    <td>{{ pn.label or "—" }}</td>
+                    <td>{{ pn.provider }}</td>
+                    <td>{{ status_badge(pn.status) }}</td>
+                    <td>{{ pn.forward_to_number or "—" }}</td>
+                    <td>
+                      <div class="lc-table-actions">
+                        <form method="post" action="/admin/phone-numbers/{{ pn.id }}/status">
+                          <select name="status" aria-label="Phone number status for {{ pn.phone_number }}">
+                            <option value="pending" {% if pn.status == 'pending' %}selected{% endif %}>pending</option>
+                            <option value="active" {% if pn.status == 'active' %}selected{% endif %}>active</option>
+                            <option value="inactive" {% if pn.status == 'inactive' %}selected{% endif %}>inactive</option>
+                          </select>
+                          <button type="submit" class="lc-btn lc-btn--secondary lc-btn--sm">Update</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>No phone numbers on file yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-  <h2>Leads</h2>
-  <p>
-    <a href="/admin/businesses/{{ business.id }}/leads">View all leads</a>
-    ·
-    <a href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
-  </p>
-  {% if leads %}
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for lead in leads[:5] %}
-          <tr>
-            <td>{{ lead.name or "—" }}</td>
-            <td>{{ lead.phone or "—" }}</td>
-            <td>{{ lead.status }}</td>
-            <td><a href="/admin/leads/{{ lead.id }}">View</a></td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% if leads|length > 5 %}
-      <p>Showing 5 most recent. <a href="/admin/businesses/{{ business.id }}/leads">See all</a>.</p>
-    {% endif %}
-  {% else %}
-    <p>No leads yet.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Leads</h2>
+        <div class="lc-btn-group" style="margin-top: 0;">
+          <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/businesses/{{ business.id }}/leads">View all leads</a>
+          <a class="lc-btn lc-btn--primary lc-btn--sm" href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
+        </div>
+      </div>
+      <div class="lc-card__body">
+        {% if leads %}
+          <div class="lc-table-wrap">
+            <table class="lc-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for lead in leads[:5] %}
+                  <tr>
+                    <td>{{ lead.name or "—" }}</td>
+                    <td>{{ lead.phone or "—" }}</td>
+                    <td>{{ status_badge(lead.status) }}</td>
+                    <td>
+                      <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/leads/{{ lead.id }}">View</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if leads|length > 5 %}
+            <p class="lc-text-muted lc-mb-0">Showing 5 most recent. <a href="/admin/businesses/{{ business.id }}/leads">See all</a>.</p>
+          {% endif %}
+        {% else %}
+          <p>No leads yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-  <h2>Linked users</h2>
-  {% if links %}
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for link in links %}
-          <tr>
-            <td>{{ link.user.email }}</td>
-            <td>{{ link.role }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No users linked yet.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Linked users</h2>
+      </div>
+      <div class="lc-card__body">
+        {% if links %}
+          <div class="lc-table-wrap">
+            <table class="lc-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for link in links %}
+                  <tr>
+                    <td>{{ link.user.email }}</td>
+                    <td>{{ link.role }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>No users linked yet.</p>
+        {% endif %}
 
-  <h2>Link existing user</h2>
-  {% if link_error %}
-    <p class="error"><strong>{{ link_error }}</strong></p>
-  {% endif %}
+        {% if business_user_invite %}
+          <h3 class="lc-admin-section__title">Business login invite</h3>
+          <p>Status: {{ status_badge(business_user_invite.status) }}</p>
+          {% if business_user_invite.token and business_user_invite.token.delivery_error %}
+            <div class="lc-alert lc-alert--error">{{ business_user_invite.token.delivery_error }}</div>
+          {% endif %}
+          <form method="post" action="/admin/businesses/{{ business.id }}/resend-invite">
+            <button type="submit" class="lc-btn lc-btn--secondary">Resend business invite</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-  <form method="post" action="/admin/businesses/{{ business.id }}/users">
-    <label for="email">User email</label>
-    <input id="email" name="email" type="email" required />
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Link existing user</h2>
+      </div>
+      <div class="lc-card__body">
+        {% if link_error %}
+          <div class="lc-alert lc-alert--error" role="alert"><strong>{{ link_error }}</strong></div>
+        {% endif %}
 
-    <label for="role">Role</label>
-    <select id="role" name="role">
-      <option value="owner">owner</option>
-      <option value="manager">manager</option>
-      <option value="staff">staff</option>
-    </select>
-
-    <button type="submit">Link user</button>
-  </form>
+        <form method="post" action="/admin/businesses/{{ business.id }}/users" class="lc-form lc-form--wide">
+          <div class="lc-field">
+            <label for="email">User email</label>
+            <input id="email" name="email" type="email" required />
+          </div>
+          <div class="lc-field">
+            <label for="role">Role</label>
+            <select id="role" name="role">
+              <option value="owner">owner</option>
+              <option value="manager">manager</option>
+              <option value="staff">staff</option>
+            </select>
+          </div>
+          <button type="submit" class="lc-btn lc-btn--primary">Link user</button>
+        </form>
+      </div>
+    </div>
+  </section>
 {% endblock %}

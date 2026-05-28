@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Lead — {{ lead.phone or lead.name or "Detail" }}{% endblock %}
 
@@ -22,16 +22,33 @@
   <p><strong>Location:</strong> {{ lead.location or "—" }}</p>
   <p><strong>Urgency:</strong> {{ lead.urgency or "—" }}</p>
 
-  <h2>AI intake</h2>
-  <p><strong>Summary:</strong></p>
-  <p>{{ lead.summary or "—" }}</p>
-  <p><strong>Next question:</strong> {{ lead.ai_next_question or "—" }}</p>
-  <p><strong>Temperature:</strong> {{ lead.ai_temperature or "—" }}</p>
-  <p><strong>Confidence:</strong>
-    {% if lead.ai_confidence is not none %}{{ "%.0f"|format(lead.ai_confidence * 100) }}%{% else %}—{% endif %}
-  </p>
-  {% if lead.ai_last_analyzed_at %}
-    <p><strong>Last analyzed:</strong> {{ lead.ai_last_analyzed_at }}</p>
+  <h2>AI Lead Summary</h2>
+  <div class="ai-panel">
+    <p><strong>Temperature:</strong> {{ lead.ai_temperature or "—" }}</p>
+    <p><strong>Confidence:</strong>
+      {% if lead.ai_confidence is not none %}{{ "%.0f"|format(lead.ai_confidence * 100) }}%{% else %}—{% endif %}
+    </p>
+    <p><strong>Urgency:</strong> {{ lead.urgency or "—" }}</p>
+    <p><strong>Service needed:</strong> {{ lead.service_needed or "—" }}</p>
+    <p><strong>Location:</strong> {{ lead.location or "—" }}</p>
+    <p><strong>Summary:</strong> {{ lead.summary or "—" }}</p>
+    <p><strong>Next question:</strong> {{ lead.ai_next_question or "—" }}</p>
+    <p><strong>Last analyzed:</strong> {{ lead.ai_last_analyzed_at or "—" }}</p>
+    <p><strong>Recommended action:</strong> {{ recommended_action }}</p>
+  </div>
+
+  <h2>Staff notifications</h2>
+  {% if recent_notifications %}
+    <ul class="notification-list">
+      {% for entry in recent_notifications %}
+        <li>
+          <strong>{{ entry.channel|upper }}</strong> · {{ entry.event_type }} · {{ entry.status }}
+          {% if entry.created_at %}· {{ entry.created_at }}{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No staff notification logged.</p>
   {% endif %}
 
   <h2>Message timeline</h2>
@@ -87,5 +104,12 @@
     }
     .message-meta { margin: 0 0 0.5rem; font-size: 0.875rem; color: #555; }
     .message-body { margin: 0; white-space: pre-wrap; }
+    .ai-panel {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 0.75rem;
+      background: #fafafa;
+    }
+    .notification-list { padding-left: 1rem; }
   </style>
 {% endblock %}

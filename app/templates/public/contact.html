@@ -1,0 +1,43 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Contact — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Contact</h1>
+    <p class="lc-page-header__lead">
+      Questions about {{ settings.app_name }}, partnerships, or getting started? We're here to help.
+    </p>
+  </header>
+
+  <div class="lc-grid lc-grid--2">
+    <div class="lc-card">
+      <h2 class="lc-card__title">General inquiries</h2>
+      <div class="lc-card__body">
+        <p class="lc-mb-0">
+          Email
+          <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
+        </p>
+      </div>
+    </div>
+    <div class="lc-card">
+      <h2 class="lc-card__title">Product demo</h2>
+      <div class="lc-card__body">
+        <p>
+          <a href="/demo/book">Request a demo</a> or try the
+          <a href="/demo">live missed-call demo</a> (call 1-833-669-1335).
+        </p>
+        <p class="lc-mb-0">
+          Partners: <a href="/partner/onboard">apply here</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <p class="lc-text-muted">
+    <a href="/">← Back to home</a>
+    · <a href="/#faq">FAQ on homepage</a>
+  </p>
+{% endblock %}

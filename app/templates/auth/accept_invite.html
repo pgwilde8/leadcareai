@@ -1,0 +1,75 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Set password — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block extra_head %}
+  {% include "auth/_auth_head.html" %}
+{% endblock %}
+
+{% block content %}
+  <div class="lc-auth-wrap">
+    <div class="lc-auth-card lc-card">
+      {% include "auth/_auth_brand.html" %}
+
+      <header class="lc-page-header">
+        <h1 class="lc-page-header__title">Set your password</h1>
+        {% if valid %}
+          <p class="lc-page-header__lead">
+            Welcome to {{ settings.app_name }}. Choose a secure password to activate your account.
+          </p>
+        {% else %}
+          <p class="lc-page-header__lead">
+            This invite link is not valid. Request a new link from your administrator or support.
+          </p>
+        {% endif %}
+      </header>
+
+      {% if error %}
+        <div class="lc-alert lc-alert--error" role="alert">
+          <strong>{{ error }}</strong>
+        </div>
+      {% endif %}
+
+      {% if valid %}
+        <form method="post" action="/auth/accept-invite" class="lc-form">
+          <input type="hidden" name="token" value="{{ token }}" />
+
+          <div class="lc-field">
+            <label for="password">New password</label>
+            <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password" />
+            <span class="lc-hint">At least 8 characters.</span>
+          </div>
+
+          <div class="lc-field">
+            <label for="password_confirm">Confirm password</label>
+            <input
+              id="password_confirm"
+              name="password_confirm"
+              type="password"
+              required
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <button type="submit" class="lc-btn lc-btn--primary lc-btn--block">Save password</button>
+        </form>
+      {% else %}
+        <div class="lc-alert lc-alert--warning">
+          Request a new invite link from support or your LeadCare AI admin.
+        </div>
+        <p class="lc-auth-footer lc-mb-0">
+          <a class="lc-btn lc-btn--secondary lc-btn--block" href="/login">Go to login</a>
+        </p>
+      {% endif %}
+
+      {% if valid %}
+        <p class="lc-auth-footer">
+          <a href="/login">← Back to login</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Demo Control Panel — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Demo Control Panel</h1>
+    <p class="lc-admin-header__lead">Live missed-call demo environment — leads and messages for the demo business only.</p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Demo">
+    <a href="/admin">← Back to admin dashboard</a>
+    <a href="/demo">Public demo page</a>
+    <a href="/demo/dashboard">Public demo dashboard</a>
+  </nav>
+
+  {% if not demo_enabled %}
+    <div class="lc-alert lc-alert--warning">
+      <strong>Demo mode is disabled.</strong> Set <code>DEMO_ENABLED=true</code> to use this page.
+    </div>
+  {% elif demo_config_error %}
+    <div class="lc-alert lc-alert--error"><strong>{{ demo_config_error }}</strong></div>
+  {% elif demo_business %}
+    <div class="lc-stat-grid">
+      <div class="lc-stat lc-stat--accent">
+        <span class="lc-stat__label">Demo business</span>
+        <span class="lc-stat__value" style="font-size: 1.1rem;">{{ demo_business.name }}</span>
+      </div>
+      <div class="lc-stat">
+        <span class="lc-stat__label">Demo Twilio number</span>
+        <span class="lc-stat__value" style="font-size: 1.1rem;"><code>{{ demo_number }}</code></span>
+      </div>
+    </div>
+
+    {% if warning %}
+      <div class="lc-alert lc-alert--warning"><strong>{{ warning }}</strong></div>
+    {% endif %}
+
+    {% if clear_result %}
+      <div class="lc-alert lc-alert--success"><strong>{{ clear_result }}</strong></div>
+    {% endif %}
+
+    <div class="lc-card lc-admin-section">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">How to run demo</h2>
+      </div>
+      <div class="lc-card__body">
+        <ol class="lc-steps">
+          <li>Call the demo number and hang up.</li>
+          <li>Reply to the text like a customer.</li>
+          <li>Watch the lead appear below.</li>
+        </ol>
+        <form method="post" action="/admin/demo/clear">
+          <button type="submit" class="lc-btn lc-btn--danger">Clear demo leads/messages</button>
+        </form>
+      </div>
+    </div>
+
+    <section class="lc-admin-section">
+      <h2 class="lc-admin-section__title">Recent demo leads</h2>
+      {% if demo_rows %}
+        <div class="lc-table-wrap">
+          <table class="lc-table">
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Caller</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>AI</th>
+                <th>Service</th>
+                <th>Location</th>
+                <th>Summary</th>
+                <th>Recommended</th>
+                <th>Latest message</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in demo_rows %}
+                {% set lead = row.lead %}
+                <tr>
+                  <td>{{ lead.created_at }}</td>
+                  <td><code>{{ row.masked_phone }}</code></td>
+                  <td>{{ lead.source }}</td>
+                  <td>{{ status_badge(lead.status) }}</td>
+                  <td>
+                    {% if lead.ai_temperature %}
+                      <span class="lc-badge lc-badge--status-{{ lead.ai_temperature|lower }}">{{ lead.ai_temperature|upper }}</span>
+                    {% endif %}
+                    {% if lead.urgency %}
+                      <span class="lc-badge lc-badge--urgency">{{ lead.urgency|upper }}</span>
+                    {% endif %}
+                    {% if not lead.ai_temperature and not lead.urgency %}—{% endif %}
+                  </td>
+                  <td>{{ lead.service_needed or "—" }}</td>
+                  <td>{{ lead.location or "—" }}</td>
+                  <td>{{ (lead.summary or "—")[:80] }}{% if lead.summary and lead.summary|length > 80 %}…{% endif %}</td>
+                  <td>{{ row.recommended_action }}</td>
+                  <td>{{ row.latest_message_preview or "—" }}</td>
+                  <td>
+                    <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/leads/{{ lead.id }}">View</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="lc-empty">
+          <p class="lc-empty__title">No demo leads yet</p>
+          <p class="lc-empty__text">Run through the demo flow to populate this table.</p>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

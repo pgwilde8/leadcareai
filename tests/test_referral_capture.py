@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.models.business_lead import BusinessLead
 from app.models.partner_application import PartnerApplication
 from app.models.partner_customer import PartnerCustomer
+from app.core.security import hash_password
 from app.services.partner_document_service import seed_default_document_templates
 from app.services.partner_service import approve_application
 from app.services.user_service import create_admin_user
@@ -27,7 +28,7 @@ def _active_partner(
     db_session: Session,
     partner_email: str,
 ) -> tuple[str, str, str | None]:
-    """Return (referral_code, partner_email, temporary_password)."""
+    """Return (referral_code, partner_email, login_password)."""
     seed_default_document_templates(db_session)
     db_session.commit()
     client.post(
@@ -58,8 +59,9 @@ def _active_partner(
     )
     db_session.commit()
     result = approve_application(db_session, application.id, reviewed_by_user_id=admin.id)
+    result.user.hashed_password = hash_password("partner-ref-secret")
     db_session.commit()
-    return result.partner.referral_code, partner_email, result.temporary_password
+    return result.partner.referral_code, partner_email, "partner-ref-secret"
 
 
 def _demo_form_data(**overrides: str) -> dict[str, str]:
@@ -80,7 +82,7 @@ def _demo_form_data(**overrides: str) -> dict[str, str]:
 def test_valid_ref_stores_referral_in_session(client: TestClient, db_session: Session) -> None:
     code, _, _ = _active_partner(client, db_session, "partner-ref@example.com")
     client.get(f"/?ref={code}")
-    response = client.get("/demo")
+    response = client.get("/demo/book")
     assert response.status_code == 200
     assert "Referred by partner" in response.text
     assert "Ref Partner" in response.text
@@ -97,13 +99,13 @@ def test_invalid_ref_does_not_crash_or_store_partner(client: TestClient) -> None
 def test_get_demo_returns_200(client: TestClient) -> None:
     response = client.get("/demo")
     assert response.status_code == 200
-    assert "Book a demo" in response.text
+    assert "missed-call demo" in response.text
 
 
 def test_post_demo_creates_business_lead(client: TestClient, db_session: Session) -> None:
-    response = client.post("/demo", data=_demo_form_data(), follow_redirects=False)
+    response = client.post("/demo/book", data=_demo_form_data(), follow_redirects=False)
     assert response.status_code == 303
-    assert response.headers["location"] == "/demo/success"
+    assert response.headers["location"] == "/demo/book/success"
 
     lead = (
         db_session.query(BusinessLead)
@@ -122,7 +124,7 @@ def test_post_demo_with_referral_creates_partner_customer(
     code, _, _ = _active_partner(client, db_session, "partner-attrib@example.com")
     client.get(f"/?ref={code}")
     response = client.post(
-        "/demo",
+        "/demo/book",
         data=_demo_form_data(email="referred@biz.example"),
         follow_redirects=False,
     )
@@ -151,7 +153,7 @@ def test_admin_can_see_referred_business_lead(
 ) -> None:
     code, _, _ = _active_partner(client, db_session, "partner-admin@example.com")
     client.get(f"/?ref={code}")
-    client.post("/demo", data=_demo_form_data(email="adminview@biz.example"))
+    client.post("/demo/book", data=_demo_form_data(email="adminview@biz.example"))
     _login_admin(client, db_session)
 
     response = client.get("/admin/business-leads")
@@ -170,7 +172,7 @@ def test_partner_dashboard_shows_referred_business_lead(
 
     client.get(f"/?ref={code}")
     client.post(
-        "/demo",
+        "/demo/book",
         data=_demo_form_data(
             email="dashref@biz.example",
             business_name="Dash Ref Plumbing",
@@ -192,9 +194,9 @@ def test_duplicate_demo_submission_does_not_duplicate_partner_customer(
     code, _, _ = _active_partner(client, db_session, "partner-dup@example.com")
     client.get(f"/?ref={code}")
     data = _demo_form_data(email="dup@biz.example")
-    client.post("/demo", data=data)
+    client.post("/demo/book", data=data)
     client.get(f"/?ref={code}")
-    client.post("/demo", data=data)
+    client.post("/demo/book", data=data)
 
     leads = (
         db_session.query(BusinessLead)

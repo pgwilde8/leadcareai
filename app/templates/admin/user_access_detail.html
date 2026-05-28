@@ -1,0 +1,146 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}User Access Detail — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">User Access Detail</h1>
+    <p class="lc-admin-header__lead">{{ target_user.email }} · {{ target_user.role }}</p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="User detail">
+    <a href="/admin/user-access">← Back to user access</a>
+  </nav>
+
+  <div class="lc-grid lc-grid--2">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Account</h2>
+        {{ status_badge("active") if target_user.is_active else status_badge("inactive") }}
+      </div>
+      <div class="lc-card__body">
+        <div class="lc-table-wrap">
+          <table class="lc-table">
+            <tbody>
+              <tr><th>Email</th><td>{{ target_user.email }}</td></tr>
+              <tr><th>Masked email</th><td>{{ masked_email }}</td></tr>
+              <tr><th>Full name</th><td>{{ target_user.full_name or "—" }}</td></tr>
+              <tr><th>Role</th><td>{{ target_user.role }}</td></tr>
+              <tr><th>Active</th><td>{{ "yes" if target_user.is_active else "no" }}</td></tr>
+              <tr><th>Created</th><td>{{ target_user.created_at }}</td></tr>
+              <tr><th>Updated</th><td>{{ target_user.updated_at }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Linked records</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Business</dt>
+            <dd>
+              {% if row.linked_business_id %}
+                <a href="/admin/businesses/{{ row.linked_business_id }}">{{ row.linked_business_name }}</a>
+              {% else %}
+                —
+              {% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Partner</dt>
+            <dd>
+              {% if row.linked_partner_application_id %}
+                <a href="/admin/partners/{{ row.linked_partner_application_id }}">{{ row.linked_partner_name }}</a>
+              {% elif row.linked_partner_id %}
+                {{ row.linked_partner_name }}
+              {% else %}
+                —
+              {% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Referral code</dt>
+            <dd>{{ row.partner_referral_code or "—" }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="lc-card lc-admin-section">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Latest invite</h2>
+      {% if row.invite_status %}{{ status_badge(row.invite_status) }}{% endif %}
+    </div>
+    <div class="lc-card__body">
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <tbody>
+            <tr><th>Purpose</th><td>{{ row.invite_purpose or "—" }}</td></tr>
+            <tr><th>Status</th><td>{{ row.invite_status }}</td></tr>
+            <tr><th>Created</th><td>{{ row.invite_created_at or "—" }}</td></tr>
+            <tr><th>Expires</th><td>{{ row.invite_expires_at or "—" }}</td></tr>
+            <tr><th>Used</th><td>{{ row.invite_used_at or "—" }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      {% if row.can_resend %}
+        <form method="post" action="/admin/users/{{ target_user.id }}/resend-invite">
+          <button type="submit" class="lc-btn lc-btn--primary">Resend invite</button>
+        </form>
+      {% else %}
+        <p class="lc-text-muted lc-mb-0">Resend invite is not available for this account (admin or inactive).</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Invite history</h2>
+    {% if invite_history %}
+      <div class="lc-table-wrap">
+        <table class="lc-table">
+          <thead>
+            <tr>
+              <th>Purpose</th>
+              <th>Status</th>
+              <th>Delivery</th>
+              <th>Created</th>
+              <th>Expires</th>
+              <th>Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in invite_history %}
+              <tr>
+                <td>{{ item.purpose }}</td>
+                <td>{{ status_badge(item.status) }}</td>
+                <td>{{ status_badge(item.delivery_status) if item.delivery_status else "—" }}</td>
+                <td>{{ item.created_at }}</td>
+                <td>{{ item.expires_at }}</td>
+                <td>{{ item.used_at or "—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="lc-text-muted">No invite tokens on record.</p>
+    {% endif %}
+    <p class="lc-text-muted"><em>Login timestamps are not tracked in this version.</em></p>
+  </section>
+{% endblock %}

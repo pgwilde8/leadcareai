@@ -1,0 +1,80 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Demo dashboard — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block content %}
+  <div class="lc-alert lc-alert--info" role="status">
+    <strong>Public demo dashboard — read-only.</strong>
+    This page shows recent leads from the live missed-call demo only. You cannot edit leads, send SMS, delete records,
+    or access admin or business settings from here.
+  </div>
+
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Demo dashboard</h1>
+    <p class="lc-page-header__lead">
+      <strong>Read-only sample view.</strong>
+      Business: {{ demo_business_name }} · Phone numbers are masked (last 4 digits only).
+    </p>
+  </header>
+
+  <p>
+    <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/demo">← Back to demo instructions</a>
+  </p>
+
+  {% if not demo_enabled %}
+    <div class="lc-alert lc-alert--error">
+      The live demo is not enabled on this environment.
+    </div>
+  {% elif rows %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Phone (masked)</th>
+            <th>Issue</th>
+            <th>Urgency</th>
+            <th>Town</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td><code>{{ row.masked_phone }}</code></td>
+              <td>{{ row.issue or "—" }}</td>
+              <td>
+                {% if row.urgency %}
+                  <span class="lc-badge lc-badge--urgency">{{ row.urgency }}</span>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ row.location or "—" }}</td>
+              <td>
+                <span class="lc-badge lc-badge--lead-{{ row.status }}">{{ row.status }}</span>
+              </td>
+              <td>{{ row.created_at }}</td>
+              <td>{{ row.summary or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="lc-empty">
+      <p class="lc-empty__title">No demo leads yet</p>
+      <p class="lc-empty__text">
+        Call the demo line, let it go unanswered, reply to the SMS, and your masked lead will appear here.
+      </p>
+      <a class="lc-btn lc-btn--primary" href="/demo">Try the missed-call demo</a>
+    </div>
+  {% endif %}
+
+  <p class="lc-text-muted" style="margin-top: var(--lc-space-6); font-size: 0.9rem;">
+    No login required. This is not your business dashboard — it is a public preview of demo activity only.
+  </p>
+{% endblock %}

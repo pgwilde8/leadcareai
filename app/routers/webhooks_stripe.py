@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Annotated
+from collections.abc import Callable
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, Request
 from fastapi.responses import JSONResponse
@@ -15,6 +16,21 @@ from app.services import business_lead_checkout_service, stripe_service
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
+
+
+def _run_webhook_handler(handler: Callable[..., Any], db: Session, *, stripe_event_id: str, payload: dict) -> JSONResponse:
+    try:
+        handler(db, stripe_event_id=stripe_event_id, **payload)
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        logger.warning("Stripe handler skipped: %s", exc)
+        return JSONResponse({"received": True, "skipped": str(exc)})
+    except Exception:
+        db.rollback()
+        logger.exception("Stripe handler failed for event %s", stripe_event_id)
+        return JSONResponse({"error": "processing failed"}, status_code=500)
+    return JSONResponse({"received": True})
 
 
 @router.post("/stripe")
@@ -35,24 +51,47 @@ async def stripe_webhook(
     if not event_id or not event_type:
         return JSONResponse({"error": "missing event id or type"}, status_code=400)
 
-    if event_type == "checkout.session.completed":
-        session_payload = event.get("data", {}).get("object", {})
-        try:
-            business_lead_checkout_service.handle_checkout_session_completed(
-                db,
-                stripe_event_id=event_id,
-                session_payload=session_payload,
-            )
-            db.commit()
-        except ValueError as exc:
-            db.rollback()
-            logger.warning("Stripe checkout handler skipped: %s", exc)
-            return JSONResponse({"received": True, "skipped": str(exc)})
-        except Exception:
-            db.rollback()
-            logger.exception("Stripe checkout handler failed")
-            return JSONResponse({"error": "processing failed"}, status_code=500)
-    else:
-        logger.info("Ignoring Stripe event type: %s", event_type)
+    obj = event.get("data", {}).get("object", {})
 
-    return JSONResponse({"received": True})
+    handlers: dict[str, tuple[Callable[..., Any], dict[str, Any]]] = {
+        "checkout.session.completed": (
+            business_lead_checkout_service.handle_checkout_session_completed,
+            {"session_payload": obj},
+        ),
+        "checkout.session.expired": (
+            business_lead_checkout_service.handle_checkout_session_expired,
+            {"session_payload": obj},
+        ),
+        "invoice.paid": (
+            business_lead_checkout_service.handle_invoice_paid,
+            {"invoice_payload": obj},
+        ),
+        "invoice.payment_failed": (
+            business_lead_checkout_service.handle_invoice_payment_failed,
+            {"invoice_payload": obj},
+        ),
+        "customer.subscription.deleted": (
+            business_lead_checkout_service.handle_subscription_deleted,
+            {"subscription_payload": obj},
+        ),
+        "customer.subscription.updated": (
+            business_lead_checkout_service.handle_subscription_updated,
+            {"subscription_payload": obj},
+        ),
+        "charge.refunded": (
+            business_lead_checkout_service.handle_charge_refunded,
+            {"charge_payload": obj},
+        ),
+        "charge.dispute.created": (
+            business_lead_checkout_service.handle_charge_dispute_created,
+            {"dispute_payload": obj},
+        ),
+    }
+
+    entry = handlers.get(event_type)
+    if entry is None:
+        logger.info("Ignoring Stripe event type: %s", event_type)
+        return JSONResponse({"received": True})
+
+    handler, kwargs = entry
+    return _run_webhook_handler(handler, db, stripe_event_id=event_id, payload=kwargs)

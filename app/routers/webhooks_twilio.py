@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.database import get_db
 from app.core.twilio_webhook import validate_twilio_signature
-from app.services import message_service, notification_service, sms_service
+from app.services import demo_intake_service, demo_live_service, message_service, notification_service, sms_service
 from app.services.twilio_inbound_sms_service import TWILIO_PROVIDER, process_inbound_sms
 from app.services.twilio_inbound_voice_service import (
     process_inbound_voice,
@@ -78,30 +78,39 @@ async def inbound_sms_webhook(
         provider_sid=provider_sid,
     )
     if processed is not None:
-        try:
-            sms_service.send_inbound_auto_response(db, processed)
-        except Exception:
-            logger.exception(
-                "Unexpected error sending inbound auto-response",
-                extra={"lead_id": str(processed.lead_id)},
-            )
-        try:
-            from app.services.business_service import get_business
-            from app.services.lead_service import get_lead
+        if demo_live_service.is_demo_business_id(db, processed.business_id):
+            try:
+                demo_intake_service.handle_demo_inbound_sms(db, processed)
+            except Exception:
+                logger.exception(
+                    "Demo inbound SMS intake failed",
+                    extra={"lead_id": str(processed.lead_id)},
+                )
+        else:
+            try:
+                sms_service.send_inbound_auto_response(db, processed)
+            except Exception:
+                logger.exception(
+                    "Unexpected error sending inbound auto-response",
+                    extra={"lead_id": str(processed.lead_id)},
+                )
+            try:
+                from app.services.business_service import get_business
+                from app.services.lead_service import get_lead
 
-            business = get_business(db, processed.business_id)
-            lead = get_lead(db, processed.lead_id)
-            notification_service.notify_inbound_sms_reply(
-                db,
-                business,
-                lead,
-                processed.body,
-            )
-        except Exception:
-            logger.exception(
-                "Unexpected error sending inbound SMS staff notification",
-                extra={"lead_id": str(processed.lead_id)},
-            )
+                business = get_business(db, processed.business_id)
+                lead = get_lead(db, processed.lead_id)
+                notification_service.notify_inbound_sms_reply(
+                    db,
+                    business,
+                    lead,
+                    processed.body,
+                )
+            except Exception:
+                logger.exception(
+                    "Unexpected error sending inbound SMS staff notification",
+                    extra={"lead_id": str(processed.lead_id)},
+                )
     db.commit()
     return _twiml_response()
 
@@ -130,6 +139,9 @@ async def inbound_voice_webhook(
         db.commit()
         return _twiml_response(TWIML_VOICE)
 
+    demo_call = demo_live_service.is_demo_phone_number(db, to_phone, settings)
+    voice_twiml = demo_live_service.DEMO_TWIML if demo_call else TWIML_VOICE
+
     try:
         processed = process_inbound_voice(
             db,
@@ -140,38 +152,47 @@ async def inbound_voice_webhook(
             direction=direction,
         )
         if processed is not None:
-            try:
-                sms_service.send_missed_call_textback(db, processed)
-            except Exception:
-                logger.exception(
-                    "Unexpected error sending missed-call text-back",
-                    extra={"lead_id": str(processed.lead_id), "call_sid": call_sid},
-                )
-            try:
-                from app.services.business_service import get_business
-                from app.services.lead_service import get_lead
+            if demo_live_service.is_demo_business_id(db, processed.business_id):
+                try:
+                    demo_intake_service.send_demo_missed_call_textback(db, processed)
+                except Exception:
+                    logger.exception(
+                        "Demo missed-call text-back failed",
+                        extra={"lead_id": str(processed.lead_id), "call_sid": call_sid},
+                    )
+            else:
+                try:
+                    sms_service.send_missed_call_textback(db, processed)
+                except Exception:
+                    logger.exception(
+                        "Unexpected error sending missed-call text-back",
+                        extra={"lead_id": str(processed.lead_id), "call_sid": call_sid},
+                    )
+                try:
+                    from app.services.business_service import get_business
+                    from app.services.lead_service import get_lead
 
-                business = get_business(db, processed.business_id)
-                lead = get_lead(db, processed.lead_id)
-                voice_msg = message_service.get_message_by_provider_sid(
-                    db, TWILIO_PROVIDER, processed.call_sid
-                )
-                notification_service.notify_new_missed_call_lead(
-                    db,
-                    business,
-                    lead,
-                    voice_msg.body if voice_msg else f"Inbound call from {processed.from_phone}",
-                )
-            except Exception:
-                logger.exception(
-                    "Unexpected error sending missed-call staff notification",
-                    extra={"lead_id": str(processed.lead_id), "call_sid": call_sid},
-                )
+                    business = get_business(db, processed.business_id)
+                    lead = get_lead(db, processed.lead_id)
+                    voice_msg = message_service.get_message_by_provider_sid(
+                        db, TWILIO_PROVIDER, processed.call_sid
+                    )
+                    notification_service.notify_new_missed_call_lead(
+                        db,
+                        business,
+                        lead,
+                        voice_msg.body if voice_msg else f"Inbound call from {processed.from_phone}",
+                    )
+                except Exception:
+                    logger.exception(
+                        "Unexpected error sending missed-call staff notification",
+                        extra={"lead_id": str(processed.lead_id), "call_sid": call_sid},
+                    )
     except Exception:
         logger.exception("Voice webhook processing failed", extra={"call_sid": call_sid})
 
     db.commit()
-    return _twiml_response(TWIML_VOICE)
+    return _twiml_response(voice_twiml)
 
 
 @router.post("/voice/status")

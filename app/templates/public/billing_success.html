@@ -1,12 +1,18 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Payment received — {{ settings.app_name }}{% endblock %}
 
+{% block container_class %}lc-container--sm{% endblock %}
+
 {% block content %}
-  <h1>Thank you for subscribing</h1>
-  <p>Your payment was received. Our team will follow up shortly to complete onboarding.</p>
-  {% if session_id %}
-    <p><small>Reference: {{ session_id }}</small></p>
-  {% endif %}
-  <p><a href="/">Return home</a></p>
+  <div class="lc-empty">
+    <p class="lc-empty__title">Thank you for subscribing</p>
+    <p class="lc-empty__text">
+      Your payment was received. Our team will follow up shortly to complete onboarding.
+    </p>
+    {% if session_id %}
+      <p class="lc-text-subtle" style="font-size: 0.85rem;">Reference: {{ session_id }}</p>
+    {% endif %}
+    <a class="lc-btn lc-btn--primary" href="/">Return home</a>
+  </div>
 {% endblock %}

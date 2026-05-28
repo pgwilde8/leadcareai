@@ -1,35 +1,56 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
 
 {% block title %}New business — LeadCare AI Admin{% endblock %}
 
-{% block content %}
-  <h1>New business</h1>
+{% block container_class %}lc-container--sm{% endblock %}
 
-  <nav>
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">New business</h1>
+    <p class="lc-admin-header__lead">Create a customer account for phone numbers, compliance, and leads.</p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="New business">
     <a href="/admin">Dashboard</a>
     <a href="/admin/businesses">Businesses</a>
   </nav>
 
   {% if error %}
-    <p class="error"><strong>{{ error }}</strong></p>
+    <div class="lc-alert lc-alert--error" role="alert"><strong>{{ error }}</strong></div>
   {% endif %}
 
-  <form method="post" action="/admin/businesses">
-    <label for="name">Business name</label>
-    <input id="name" name="name" type="text" required value="{{ form.name or '' }}" />
-
-    <label for="industry">Industry</label>
-    <input id="industry" name="industry" type="text" value="{{ form.industry or '' }}" />
-
-    <label for="website_url">Website URL</label>
-    <input id="website_url" name="website_url" type="url" value="{{ form.website_url or '' }}" />
-
-    <label for="main_phone">Main phone</label>
-    <input id="main_phone" name="main_phone" type="text" value="{{ form.main_phone or '' }}" />
-
-    <label for="timezone">Timezone</label>
-    <input id="timezone" name="timezone" type="text" value="{{ form.timezone or 'America/New_York' }}" />
-
-    <button type="submit">Create business</button>
-  </form>
+  <div class="lc-card">
+    <div class="lc-card__body">
+      <form method="post" action="/admin/businesses" class="lc-form lc-form--wide">
+        <div class="lc-field">
+          <label for="name">Business name</label>
+          <input id="name" name="name" type="text" required value="{{ form.name or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="industry">Industry</label>
+          <input id="industry" name="industry" type="text" value="{{ form.industry or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="website_url">Website URL</label>
+          <input id="website_url" name="website_url" type="url" value="{{ form.website_url or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="main_phone">Main phone</label>
+          <input id="main_phone" name="main_phone" type="text" value="{{ form.main_phone or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="timezone">Timezone</label>
+          <input id="timezone" name="timezone" type="text" value="{{ form.timezone or 'America/New_York' }}" />
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Create business</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

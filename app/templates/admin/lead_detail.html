@@ -1,108 +1,196 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
 
 {% block title %}Lead — {{ lead.name or lead.phone or "Lead" }}{% endblock %}
 
-{% block content %}
-  <h1>Lead detail</h1>
-  <p>Business: <a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a></p>
+{% block container_class %}lc-container--wide{% endblock %}
 
-  <nav>
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Lead detail</h1>
+    <p class="lc-admin-header__lead">
+      Business: <a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a>
+      · Status: {{ status_badge(lead.status) }}
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Lead">
     <a href="/admin/businesses/{{ business.id }}/leads">Back to leads</a>
+    <a href="/admin/leads">All operational leads</a>
   </nav>
 
-  <p><strong>Status:</strong> {{ lead.status }}</p>
-  <p><strong>Source:</strong> {{ lead.source }}</p>
-  <p><strong>Name:</strong> {{ lead.name or "—" }}</p>
-  <p><strong>Phone:</strong> {{ lead.phone or "—" }}</p>
-  <p><strong>Email:</strong> {{ lead.email or "—" }}</p>
-  <p><strong>Service needed:</strong> {{ lead.service_needed or "—" }}</p>
-  <p><strong>Location:</strong> {{ lead.location or "—" }}</p>
-  <p><strong>Urgency:</strong> {{ lead.urgency or "—" }}</p>
-  <p><strong>Preferred contact time:</strong> {{ lead.preferred_contact_time or "—" }}</p>
-  <p><strong>Summary:</strong></p>
-  <p>{{ lead.summary or "—" }}</p>
+  <div class="lc-grid lc-grid--2">
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Contact &amp; request</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Source</dt>
+            <dd>{{ status_badge(lead.source) if lead.source == 'demo' else (lead.source or "—") }}</dd>
+          </div>
+          <div>
+            <dt>Name</dt>
+            <dd>{{ lead.name or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ lead.phone or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>{{ lead.email or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Service needed</dt>
+            <dd>{{ lead.service_needed or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{{ lead.location or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Urgency</dt>
+            <dd>{% if lead.urgency %}{{ status_badge(lead.urgency) }}{% else %}—{% endif %}</dd>
+          </div>
+          <div>
+            <dt>Preferred contact time</dt>
+            <dd>{{ lead.preferred_contact_time or "—" }}</dd>
+          </div>
+          <div class="lc-meta-grid__wide">
+            <dt>Summary</dt>
+            <dd>{{ lead.summary or "—" }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
 
-  <h2>Message history</h2>
-  <p><em>Twilio SMS sync coming later.</em></p>
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">AI lead summary</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Temperature</dt>
+            <dd>
+              {% if lead.ai_temperature %}
+                <span class="lc-badge lc-badge--status-{{ lead.ai_temperature|lower }}">{{ lead.ai_temperature|upper }}</span>
+              {% else %}—{% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Confidence</dt>
+            <dd>
+              {% if lead.ai_confidence is not none %}{{ "%.0f"|format(lead.ai_confidence * 100) }}%{% else %}—{% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Last analyzed</dt>
+            <dd>{{ lead.ai_last_analyzed_at or "—" }}</dd>
+          </div>
+          <div class="lc-meta-grid__wide">
+            <dt>Recommended action</dt>
+            <dd>{{ recommended_action }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </div>
 
-  {% if messages %}
-    <ul class="message-list">
-      {% for msg in messages %}
-        <li class="message-item message-{{ msg.direction }}">
-          <p class="message-meta">
-            <strong>{{ msg.direction }}</strong>
-            · {{ msg.channel }}
-            · {{ msg.status }}
-            {% if msg.created_at %}· {{ msg.created_at }}{% endif %}
-          </p>
-          <p class="message-body">{{ msg.body }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No messages yet.</p>
-  {% endif %}
+  <section class="lc-admin-section">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Message history</h2>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted"><em>Twilio SMS sync coming later.</em></p>
 
-  <h3>Add internal message</h3>
-  {% if message_error %}
-    <p class="error"><strong>{{ message_error }}</strong></p>
-  {% endif %}
+        {% if messages %}
+          <ul class="lc-message-list">
+            {% for msg in messages %}
+              <li class="lc-message-item lc-message-item--{{ msg.direction }}">
+                <p class="lc-message-meta">
+                  <strong>{{ msg.direction }}</strong>
+                  · {{ msg.channel }}
+                  · {{ status_badge(msg.status) }}
+                  {% if msg.created_at %}· {{ msg.created_at }}{% endif %}
+                </p>
+                <p class="lc-message-body">{{ msg.body }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No messages yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
-  <form method="post" action="/admin/leads/{{ lead.id }}/messages">
-    <label for="direction">Direction</label>
-    <select id="direction" name="direction">
-      <option value="internal" selected>internal</option>
-      <option value="inbound">inbound</option>
-      <option value="outbound">outbound</option>
-    </select>
+  <div class="lc-grid lc-grid--2">
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Add internal message</h2>
+      </div>
+      <div class="lc-card__body">
+        {% if message_error %}
+          <div class="lc-alert lc-alert--error" role="alert"><strong>{{ message_error }}</strong></div>
+        {% endif %}
 
-    <label for="channel">Channel</label>
-    <select id="channel" name="channel">
-      <option value="manual" selected>manual</option>
-      <option value="note">note</option>
-      <option value="sms">sms</option>
-    </select>
+        <form method="post" action="/admin/leads/{{ lead.id }}/messages" class="lc-form lc-form--wide">
+          <div class="lc-field">
+            <label for="direction">Direction</label>
+            <select id="direction" name="direction">
+              <option value="internal" selected>internal</option>
+              <option value="inbound">inbound</option>
+              <option value="outbound">outbound</option>
+            </select>
+          </div>
+          <div class="lc-field">
+            <label for="channel">Channel</label>
+            <select id="channel" name="channel">
+              <option value="manual" selected>manual</option>
+              <option value="note">note</option>
+              <option value="sms">sms</option>
+            </select>
+          </div>
+          <div class="lc-field">
+            <label for="body">Message</label>
+            <textarea id="body" name="body" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="lc-btn lc-btn--primary">Add message</button>
+        </form>
+      </div>
+    </section>
 
-    <label for="body">Message</label>
-    <textarea id="body" name="body" rows="4" required></textarea>
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Update status</h2>
+      </div>
+      <div class="lc-card__body">
+        {% if status_error %}
+          <div class="lc-alert lc-alert--error" role="alert"><strong>{{ status_error }}</strong></div>
+        {% endif %}
 
-    <button type="submit">Add message</button>
-  </form>
-
-  <h2>Update status</h2>
-  {% if status_error %}
-    <p class="error"><strong>{{ status_error }}</strong></p>
-  {% endif %}
-
-  <form method="post" action="/admin/leads/{{ lead.id }}/status">
-    <label for="status">Status</label>
-    <select id="status" name="status">
-      {% for s in statuses %}
-        <option value="{{ s }}" {% if s == lead.status %}selected{% endif %}>{{ s }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Update status</button>
-  </form>
-
-  <style>
-    .message-list {
-      list-style: none;
-      padding: 0;
-    }
-    .message-item {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-    .message-meta {
-      margin: 0 0 0.5rem;
-      font-size: 0.875rem;
-      color: #555;
-    }
-    .message-body {
-      margin: 0;
-      white-space: pre-wrap;
-    }
-  </style>
+        <form method="post" action="/admin/leads/{{ lead.id }}/status" class="lc-form">
+          <div class="lc-field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              {% for s in statuses %}
+                <option value="{{ s }}" {% if s == lead.status %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="lc-btn lc-btn--primary">Update status</button>
+        </form>
+      </div>
+    </section>
+  </div>
 {% endblock %}

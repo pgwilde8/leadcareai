@@ -1,35 +1,48 @@
-{% extends "base.html" %}
+{# Same as login_index.html — GET /login renders login_index via router. Kept for template inventory. #}
+{% extends "layout/base.html" %}
 
-{% block title %}Login — LeadCare AI{% endblock %}
+{% block title %}Log in — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block extra_head %}
+  {% include "auth/_auth_head.html" %}
+{% endblock %}
 
 {% block content %}
-  <h1>LeadCare AI</h1>
-  <p>Sign in to continue.</p>
+  <div class="lc-auth-wrap">
+    <div class="lc-auth-card lc-auth-card--wide lc-card">
+      {% include "auth/_auth_brand.html" %}
 
-  {% if error %}
-    <p class="error"><strong>{{ error }}</strong></p>
-  {% endif %}
+      <header class="lc-page-header">
+        <h1 class="lc-page-header__title">Log in</h1>
+        <p class="lc-page-header__lead">Choose how you want to sign in to {{ settings.app_name }}.</p>
+      </header>
 
-  <form method="post" action="/login">
-    <label for="email">Email</label>
-    <input
-      id="email"
-      name="email"
-      type="email"
-      required
-      autocomplete="email"
-      value="{{ prefill_email }}"
-    />
+      <ul class="lc-auth-options">
+        <li>
+          <a class="lc-auth-options__item" href="/login/business">
+            <strong>Business login</strong>
+            <span>For business owners and staff — leads, settings, and notifications.</span>
+          </a>
+        </li>
+        <li>
+          <a class="lc-auth-options__item" href="/login/admin">
+            <strong>Admin login</strong>
+            <span>For LeadCare AI internal administrators.</span>
+          </a>
+        </li>
+        <li>
+          <a class="lc-auth-options__item" href="/partner/onboard">
+            <strong>Partner application</strong>
+            <span>Apply to become a referral partner. Log in after approval.</span>
+          </a>
+        </li>
+      </ul>
 
-    <label for="password">Password</label>
-    <input
-      id="password"
-      name="password"
-      type="password"
-      required
-      autocomplete="current-password"
-    />
-
-    <button type="submit">Log in</button>
-  </form>
+      <p class="lc-auth-footer">
+        <a href="/">← Back to home</a>
+      </p>
+    </div>
+  </div>
 {% endblock %}

@@ -1,18 +1,36 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
 
 {% block title %}Admin — LeadCare AI{% endblock %}
 
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
 {% block content %}
-  <h1>LeadCare AI Admin</h1>
-  <p>Signed in as <strong>{{ user.email }}</strong></p>
+  {{ admin_toolbar(user) }}
 
-  <nav>
-    <a href="/admin/businesses">Businesses</a>
-    <a href="/admin/business-leads">Business leads</a>
-    <a href="/admin/partners">Partners</a>
-  </nav>
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">LeadCare AI Admin</h1>
+    <p class="lc-admin-header__lead">Operations console for businesses, leads, partners, and platform health.</p>
+  </header>
 
-  <form method="post" action="/logout">
-    <button type="submit">Log out</button>
-  </form>
+  {% include "admin/_admin_nav_main.html" %}
+
+  <section class="lc-admin-section" aria-labelledby="admin-quick-links">
+    <h2 id="admin-quick-links" class="lc-admin-section__title">Quick links</h2>
+    <div class="lc-admin-grid">
+      <a class="lc-admin-grid__link" href="/admin/businesses">Businesses</a>
+      <a class="lc-admin-grid__link" href="/admin/leads">Operational leads</a>
+      <a class="lc-admin-grid__link" href="/admin/business-leads">Prospect pipeline</a>
+      <a class="lc-admin-grid__link" href="/admin/partners">Partners</a>
+      <a class="lc-admin-grid__link" href="/admin/user-access">User access</a>
+      <a class="lc-admin-grid__link" href="/admin/commissions">Commissions</a>
+      <a class="lc-admin-grid__link" href="/admin/notification-logs">Notification logs</a>
+      <a class="lc-admin-grid__link" href="/admin/demo">Demo control panel</a>
+      <a class="lc-admin-grid__link" href="/admin/system-check">System check</a>
+    </div>
+  </section>
 {% endblock %}

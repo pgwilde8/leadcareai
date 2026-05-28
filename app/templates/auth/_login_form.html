@@ -1,0 +1,34 @@
+{% if error %}
+  <div class="lc-alert lc-alert--error" role="alert">
+    <strong>{{ error }}</strong>
+  </div>
+{% endif %}
+
+<form method="post" action="{{ login_action }}" class="lc-form">
+  <input type="hidden" name="login_view" value="{{ login_view }}" />
+
+  <div class="lc-field">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      value="{{ prefill_email }}"
+    />
+  </div>
+
+  <div class="lc-field">
+    <label for="password">Password</label>
+    <input
+      id="password"
+      name="password"
+      type="password"
+      required
+      autocomplete="current-password"
+    />
+  </div>
+
+  <button type="submit" class="lc-btn lc-btn--primary lc-btn--block">Log in</button>
+</form>

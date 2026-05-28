@@ -1,0 +1,30 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Business login — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block extra_head %}
+  {% include "auth/_auth_head.html" %}
+{% endblock %}
+
+{% block content %}
+  <div class="lc-auth-wrap">
+    <div class="lc-auth-card lc-card">
+      {% include "auth/_auth_brand.html" %}
+
+      <header class="lc-page-header">
+        <h1 class="lc-page-header__title">Business login</h1>
+        <p class="lc-page-header__lead">
+          Sign in to your dashboard to view leads, update settings, and manage notifications.
+        </p>
+      </header>
+
+      {% include "auth/_login_form.html" %}
+
+      <p class="lc-auth-footer">
+        <a href="/login">← All login options</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

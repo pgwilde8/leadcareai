@@ -5,6 +5,7 @@ from app.models.business import Business
 from app.models.business_lead import BusinessLead
 from app.models.business_compliance_profile import BusinessComplianceProfile
 from app.models.business_user import BusinessUser
+from app.models.commission import Commission
 from app.models.lead import Lead
 from app.models.message import Message
 from app.models.notification_log import NotificationLog
@@ -16,6 +17,7 @@ from app.models.partner_document_template import PartnerDocumentTemplate
 from app.models.partner_signed_document import PartnerSignedDocument
 from app.models.phone_number import PhoneNumber
 from app.models.user import User
+from app.models.user_invite_token import UserInviteToken
 
 __all__ = [
     "Base",
@@ -23,6 +25,7 @@ __all__ = [
     "BusinessLead",
     "BusinessComplianceProfile",
     "BusinessUser",
+    "Commission",
     "Lead",
     "Message",
     "NotificationLog",
@@ -34,4 +37,5 @@ __all__ = [
     "PartnerSignedDocument",
     "PhoneNumber",
     "User",
+    "UserInviteToken",
 ]

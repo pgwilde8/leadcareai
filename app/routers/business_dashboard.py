@@ -15,6 +15,7 @@ from app.models.user import User
 from app.routers.auth import require_business_user
 from app.services import lead_service, message_service, phone_number_service
 from app.services import business_settings_service
+from app.services import notification_service
 from app.services.lead_service import BUSINESS_SELECTABLE_STATUSES, LEAD_STATUSES
 from app.templates import templates
 
@@ -48,11 +49,19 @@ def _lead_detail_context(
     lead,
     status_error: str | None = None,
 ) -> dict:
+    recent_notifications = notification_service.list_recent_notifications_for_lead(
+        db,
+        business_id=business.id,
+        lead_id=lead.id,
+        limit=5,
+    )
     return {
         "user": user,
         "business": business,
         "lead": lead,
         "messages": message_service.list_messages_for_lead(db, lead.id),
+        "recommended_action": lead_service.recommended_action_for_lead(lead),
+        "recent_notifications": recent_notifications,
         "statuses": list(BUSINESS_SELECTABLE_STATUSES),
         "status_error": status_error,
     }
@@ -100,6 +109,7 @@ def business_leads_list(
             "user": user,
             "business": business,
             "inbox_rows": inbox_rows,
+            "recommended_action_for_lead": lead_service.recommended_action_for_lead,
         },
     )
 

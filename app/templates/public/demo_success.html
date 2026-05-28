@@ -1,9 +1,15 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Thanks — {{ settings.app_name }}{% endblock %}
 
+{% block container_class %}lc-container--sm{% endblock %}
+
 {% block content %}
-  <h1>Thank you</h1>
-  <p>We received your demo request and will be in touch soon.</p>
-  <p><a href="/">Return home</a></p>
+  <div class="lc-empty">
+    <p class="lc-empty__title">Thank you</p>
+    <p class="lc-empty__text">
+      We received your demo request and will be in touch soon.
+    </p>
+    <a class="lc-btn lc-btn--primary" href="/">Return home</a>
+  </div>
 {% endblock %}

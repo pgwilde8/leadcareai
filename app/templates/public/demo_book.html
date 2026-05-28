@@ -1,0 +1,71 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Book a demo — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Book a demo</h1>
+    <p class="lc-page-header__lead">
+      Tell us about your business. We'll follow up about missed-call recovery and SMS lead follow-up.
+    </p>
+  </header>
+
+  {% if referral_partner_name %}
+    <div class="lc-alert lc-alert--info">
+      Referred by partner: <strong>{{ referral_partner_name }}</strong>{% if referral_code %} ({{ referral_code }}){% endif %}
+    </div>
+  {% endif %}
+
+  {% if error %}
+    <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <div class="lc-card">
+    <div class="lc-card__body">
+      <form method="post" action="/demo/book" class="lc-form lc-form--wide">
+        <div class="lc-field">
+          <label for="business_name">Business name</label>
+          <input id="business_name" type="text" name="business_name" value="{{ form.business_name or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="contact_name">Your name</label>
+          <input id="contact_name" type="text" name="contact_name" value="{{ form.contact_name or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" value="{{ form.email or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="phone">Phone</label>
+          <input id="phone" type="text" name="phone" value="{{ form.phone or '' }}" required />
+        </div>
+        <div class="lc-field">
+          <label for="industry">Industry</label>
+          <input id="industry" type="text" name="industry" value="{{ form.industry or '' }}" placeholder="e.g. HVAC, plumbing" />
+        </div>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="city">City</label>
+            <input id="city" type="text" name="city" value="{{ form.city or '' }}" required />
+          </div>
+          <div class="lc-field">
+            <label for="state">State</label>
+            <input id="state" type="text" name="state" value="{{ form.state or '' }}" required maxlength="64" />
+          </div>
+        </div>
+        <div class="lc-field">
+          <label for="notes">What happens when you miss calls?</label>
+          <textarea id="notes" name="notes" rows="4" placeholder="Optional — how you handle voicemails, after-hours, etc.">{{ form.notes or '' }}</textarea>
+        </div>
+        <button type="submit" class="lc-btn lc-btn--primary">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="lc-text-muted">
+    <a href="/demo">Try the live missed-call demo</a>
+    · <a href="/">← Back to home</a>
+  </p>
+{% endblock %}

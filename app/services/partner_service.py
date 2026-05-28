@@ -13,11 +13,10 @@ from app.models.partner import Partner
 from app.models.partner_application import APPLICATION_STATUSES, PartnerApplication
 from app.models.partner_signed_document import PartnerSignedDocument
 from app.models.user import User
+from app.services import user_invite_service
 from app.services.user_service import (
-    create_user,
     get_user_by_email,
     get_user_by_id,
-    link_existing_user_as_partner,
 )
 
 APPLICATION_STATUS_ADMIN_REVIEW = "admin_review"
@@ -33,8 +32,9 @@ PARTNER_ACTIVATION_SESSION_KEY = "partner_activation_notice"
 class PartnerApprovalResult:
     partner: Partner
     user: User
-    temporary_password: str | None = None
     user_was_created: bool = False
+    invite_status: str = "not needed"
+    invite_error: str | None = None
 
 
 def _normalize_email(email: str) -> str:
@@ -53,29 +53,36 @@ def _generate_referral_code(db: Session) -> str:
     raise RuntimeError("Could not generate unique referral code")
 
 
-def _generate_temporary_password() -> str:
-    return secrets.token_urlsafe(12)
-
-
 def activate_partner_login(
     db: Session,
     *,
     partner: Partner,
     application: PartnerApplication,
+    created_by_user_id: uuid.UUID | None = None,
+    resend_invite: bool = False,
 ) -> PartnerApprovalResult:
-    """Create or link a User for partner login. Idempotent when already linked."""
+    """Create or link a User for partner login and issue invite when needed."""
     if partner.user_id is not None:
         user = get_user_by_id(db, partner.user_id)
         if user is None:
             partner.user_id = None
         else:
-            if user.role != "partner":
-                link_existing_user_as_partner(db, user=user, display_name=partner.display_name)
-            elif not user.is_active:
-                user.is_active = True
-            return PartnerApprovalResult(partner=partner, user=user)
+            result = user_invite_service.create_or_invite_partner_user(
+                db,
+                partner=partner,
+                email=user.email,
+                full_name=partner.display_name,
+                created_by_user_id=created_by_user_id,
+                resend=resend_invite,
+            )
+            return PartnerApprovalResult(
+                partner=partner,
+                user=result.user,
+                user_was_created=result.user_created,
+                invite_status=result.invite_delivery_status,
+                invite_error=result.invite_delivery_error,
+            )
 
-    existing_partner_for_user = None
     user = get_user_by_email(db, application.email)
     if user is not None:
         existing_partner_for_user = (
@@ -85,26 +92,21 @@ def activate_partner_login(
         )
         if existing_partner_for_user is not None:
             raise ValueError("Cannot link partner login: user is already linked to another partner")
-        user = link_existing_user_as_partner(db, user=user, display_name=partner.display_name)
-        partner.user_id = user.id
-        db.flush()
-        return PartnerApprovalResult(partner=partner, user=user)
 
-    temporary_password = _generate_temporary_password()
-    user = create_user(
+    result = user_invite_service.create_or_invite_partner_user(
         db,
+        partner=partner,
         email=application.email,
-        password=temporary_password,
         full_name=partner.display_name,
-        role="partner",
+        created_by_user_id=created_by_user_id,
+        resend=resend_invite,
     )
-    partner.user_id = user.id
-    db.flush()
     return PartnerApprovalResult(
         partner=partner,
-        user=user,
-        temporary_password=temporary_password,
-        user_was_created=True,
+        user=result.user,
+        user_was_created=result.user_created,
+        invite_status=result.invite_delivery_status,
+        invite_error=result.invite_delivery_error,
     )
 
 
@@ -234,7 +236,12 @@ def approve_application(
         application.reviewed_by_user_id = reviewed_by_user_id
         application.rejection_reason = None
         db.flush()
-        return activate_partner_login(db, partner=partner, application=application)
+        return activate_partner_login(
+            db,
+            partner=partner,
+            application=application,
+            created_by_user_id=reviewed_by_user_id,
+        )
 
     display_name = f"{application.first_name} {application.last_name}".strip()
     partner = Partner(
@@ -253,7 +260,12 @@ def approve_application(
     application.reviewed_by_user_id = reviewed_by_user_id
     application.rejection_reason = None
     db.flush()
-    return activate_partner_login(db, partner=partner, application=application)
+    return activate_partner_login(
+        db,
+        partner=partner,
+        application=application,
+        created_by_user_id=reviewed_by_user_id,
+    )
 
 
 def reject_application(
@@ -297,14 +309,16 @@ def store_activation_notice(
     *,
     application_id: uuid.UUID,
     login_email: str,
-    temporary_password: str | None,
+    invite_status: str,
+    invite_error: str | None,
     user_was_created: bool,
 ) -> None:
-    if not temporary_password:
+    if invite_status == "not needed":
         return
     request.session[PARTNER_ACTIVATION_SESSION_KEY] = {
         "application_id": str(application_id),
         "login_email": login_email,
-        "temporary_password": temporary_password,
+        "invite_status": invite_status,
+        "invite_error": invite_error,
         "user_was_created": user_was_created,
     }

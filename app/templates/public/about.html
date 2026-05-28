@@ -1,0 +1,33 @@
+{% extends "layout/base.html" %}
+
+{% block title %}About — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">About {{ settings.app_name }}</h1>
+    <p class="lc-page-header__lead">
+      Operational missed-call recovery for home-service and trades businesses — not another flashy AI widget.
+    </p>
+  </header>
+
+  <div class="lc-card">
+    <div class="lc-card__body">
+      <p>
+        {{ settings.app_name }} helps local service businesses recover missed phone calls with automated SMS follow-up
+        and structured lead intake. When your team cannot answer, we keep the conversation going by text so callers
+        do not move on to a competitor.
+      </p>
+      <p class="lc-mb-0">
+        We focus on plumbers, HVAC, electricians, roofers, and similar operators who lose jobs when nobody picks up the phone.
+      </p>
+    </div>
+  </div>
+
+  <div class="lc-btn-group">
+    <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+    <a class="lc-btn lc-btn--primary" href="/demo">Try the missed-call demo</a>
+    <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a sales conversation</a>
+  </div>
+{% endblock %}

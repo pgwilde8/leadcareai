@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Leads — {{ business.name }}{% endblock %}
 
@@ -16,9 +16,9 @@
           <th>Phone</th>
           <th>Status</th>
           <th>Source</th>
+          <th>AI</th>
+          <th>Service / Location</th>
           <th>Summary</th>
-          <th>Urgency</th>
-          <th>AI temp</th>
           <th>Last message</th>
           <th></th>
         </tr>
@@ -35,9 +35,23 @@
               {% elif lead.source == "missed_call" %}Missed call
               {% else %}{{ lead.source }}{% endif %}
             </td>
+            <td>
+              {% if lead.ai_temperature %}
+                <span class="badge badge-{{ lead.ai_temperature|lower }}">{{ lead.ai_temperature|upper }}</span>
+              {% endif %}
+              {% if lead.urgency %}
+                <span class="badge badge-urgency">{{ lead.urgency|upper }}</span>
+              {% endif %}
+              {% if not lead.ai_temperature and not lead.urgency %}—{% endif %}
+            </td>
+            <td>
+              {% if lead.service_needed or lead.location %}
+                {{ lead.service_needed or "Unknown service" }}{% if lead.location %} · {{ lead.location }}{% endif %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
             <td>{{ (lead.summary or "—")[:80] }}{% if lead.summary and lead.summary|length > 80 %}…{% endif %}</td>
-            <td>{{ lead.urgency or "—" }}</td>
-            <td>{{ lead.ai_temperature or "—" }}</td>
             <td>{{ row.last_message_preview or "—" }}</td>
             <td><a href="/business/leads/{{ lead.id }}">View</a></td>
           </tr>
@@ -56,5 +70,18 @@
     body { max-width: 56rem; }
     .lead-inbox { font-size: 0.9rem; }
     .lead-inbox th, .lead-inbox td { vertical-align: top; }
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+    .badge-hot { background: #ffe3e3; color: #b42318; }
+    .badge-warm { background: #fff2cc; color: #7a5a00; }
+    .badge-cold { background: #e3f2fd; color: #0b4f80; }
+    .badge-urgency { background: #fef3c7; color: #92400e; }
   </style>
 {% endblock %}

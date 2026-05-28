@@ -11,6 +11,7 @@ from app.models.partner import Partner
 from app.models.partner_application import PartnerApplication
 from app.models.partner_signed_document import PartnerSignedDocument
 from app.models.user import User
+from app.models.user_invite_token import UserInviteToken
 from app.services.partner_document_service import seed_default_document_templates
 from app.services.partner_service import approve_application, get_partner_by_application
 from app.services.user_service import create_admin_user, create_user, get_user_by_email
@@ -147,15 +148,22 @@ def test_approve_creates_partner_user_with_role_partner(
     assert result.user.role == "partner"
     assert result.user.is_active is True
     assert result.partner.user_id == result.user.id
-    assert result.temporary_password
+    assert result.invite_status in {"sent", "skipped", "failed"}
     assert result.user_was_created is True
 
     user = get_user_by_email(db_session, "login@example.com")
     assert user is not None
     assert user.role == "partner"
+    invite = (
+        db_session.query(UserInviteToken)
+        .filter(UserInviteToken.user_id == user.id, UserInviteToken.purpose == "partner_invite")
+        .one_or_none()
+    )
+    assert invite is not None
+    assert invite.token_hash
 
 
-def test_approve_shows_temporary_password_once_on_admin_page(
+def test_approve_shows_invite_status_notice(
     client: TestClient,
     db_session: Session,
 ) -> None:
@@ -165,12 +173,12 @@ def test_approve_shows_temporary_password_once_on_admin_page(
     client.post(f"/admin/partners/{application.id}/approve", follow_redirects=False)
     first = client.get(f"/admin/partners/{application.id}")
     assert first.status_code == 200
-    assert "Temporary password" in first.text
+    assert "Partner login invite" in first.text
     assert "temppw@example.com" in first.text
 
     second = client.get(f"/admin/partners/{application.id}")
     assert second.status_code == 200
-    assert "Temporary password" not in second.text
+    assert "Partner login invite" not in second.text
     assert "Linked login email" in second.text
 
 
@@ -187,6 +195,7 @@ def test_admin_detail_shows_linked_user_and_referral_code(
     assert "detail@example.com" in response.text
     assert "Referral code" in response.text
     assert "ref=" in response.text
+    assert "Invite status" in response.text
 
 
 def test_admin_reject_marks_application_rejected(
@@ -254,7 +263,7 @@ def test_non_partner_user_cannot_access_partner_dashboard(
     assert response.headers["location"] == "/login"
 
 
-def test_partner_dashboard_after_approval_with_temp_password(
+def test_partner_dashboard_after_approval_with_invite_acceptance(
     client: TestClient,
     db_session: Session,
 ) -> None:
@@ -267,12 +276,19 @@ def test_partner_dashboard_after_approval_with_temp_password(
         reviewed_by_user_id=admin.id,
     )
     db_session.commit()
-    assert result.temporary_password
-
-    client.post(
-        "/login",
-        data={"email": "dash@example.com", "password": result.temporary_password},
+    invite = (
+        db_session.query(UserInviteToken)
+        .filter(UserInviteToken.user_id == result.user.id, UserInviteToken.purpose == "partner_invite")
+        .order_by(UserInviteToken.created_at.desc())
+        .first()
     )
+    assert invite is not None
+    # Route-level invite acceptance behavior is validated in dedicated invite tests.
+    from app.core.security import hash_password
+
+    result.user.hashed_password = hash_password("dash-new-secret")
+    db_session.commit()
+    client.post("/login", data={"email": "dash@example.com", "password": "dash-new-secret"})
     response = client.get("/partner/dashboard")
     assert response.status_code == 200
     assert result.partner.referral_code in response.text

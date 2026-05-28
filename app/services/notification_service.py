@@ -17,6 +17,7 @@ from app.models.message import Message
 from app.models.notification_log import NotificationLog
 from app.services.business_service import get_business
 from app.services.lead_service import get_lead
+from app.services.lead_service import recommended_action_for_lead
 from app.services.twilio_service import SendSmsResult, TwilioConfigError, TwilioSendError, send_sms
 
 logger = logging.getLogger(__name__)
@@ -122,16 +123,46 @@ def _build_staff_sms_body(
     lead: Lead,
     message: Message | str | None,
 ) -> str:
-    summary = _short_summary(lead, message)
-    phone = lead.phone or "unknown"
-    parts = [f"LeadCare AI: {event_prefix} for {business.name} from {phone}. {summary}."]
+    urgency = (lead.urgency or "normal").strip().upper() or "NORMAL"
+    service = (lead.service_needed or "Unknown service").strip()
+    town = (lead.location or "Unknown town").strip()
+    name = (lead.name or "Unknown").strip()
+    callback = (lead.preferred_contact_time or "Not provided").strip()
+    last_message = _short_summary(lead, message)
+    parts = [
+        f"LeadCare AI: {urgency} | {service} | {town}\n"
+        f"Name: {name}\n"
+        f"Callback: {callback}\n"
+        f"Last message: {last_message}"
+    ]
+    if lead.ai_temperature or lead.ai_confidence is not None or lead.ai_last_analyzed_at:
+        parts.append(f"\nRecommended: {recommended_action_for_lead(lead)}")
     detail_url = _lead_detail_url(lead.id)
     if detail_url:
-        parts.append(f" View dashboard: {detail_url}")
+        parts.append(f"\nView dashboard: {detail_url}")
     body = "".join(parts)
     if len(body) > STAFF_SMS_MAX_LEN:
         body = body[: STAFF_SMS_MAX_LEN - 1] + "…"
     return body
+
+
+def list_recent_notifications_for_lead(
+    db: Session,
+    *,
+    business_id: uuid.UUID,
+    lead_id: uuid.UUID,
+    limit: int = 5,
+) -> list[NotificationLog]:
+    return (
+        db.query(NotificationLog)
+        .filter(
+            NotificationLog.business_id == business_id,
+            NotificationLog.lead_id == lead_id,
+        )
+        .order_by(NotificationLog.created_at.desc())
+        .limit(max(1, limit))
+        .all()
+    )
 
 
 def _smtp_configured() -> bool:

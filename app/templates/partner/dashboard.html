@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Partner dashboard — {{ settings.app_name }}{% endblock %}
 
@@ -18,10 +18,10 @@
   <table>
     <tbody>
       <tr><th>Referred businesses</th><td>{{ stats.businesses_referred }}</td></tr>
-      <tr><th>Active paying customers</th><td>{{ stats.active_paying_customers }} <em>(not tracked yet)</em></td></tr>
-      <tr><th>Pending commissions</th><td>{{ stats.pending_commissions }} <em>(coming with Stripe)</em></td></tr>
-      <tr><th>Approved commissions</th><td>{{ stats.approved_commissions }} <em>(coming with Stripe)</em></td></tr>
-      <tr><th>Paid commissions</th><td>{{ stats.paid_commissions }} <em>(coming with Stripe)</em></td></tr>
+      <tr><th>Active paying customers</th><td>{{ stats.active_paying_customers }}</td></tr>
+      <tr><th>Pending commissions</th><td>{{ stats.pending_commissions }}</td></tr>
+      <tr><th>Approved commissions</th><td>{{ stats.approved_commissions }}</td></tr>
+      <tr><th>Paid commissions</th><td>{{ stats.paid_commissions }}</td></tr>
     </tbody>
   </table>
 
@@ -51,6 +51,43 @@
     </table>
   {% else %}
     <p>No referred businesses yet. Share your referral link to get started.</p>
+  {% endif %}
+
+  <h2>Commissions</h2>
+  {% if commissions %}
+    <table>
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Eligible</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in commissions %}
+          <tr>
+            <td>
+              {{ commission_business_names.get(item.business_id|string, "Business #" ~ item.business_id) }}
+            </td>
+            <td>{{ item.commission_type }}</td>
+            <td>${{ "%.2f"|format(item.amount_cents / 100) }} {{ item.currency }}</td>
+            <td>
+              <strong>{{ item.status }}</strong>
+              {% if item.status == "canceled" %}
+                <br><em>Not payable</em>
+              {% endif %}
+            </td>
+            <td>{{ item.created_at }}</td>
+            <td>{{ item.eligible_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No commissions yet. Commissions are created only from paid customer invoices.</p>
   {% endif %}
 
   <form method="post" action="/logout">

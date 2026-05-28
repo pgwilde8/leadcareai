@@ -1,26 +1,340 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
-{% block title %}{{ settings.app_name }} — Missed call follow-up{% endblock %}
+{% block title %}{{ settings.app_name }} — Stop losing customers when you miss calls{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .lc-faq { margin: 0; }
+    .lc-faq__item { margin-bottom: var(--lc-space-5); }
+    .lc-faq__item dt {
+      font-weight: 700;
+      color: var(--lc-primary-dark);
+      margin-bottom: var(--lc-space-2);
+    }
+    .lc-faq__item dd {
+      margin: 0;
+      color: var(--lc-text-muted);
+    }
+    .lc-chat {
+      display: flex;
+      flex-direction: column;
+      gap: var(--lc-space-3);
+      max-width: 22rem;
+      margin: 0 auto;
+    }
+    .lc-chat__bubble {
+      padding: var(--lc-space-3) var(--lc-space-4);
+      border-radius: var(--lc-radius-lg);
+      font-size: 0.92rem;
+      max-width: 95%;
+    }
+    .lc-chat__bubble--out {
+      align-self: flex-end;
+      background: var(--lc-primary);
+      color: var(--lc-text-on-primary);
+      border-bottom-right-radius: var(--lc-radius-sm);
+    }
+    .lc-chat__bubble--in {
+      align-self: flex-start;
+      background: var(--lc-bg-muted);
+      color: var(--lc-text);
+      border: 1px solid var(--lc-border);
+      border-bottom-left-radius: var(--lc-radius-sm);
+    }
+    .lc-chat__meta {
+      font-size: 0.75rem;
+      color: var(--lc-text-subtle);
+      text-align: center;
+    }
+    .lc-mock-lead dt {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--lc-text-subtle);
+    }
+    .lc-mock-lead dd {
+      margin: 0 0 var(--lc-space-3);
+      font-weight: 600;
+      color: var(--lc-primary-dark);
+    }
+    .lc-pricing-card {
+      text-align: center;
+    }
+    .lc-pricing-card__price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--lc-primary-dark);
+      margin: var(--lc-space-2) 0;
+    }
+    .lc-pricing-card__label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--lc-secondary);
+    }
+    .lc-industry-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: var(--lc-space-3);
+    }
+    .lc-industry-list li {
+      padding: var(--lc-space-3) var(--lc-space-4);
+      background: var(--lc-bg-muted);
+      border-radius: var(--lc-radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      border: 1px solid var(--lc-border);
+    }
+    .lc-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: step;
+    }
+    .lc-steps li {
+      position: relative;
+      padding-left: 3rem;
+      margin-bottom: var(--lc-space-5);
+    }
+    .lc-steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: var(--lc-primary);
+      color: var(--lc-text-on-primary);
+      border-radius: 999px;
+    }
+    .lc-cta-band {
+      background: linear-gradient(135deg, var(--lc-primary-dark), #0a4a5c);
+      color: var(--lc-text-inverse);
+      border-radius: var(--lc-radius-lg);
+      padding: var(--lc-space-8);
+      text-align: center;
+    }
+    .lc-cta-band h2 { color: inherit; }
+    .lc-cta-band p { color: rgba(248, 250, 252, 0.9); }
+    .lc-referral-banner {
+      margin-bottom: var(--lc-space-6);
+    }
+  </style>
+{% endblock %}
 
 {% block content %}
-  <h1>{{ settings.app_name }}</h1>
-  <p>Turn missed calls into booked jobs with automated SMS follow-up for local service businesses.</p>
-
-  <h2>See how many missed calls you're losing</h2>
-  <p>Most home-service businesses miss 20–40% of inbound calls. Every missed call is a lead walking to a competitor.</p>
-
   {% if referral_partner_name %}
-    <p><em>Referred by {{ referral_partner_name }}{% if referral_code %} ({{ referral_code }}){% endif %}</em></p>
+    <div class="lc-alert lc-alert--info lc-referral-banner" role="status">
+      Referred by <strong>{{ referral_partner_name }}</strong>{% if referral_code %} ({{ referral_code }}){% endif %}
+    </div>
   {% endif %}
 
-  <p>
-    <a href="/demo"><strong>Book a demo</strong></a> — tell us about your business and we'll show you how {{ settings.app_name }} helps.
-  </p>
+  {# —— Hero —— #}
+  <section class="lc-hero" aria-labelledby="hero-title">
+    <p class="lc-hero__eyebrow">Missed-call recovery for local service businesses</p>
+    <h1 id="hero-title" class="lc-hero__title">Stop Losing Customers When You Miss Calls</h1>
+    <p class="lc-hero__lead">
+      LeadCare AI instantly texts missed callers, collects the details, and alerts your team before the customer moves on.
+    </p>
+    <div class="lc-hero__actions">
+      <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+    </div>
+    <p class="lc-text-muted lc-mt-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+      Demo line: <strong style="color: var(--lc-accent-warm);">1-833-669-1335</strong>
+      · <a href="/demo" style="color: var(--lc-accent-warm);">Try the missed-call demo</a>
+    </p>
+  </section>
 
-  <nav>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
-    <a href="/partner/onboard">Become a partner</a>
-    <a href="/login">Log in</a>
-  </nav>
+  {# —— How it works —— #}
+  <section class="lc-section" aria-labelledby="how-title">
+    <header class="lc-page-header">
+      <h2 id="how-title" class="lc-page-header__title">How it works</h2>
+      <p class="lc-page-header__lead">
+        When your team cannot answer, LeadCare AI keeps the conversation going by text so leads do not slip away.
+      </p>
+    </header>
+    <ol class="lc-steps lc-grid lc-grid--3">
+      <li>
+        <strong>Missed call detected</strong>
+        <p class="lc-text-muted lc-mb-0">An inbound call goes unanswered on your business line.</p>
+      </li>
+      <li>
+        <strong>Instant SMS follow-up</strong>
+        <p class="lc-text-muted lc-mb-0">The caller receives a friendly text asking what they need help with.</p>
+      </li>
+      <li>
+        <strong>Team alerted with details</strong>
+        <p class="lc-text-muted lc-mb-0">Replies are captured as a structured lead and your team is notified to call back.</p>
+      </li>
+    </ol>
+  </section>
+
+  {# —— Live missed-call demo —— #}
+  <section class="lc-section" aria-labelledby="live-demo-title">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 id="live-demo-title" class="lc-card__title">Live missed-call demo</h2>
+        <a class="lc-btn lc-btn--primary lc-btn--sm" href="/demo">View instructions</a>
+      </div>
+      <div class="lc-card__body">
+        <p>Call <strong>1-833-669-1335</strong>, let it ring through, reply to the SMS from Joe's Plumbing Demo, then open the demo dashboard to see your lead (phone masked).</p>
+        <div class="lc-btn-group">
+          <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call 1-833-669-1335</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/dashboard">Open demo dashboard</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# —— Example SMS conversation —— #}
+  <section class="lc-section" aria-labelledby="sms-title">
+    <header class="lc-page-header">
+      <h2 id="sms-title" class="lc-page-header__title">Example SMS conversation</h2>
+      <p class="lc-page-header__lead">What your customer sees after a missed call — fast, professional, and on-brand.</p>
+    </header>
+    <div class="lc-grid lc-grid--2">
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <div class="lc-chat" role="group" aria-label="Sample SMS thread">
+            <p class="lc-chat__meta">Automated · right after missed call</p>
+            <div class="lc-chat__bubble lc-chat__bubble--out">
+              Hi, this is Joe's Plumbing Demo. Sorry we missed your call. What plumbing issue can we help with? Reply STOP to opt out.
+            </div>
+            <div class="lc-chat__bubble lc-chat__bubble--in">
+              Kitchen sink is backing up, need someone today if possible.
+            </div>
+            <div class="lc-chat__bubble lc-chat__bubble--out">
+              Thanks! What city are you in, and is this urgent or can it wait a day?
+            </div>
+            <div class="lc-chat__bubble lc-chat__bubble--in">
+              Round Rock — pretty urgent, water is slow to drain.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lc-card">
+        <h3 class="lc-section__title">Why texting works</h3>
+        <ul class="lc-text-muted">
+          <li>Most callers won't leave a voicemail — but they will reply to a text.</li>
+          <li>You collect issue, location, and urgency before your team calls back.</li>
+          <li>Every missed call becomes a trackable lead instead of a dead end.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {# —— Business-side lead summary —— #}
+  <section class="lc-section" aria-labelledby="lead-summary-title">
+    <header class="lc-page-header">
+      <h2 id="lead-summary-title" class="lc-page-header__title">Business-side lead summary</h2>
+      <p class="lc-page-header__lead">Your team sees structured details — not a messy voicemail transcript.</p>
+    </header>
+    <div class="lc-card" style="max-width: 28rem;">
+      <div class="lc-card__header">
+        <h3 class="lc-card__title">New missed-call lead</h3>
+        <span class="lc-badge lc-badge--urgency">Urgent</span>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-mock-lead">
+          <dt>Phone</dt>
+          <dd>•••• 1234</dd>
+          <dt>Issue</dt>
+          <dd>Kitchen sink backing up</dd>
+          <dt>Location</dt>
+          <dd>Round Rock, TX</dd>
+          <dt>Status</dt>
+          <dd><span class="lc-badge lc-badge--lead-qualifying">Qualifying</span></dd>
+          <dt>Summary</dt>
+          <dd class="lc-mb-0" style="font-weight: 400; color: var(--lc-text-muted);">
+            Caller needs same-day help; water draining slowly.
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  {# —— Built for local service businesses —— #}
+  <section class="lc-section" aria-labelledby="industries-title">
+    <header class="lc-page-header">
+      <h2 id="industries-title" class="lc-page-header__title">Built for local service businesses</h2>
+      <p class="lc-page-header__lead">
+        Home-service and trades operators who lose jobs when nobody answers the phone.
+      </p>
+    </header>
+    <ul class="lc-industry-list">
+      <li>Plumbing</li>
+      <li>HVAC</li>
+      <li>Electrical</li>
+      <li>Roofing</li>
+      <li>Garage doors</li>
+      <li>Pest control</li>
+      <li>Landscaping</li>
+      <li>Restoration</li>
+    </ul>
+  </section>
+
+  {# —— Pricing —— #}
+  <section class="lc-section" aria-labelledby="pricing-title">
+    <header class="lc-page-header">
+      <h2 id="pricing-title" class="lc-page-header__title">Pricing</h2>
+      <p class="lc-page-header__lead">Straightforward pricing for teams that want missed calls handled automatically.</p>
+    </header>
+    <div class="lc-grid lc-grid--2">
+      <div class="lc-card lc-pricing-card">
+        <p class="lc-pricing-card__label">One-Time Setup</p>
+        <p class="lc-pricing-card__price">$199</p>
+        <p class="lc-text-muted lc-mb-0">Configuration, messaging templates, forwarding setup, and team notifications.</p>
+      </div>
+      <div class="lc-card lc-pricing-card">
+        <p class="lc-pricing-card__label">Monthly Service</p>
+        <p class="lc-pricing-card__price">$147<span style="font-size: 1rem; font-weight: 500;">/month</span></p>
+        <p class="lc-text-muted lc-mb-0">Ongoing missed-call SMS follow-up, lead intake, and dashboard access.</p>
+      </div>
+    </div>
+    <p class="lc-text-muted" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+      <a href="/demo/book">Book a demo</a> to discuss volume, multiple locations, or partner referrals.
+    </p>
+  </section>
+
+  {# —— FAQ —— #}
+  <section class="lc-section" id="faq" aria-labelledby="faq-title">
+    <header class="lc-page-header">
+      <h2 id="faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body">
+        {% include "public/_faq_items.html" %}
+      </div>
+    </div>
+  </section>
+
+  {# —— Final CTA —— #}
+  <section class="lc-section" aria-labelledby="final-cta-title">
+    <div class="lc-cta-band">
+      <h2 id="final-cta-title">Every missed call is a job you might lose</h2>
+      <p>Try the live demo now or book a conversation with our team.</p>
+      <div class="lc-hero__actions" style="justify-content: center;">
+        <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call 1-833-669-1335</a>
+        <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+      </div>
+      <p class="lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.85rem;">
+        <a href="/demo" style="color: var(--lc-accent-warm);">Missed-call demo instructions</a>
+      </p>
+    </div>
+  </section>
 {% endblock %}

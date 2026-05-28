@@ -1,0 +1,116 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Commissions — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Commissions</h1>
+    <p class="lc-admin-header__lead">
+      Ledger records from paid Stripe events. Payouts are tracked manually in V1.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Commissions">
+    <a href="/admin">← Back to admin dashboard</a>
+  </nav>
+
+  <form method="get" action="/admin/commissions" class="lc-admin-filter-bar">
+    <span class="lc-admin-filter-bar__label">Filter</span>
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">All</option>
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Apply filter</button>
+  </form>
+
+  {% if rows %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th>Partner</th>
+            <th>Business</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Eligible</th>
+            <th>Stripe ref</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for commission, partner, business in rows %}
+            <tr>
+              <td>{{ commission.created_at }}</td>
+              <td>{{ partner.display_name if partner else "—" }}</td>
+              <td>{{ business.name if business else "—" }}</td>
+              <td>{{ commission.commission_type }}</td>
+              <td>${{ "%.2f"|format(commission.amount_cents / 100) }} {{ commission.currency }}</td>
+              <td>
+                {{ status_badge(commission.status) }}
+                {% if commission.status == "canceled" %}
+                  <br><em>canceled</em>
+                {% endif %}
+              </td>
+              <td>{{ commission.eligible_at }}</td>
+              <td><code>{{ commission.stripe_invoice_id or commission.stripe_checkout_session_id or "—" }}</code></td>
+              <td>
+                {% if commission.notes %}
+                  {% if refund_review_note in commission.notes %}
+                    <strong>Review for clawback:</strong>
+                  {% endif %}
+                  {{ commission.notes }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                <div class="lc-table-actions">
+                  {% if commission.status == "pending" %}
+                    <form method="post" action="/admin/commissions/{{ commission.id }}/approve">
+                      <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Approve</button>
+                    </form>
+                  {% endif %}
+                  {% if commission.status == "approved" %}
+                    <form method="post" action="/admin/commissions/{{ commission.id }}/mark-paid">
+                      <button type="submit" class="lc-btn lc-btn--secondary lc-btn--sm">Mark paid</button>
+                    </form>
+                  {% endif %}
+                  {% if commission.status in ["pending", "approved"] %}
+                    <form method="post" action="/admin/commissions/{{ commission.id }}/cancel">
+                      <button type="submit" class="lc-btn lc-btn--ghost lc-btn--sm">Cancel</button>
+                    </form>
+                  {% endif %}
+                  {% if commission.status == "paid" and refund_review_note in (commission.notes or "") %}
+                    <form method="post" action="/admin/commissions/{{ commission.id }}/mark-clawed-back">
+                      <button type="submit" class="lc-btn lc-btn--danger lc-btn--sm">Mark clawed back</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="lc-empty">
+      <p class="lc-empty__title">No commission ledger rows</p>
+      <p class="lc-empty__text">No rows match the current filter.</p>
+    </div>
+  {% endif %}
+{% endblock %}

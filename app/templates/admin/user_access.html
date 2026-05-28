@@ -1,0 +1,121 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}User Access — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">User Access</h1>
+    <p class="lc-admin-header__lead">
+      Central view of login accounts, invite status, and linked business or partner records.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="User access">
+    <a href="/admin">← Back to admin dashboard</a>
+  </nav>
+
+  <form method="get" action="/admin/user-access" class="lc-admin-filter-bar">
+    <span class="lc-admin-filter-bar__label">Filters</span>
+    <label for="role">Role</label>
+    <select id="role" name="role">
+      <option value="">All</option>
+      <option value="business_user" {% if filters.role == "business_user" %}selected{% endif %}>business_user</option>
+      <option value="partner" {% if filters.role == "partner" %}selected{% endif %}>partner</option>
+      <option value="admin" {% if filters.role == "admin" %}selected{% endif %}>admin</option>
+    </select>
+
+    <label for="invite_status">Invite status</label>
+    <select id="invite_status" name="invite_status">
+      <option value="">All</option>
+      <option value="sent" {% if filters.invite_status == "sent" %}selected{% endif %}>sent</option>
+      <option value="failed" {% if filters.invite_status == "failed" %}selected{% endif %}>failed</option>
+      <option value="skipped" {% if filters.invite_status == "skipped" %}selected{% endif %}>skipped</option>
+      <option value="accepted" {% if filters.invite_status == "accepted" %}selected{% endif %}>accepted</option>
+      <option value="expired" {% if filters.invite_status == "expired" %}selected{% endif %}>expired</option>
+      <option value="not needed" {% if filters.invite_status == "not needed" %}selected{% endif %}>not needed</option>
+    </select>
+
+    <label for="q">Email search</label>
+    <input id="q" name="q" type="text" value="{{ filters.q }}" placeholder="email contains…" />
+
+    <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Apply filters</button>
+  </form>
+
+  {% if rows %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Business</th>
+            <th>Partner</th>
+            <th>Referral</th>
+            <th>Invite purpose</th>
+            <th>Invite status</th>
+            <th>Invite created</th>
+            <th>Expires</th>
+            <th>Used</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td><a href="/admin/user-access/{{ row.user_id }}">{{ row.email }}</a></td>
+              <td>{{ row.role }}</td>
+              <td>{{ "yes" if row.is_active else "no" }}</td>
+              <td>
+                {% if row.linked_business_id %}
+                  <a href="/admin/businesses/{{ row.linked_business_id }}">{{ row.linked_business_name }}</a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                {% if row.linked_partner_application_id %}
+                  <a href="/admin/partners/{{ row.linked_partner_application_id }}">{{ row.linked_partner_name }}</a>
+                {% elif row.linked_partner_id %}
+                  {{ row.linked_partner_name }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ row.partner_referral_code or "—" }}</td>
+              <td>{{ row.invite_purpose or "—" }}</td>
+              <td>{{ status_badge(row.invite_status) if row.invite_status else "—" }}</td>
+              <td>{{ row.invite_created_at or "—" }}</td>
+              <td>{{ row.invite_expires_at or "—" }}</td>
+              <td>{{ row.invite_used_at or "—" }}</td>
+              <td>
+                <div class="lc-table-actions">
+                  <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/user-access/{{ row.user_id }}">Details</a>
+                  {% if row.can_resend %}
+                    <form method="post" action="/admin/users/{{ row.user_id }}/resend-invite">
+                      <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Resend invite</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="lc-empty">
+      <p class="lc-empty__title">No users found</p>
+      <p class="lc-empty__text">No users match the current filters.</p>
+    </div>
+  {% endif %}
+{% endblock %}

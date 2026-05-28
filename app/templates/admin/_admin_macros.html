@@ -1,0 +1,17 @@
+{% macro status_badge(value) %}
+  {% if value %}
+    {% set slug = value|lower|replace(' ', '_')|replace('-', '_') %}
+    <span class="lc-badge lc-badge--status-{{ slug }}">{{ value }}</span>
+  {% else %}—{% endif %}
+{% endmacro %}
+
+{% macro admin_toolbar(user) %}
+  {% if user %}
+    <div class="lc-admin-toolbar">
+      <span class="lc-text-muted">Signed in as <strong>{{ user.email }}</strong></span>
+      <form method="post" action="/logout">
+        <button type="submit" class="lc-btn lc-btn--ghost lc-btn--sm">Log out</button>
+      </form>
+    </div>
+  {% endif %}
+{% endmacro %}

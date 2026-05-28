@@ -181,6 +181,23 @@ def dashboard_lead_counts(db: Session, business_id: uuid.UUID) -> dict[str, int]
     return counts
 
 
+def recommended_action_for_lead(lead: Lead) -> str:
+    """Operator-focused follow-up recommendation from AI lead signals."""
+    temperature = (lead.ai_temperature or "").strip().lower()
+    urgency = (lead.urgency or "").strip().lower()
+    is_urgent = urgency in {"urgent", "emergency", "asap", "today"}
+
+    if temperature == "hot" and is_urgent:
+        return "Call immediately"
+    if temperature == "hot":
+        return "Call as soon as possible"
+    if temperature == "warm":
+        return "Follow up today"
+    if temperature == "cold":
+        return "Review when available"
+    return "Review lead details"
+
+
 def get_lead_by_business_and_phone(
     db: Session,
     business_id: uuid.UUID,

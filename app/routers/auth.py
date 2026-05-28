@@ -16,12 +16,32 @@ from app.models.business import Business
 from app.models.user import User
 from app.services.business_service import get_primary_business_for_user
 from app.services.user_service import get_user_by_email
+from app.services.user_invite_service import consume_invite_and_set_password, get_valid_token_by_raw
 from app.templates import templates
 
 router = APIRouter(tags=["auth"])
 
 SESSION_USER_ID_KEY = "user_id"
 SESSION_USER_ROLE_KEY = "user_role"
+
+_LOGIN_VIEW_TEMPLATES: dict[str, str] = {
+    "business": "auth/login_business.html",
+    "admin": "auth/login_admin.html",
+}
+
+
+def _login_form_context(
+    login_view: str,
+    *,
+    error: str | None = None,
+    prefill_email: str = "",
+) -> dict:
+    return {
+        "login_view": login_view,
+        "login_action": "/login",
+        "error": error,
+        "prefill_email": prefill_email,
+    }
 
 
 def get_current_user(request: Request, db: Session) -> User | None:
@@ -74,10 +94,24 @@ def require_partner(request: Request, db: Session):
 
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "auth/login_index.html", {})
+
+
+@router.get("/login/business", response_class=HTMLResponse)
+def login_business_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
-        "auth/login.html",
-        {"error": None, "prefill_email": ""},
+        "auth/login_business.html",
+        _login_form_context("business"),
+    )
+
+
+@router.get("/login/admin", response_class=HTMLResponse)
+def login_admin_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request,
+        "auth/login_admin.html",
+        _login_form_context("admin"),
     )
 
 
@@ -87,7 +121,10 @@ def login_submit(
     db: Annotated[Session, Depends(get_db)],
     email: str = Form(""),
     password: str = Form(""),
+    login_view: str = Form("business"),
 ):
+    view = login_view if login_view in _LOGIN_VIEW_TEMPLATES else "business"
+    template_name = _LOGIN_VIEW_TEMPLATES[view]
     user = get_user_by_email(db, email)
 
     if (
@@ -97,11 +134,8 @@ def login_submit(
     ):
         return templates.TemplateResponse(
             request,
-            "auth/login.html",
-            {
-                "error": "Invalid email or password",
-                "prefill_email": email.strip(),
-            },
+            template_name,
+            _login_form_context(view, error="Invalid email or password", prefill_email=email.strip()),
             status_code=401,
         )
 
@@ -120,4 +154,70 @@ def login_submit(
 @router.post("/logout")
 def logout(request: Request) -> RedirectResponse:
     request.session.clear()
+    return RedirectResponse(url="/login", status_code=303)
+
+
+@router.get("/auth/accept-invite", response_class=HTMLResponse)
+def accept_invite_page(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    token: str = "",
+) -> HTMLResponse:
+    trimmed = token.strip()
+    valid = bool(trimmed and get_valid_token_by_raw(db, raw_token=trimmed))
+    return templates.TemplateResponse(
+        request,
+        "auth/accept_invite.html",
+        {
+            "token": trimmed,
+            "valid": valid,
+            "error": None if valid else "Invite link is invalid or expired",
+            "success": False,
+        },
+    )
+
+
+@router.post("/auth/accept-invite")
+def accept_invite_submit(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    token: str = Form(""),
+    password: str = Form(""),
+    password_confirm: str = Form(""),
+):
+    trimmed = token.strip()
+    if not trimmed:
+        return templates.TemplateResponse(
+            request,
+            "auth/accept_invite.html",
+            {"token": "", "valid": False, "error": "Missing invite token", "success": False},
+            status_code=400,
+        )
+    if password != password_confirm:
+        return templates.TemplateResponse(
+            request,
+            "auth/accept_invite.html",
+            {"token": trimmed, "valid": True, "error": "Passwords do not match", "success": False},
+            status_code=400,
+        )
+    try:
+        user = consume_invite_and_set_password(db, raw_token=trimmed, new_password=password)
+        if user is None:
+            db.rollback()
+            return templates.TemplateResponse(
+                request,
+                "auth/accept_invite.html",
+                {"token": trimmed, "valid": False, "error": "Invite link is invalid or expired", "success": False},
+                status_code=400,
+            )
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        return templates.TemplateResponse(
+            request,
+            "auth/accept_invite.html",
+            {"token": trimmed, "valid": True, "error": str(exc), "success": False},
+            status_code=400,
+        )
+
     return RedirectResponse(url="/login", status_code=303)

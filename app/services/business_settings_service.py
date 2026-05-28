@@ -22,36 +22,51 @@ def _strip(value: str | None) -> str | None:
     return stripped or None
 
 
+def resolve_outbound_sms_label(
+    business: Business | None = None,
+    *,
+    business_name: str | None = None,
+    sms_signature: str | None = None,
+) -> str:
+    """
+    Label/signature for outbound SMS openers.
+
+    Precedence: sms_signature -> business.name -> "LeadCare AI".
+    """
+    signature = (
+        (sms_signature or (business.sms_signature if business is not None else None) or "")
+        .strip()
+    )
+    if signature:
+        return signature
+
+    name = (business_name or (business.name if business is not None else None) or "").strip()
+    if name:
+        return name
+
+    return "LeadCare AI"
+
+
 def build_missed_call_textback_body(business: Business) -> str:
     """Resolved SMS body for missed-call text-back (custom or platform default)."""
     custom = (business.missed_call_textback_message or "").strip()
     if custom:
         return custom
 
-    name = (business.sms_signature or business.name or "").strip()
-    if name:
-        return (
-            f"{name}: Sorry we missed your call. "
-            "What can we help you with today?"
-            f"{STOP_SUFFIX}"
-        )
+    label = resolve_outbound_sms_label(business)
     return (
-        "Sorry we missed your call. What can we help you with today?"
+        f"{label}: Sorry we missed your call. "
+        "What can we help you with today?"
         f"{STOP_SUFFIX}"
     )
 
 
 def preview_default_missed_call_message(business: Business) -> str:
     """Default message shown in settings when no custom message is saved."""
-    name = (business.sms_signature or business.name or "").strip()
-    if name:
-        return (
-            f"{name}: Sorry we missed your call. "
-            "What can we help you with today?"
-            f"{STOP_SUFFIX}"
-        )
+    label = resolve_outbound_sms_label(business)
     return (
-        "Sorry we missed your call. What can we help you with today?"
+        f"{label}: Sorry we missed your call. "
+        "What can we help you with today?"
         f"{STOP_SUFFIX}"
     )
 

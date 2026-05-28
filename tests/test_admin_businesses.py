@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from app.models.user_invite_token import UserInviteToken
 from app.services.business_service import create_business
 from app.services.user_service import create_admin_user, create_user
 
@@ -35,6 +36,30 @@ def test_admin_can_view_business_list(
     response = client.get("/admin/businesses")
     assert response.status_code == 200
     assert "Test Roofing" in response.text
+
+
+def test_admin_can_open_operational_leads_page(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    _login_admin(client, db_session)
+    business = create_business(db_session, name="Ops Leads Co")
+    from app.services.lead_service import create_lead
+
+    create_lead(
+        db_session,
+        business.id,
+        phone="+15550001111",
+        source="missed_call",
+        summary="Inbound call",
+    )
+    db_session.commit()
+
+    response = client.get("/admin/leads")
+    assert response.status_code == 200
+    assert "Operational leads" in response.text
+    assert "Ops Leads Co" in response.text
+    assert "+15550001111" in response.text
 
 
 def test_admin_can_open_new_business_form(
@@ -105,3 +130,26 @@ def test_admin_can_link_existing_user_to_business(
     detail = client.get(f"/admin/businesses/{business.id}")
     assert "staff@example.com" in detail.text
     assert "staff" in detail.text
+
+
+def test_admin_can_resend_business_invite(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    _login_admin(client, db_session)
+    business = create_business(db_session, name="Invite Resend Co")
+    user = create_user(db_session, email="owner-resend@example.com", password="owner-secret", role="business_user")
+    from app.services.business_service import link_user_to_business
+
+    link_user_to_business(db_session, user.id, business.id)
+    db_session.commit()
+
+    response = client.post(f"/admin/businesses/{business.id}/resend-invite", follow_redirects=False)
+    assert response.status_code == 303
+    db_session.expire_all()
+    token = (
+        db_session.query(UserInviteToken)
+        .filter(UserInviteToken.user_id == user.id, UserInviteToken.purpose == "business_invite")
+        .one_or_none()
+    )
+    assert token is not None

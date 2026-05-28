@@ -1,42 +1,62 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
 
 {% block title %}Leads — {{ business.name }}{% endblock %}
 
-{% block content %}
-  <h1>Leads</h1>
-  <p>Business: <strong>{{ business.name }}</strong></p>
+{% block container_class %}lc-container--wide{% endblock %}
 
-  <nav>
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Leads</h1>
+    <p class="lc-admin-header__lead">Business: <strong>{{ business.name }}</strong></p>
+  </header>
+
+  <div class="lc-admin-filter-bar">
+    <span class="lc-admin-filter-bar__label">Actions</span>
     <a href="/admin/businesses/{{ business.id }}">Back to business</a>
-    <a href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
-  </nav>
+    <a class="lc-btn lc-btn--primary lc-btn--sm" href="/admin/businesses/{{ business.id }}/leads/new">Add manual lead</a>
+  </div>
 
   {% if leads %}
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Service</th>
-          <th>Status</th>
-          <th>Source</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for lead in leads %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
           <tr>
-            <td>{{ lead.name or "—" }}</td>
-            <td>{{ lead.phone or "—" }}</td>
-            <td>{{ lead.service_needed or "—" }}</td>
-            <td>{{ lead.status }}</td>
-            <td>{{ lead.source }}</td>
-            <td><a href="/admin/leads/{{ lead.id }}">View</a></td>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Source</th>
+            <th></th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for lead in leads %}
+            <tr>
+              <td>{{ lead.name or "—" }}</td>
+              <td>{{ lead.phone or "—" }}</td>
+              <td>{{ lead.service_needed or "—" }}</td>
+              <td>{{ status_badge(lead.status) }}</td>
+              <td>{{ lead.source or "—" }}</td>
+              <td>
+                <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/leads/{{ lead.id }}">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p>No leads yet. <a href="/admin/businesses/{{ business.id }}/leads/new">Add one</a>.</p>
+    <div class="lc-empty">
+      <p class="lc-empty__title">No leads yet</p>
+      <p class="lc-empty__text">Add a manual lead or wait for inbound missed-call/SMS activity.</p>
+      <a class="lc-btn lc-btn--primary" href="/admin/businesses/{{ business.id }}/leads/new">Add one</a>
+    </div>
   {% endif %}
 {% endblock %}

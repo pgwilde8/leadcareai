@@ -8,8 +8,9 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.database import get_db
-from app.services import business_lead_service
+from app.services import business_lead_service, demo_live_service
 from app.services.referral_service import get_referral_from_session, resolve_referral_partner
 from app.templates import templates
 
@@ -28,6 +29,16 @@ def _sms(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "legal/sms.html", {})
 
 
+@router.get("/about", response_class=HTMLResponse, response_model=None)
+def about_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "public/about.html", {})
+
+
+@router.get("/contact", response_class=HTMLResponse, response_model=None)
+def contact_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "public/contact.html", {})
+
+
 @router.get("/", response_class=HTMLResponse, response_model=None)
 def landing_page(request: Request, db: Annotated[Session, Depends(get_db)]):
     referral_code, _ = get_referral_from_session(request)
@@ -43,12 +54,39 @@ def landing_page(request: Request, db: Annotated[Session, Depends(get_db)]):
 
 
 @router.get("/demo", response_class=HTMLResponse, response_model=None)
-def demo_form(request: Request, db: Annotated[Session, Depends(get_db)]):
+def demo_live_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "public/demo.html",
+        {
+            "demo_business_name": demo_live_service.DEMO_BUSINESS_DISPLAY_NAME,
+            "demo_phone_display": demo_live_service.DEMO_PHONE_DISPLAY,
+        },
+    )
+
+
+@router.get("/demo/dashboard", response_class=HTMLResponse, response_model=None)
+def demo_dashboard_page(request: Request, db: Annotated[Session, Depends(get_db)]):
+    settings = get_settings()
+    rows = demo_live_service.list_public_demo_leads(db) if demo_live_service.is_demo_enabled(settings) else []
+    return templates.TemplateResponse(
+        request,
+        "public/demo_dashboard.html",
+        {
+            "demo_enabled": demo_live_service.is_demo_enabled(settings),
+            "demo_business_name": demo_live_service.DEMO_BUSINESS_DISPLAY_NAME,
+            "rows": rows,
+        },
+    )
+
+
+@router.get("/demo/book", response_class=HTMLResponse, response_model=None)
+def demo_book_form(request: Request, db: Annotated[Session, Depends(get_db)]):
     referral_code, _ = get_referral_from_session(request)
     partner = resolve_referral_partner(db, request)
     return templates.TemplateResponse(
         request,
-        "public/demo.html",
+        "public/demo_book.html",
         {
             "error": None,
             "form": {},
@@ -58,8 +96,8 @@ def demo_form(request: Request, db: Annotated[Session, Depends(get_db)]):
     )
 
 
-@router.post("/demo", response_model=None)
-def demo_submit(
+@router.post("/demo/book", response_model=None)
+def demo_book_submit(
     request: Request,
     db: Annotated[Session, Depends(get_db)],
     business_name: str = Form(""),
@@ -104,7 +142,7 @@ def demo_submit(
         db.rollback()
         return templates.TemplateResponse(
             request,
-            "public/demo.html",
+            "public/demo_book.html",
             {
                 "error": str(exc),
                 "form": form,
@@ -114,11 +152,11 @@ def demo_submit(
             status_code=400,
         )
 
-    return RedirectResponse(url="/demo/success", status_code=303)
+    return RedirectResponse(url="/demo/book/success", status_code=303)
 
 
-@router.get("/demo/success", response_class=HTMLResponse, response_model=None)
-def demo_success(request: Request) -> HTMLResponse:
+@router.get("/demo/book/success", response_class=HTMLResponse, response_model=None)
+def demo_book_success(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/demo_success.html", {})
 
 

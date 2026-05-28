@@ -1,0 +1,44 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
+
+{% block title %}System Check — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">System Check</h1>
+    <p class="lc-admin-header__lead">
+      Secrets are never displayed here; only configured/not-configured status values are shown.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="System check">
+    <a href="/admin">← Back to admin dashboard</a>
+  </nav>
+
+  <div class="lc-table-wrap">
+    <table class="lc-table">
+      <thead>
+        <tr>
+          <th>Check</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for check in checks %}
+          <tr>
+            <td>{{ check.name }}</td>
+            <td>{{ check.value }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

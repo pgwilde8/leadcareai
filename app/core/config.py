@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o-mini"
     openai_enabled: bool = True
     openai_timeout_seconds: float = 20.0
+    demo_enabled: bool = False
+    demo_business_id: str | None = None
+    demo_twilio_number: str | None = None
 
     @property
     def effective_public_base_url(self) -> str | None:

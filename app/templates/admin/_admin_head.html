@@ -1,0 +1,288 @@
+<style>
+  .lc-admin-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lc-space-3);
+    margin-bottom: var(--lc-space-5);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    background: var(--lc-bg-elevated);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius);
+    font-size: 0.9rem;
+  }
+
+  .lc-admin-toolbar .lc-btn {
+    margin-top: 0;
+  }
+
+  .lc-admin-header {
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .lc-admin-header__title {
+    margin-bottom: var(--lc-space-2);
+  }
+
+  .lc-admin-header__lead {
+    color: var(--lc-text-muted);
+    margin: 0;
+    max-width: 48rem;
+  }
+
+  .lc-admin-nav {
+    margin-bottom: var(--lc-space-6);
+  }
+
+  .lc-admin-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lc-space-2) var(--lc-space-4);
+    margin-bottom: var(--lc-space-5);
+    padding: var(--lc-space-3) var(--lc-space-4);
+    background: var(--lc-bg-muted);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius);
+    font-size: 0.88rem;
+  }
+
+  .lc-admin-filter-bar__label {
+    font-weight: 600;
+    color: var(--lc-text-muted);
+    margin-right: var(--lc-space-2);
+  }
+
+  .lc-admin-section {
+    margin-bottom: var(--lc-space-8);
+  }
+
+  .lc-admin-section__title {
+    font-size: 1.05rem;
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .lc-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: var(--lc-space-3);
+    margin-bottom: var(--lc-space-6);
+  }
+
+  .lc-admin-grid__link {
+    display: block;
+    padding: var(--lc-space-4);
+    background: var(--lc-bg-elevated);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius);
+    text-decoration: none;
+    color: var(--lc-primary-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .lc-admin-grid__link:hover {
+    border-color: var(--lc-primary);
+    background: var(--lc-info-bg);
+    color: var(--lc-primary);
+  }
+
+  .lc-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--lc-space-4) var(--lc-space-6);
+    margin: 0;
+  }
+
+  .lc-meta-grid dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--lc-text-subtle);
+    margin-bottom: var(--lc-space-1);
+  }
+
+  .lc-meta-grid dd {
+    margin: 0 0 var(--lc-space-3);
+    color: var(--lc-text);
+    word-break: break-word;
+  }
+
+  .lc-meta-grid__wide {
+    grid-column: 1 / -1;
+  }
+
+  .lc-table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lc-space-2);
+  }
+
+  .lc-table-actions form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lc-space-2);
+    margin: 0;
+  }
+
+  .lc-table-actions select {
+    width: auto;
+    min-width: 6rem;
+    margin-top: 0;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .lc-table-actions .lc-btn,
+  .lc-table-actions button {
+    margin-top: 0;
+  }
+
+  .lc-summary-cell {
+    max-width: 20rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lc-message-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lc-message-item {
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius);
+    padding: var(--lc-space-4);
+    margin-bottom: var(--lc-space-3);
+    background: var(--lc-bg-elevated);
+  }
+
+  .lc-message-item--inbound {
+    border-left: 3px solid var(--lc-primary);
+  }
+
+  .lc-message-item--outbound {
+    border-left: 3px solid var(--lc-secondary);
+  }
+
+  .lc-message-item--internal {
+    border-left: 3px solid var(--lc-accent-warm);
+  }
+
+  .lc-message-meta {
+    margin: 0 0 var(--lc-space-2);
+    font-size: 0.8rem;
+    color: var(--lc-text-muted);
+  }
+
+  .lc-message-body {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: 0.92rem;
+  }
+
+  /* Status badge slugs: value|lower|replace(' ','_') */
+  .lc-badge--status-needs_review { background: #ffedd5; color: #9a3412; }
+  .lc-badge--status-pending { background: var(--lc-warning-bg); color: var(--lc-warning); }
+  .lc-badge--status-approved { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-active { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-past_due { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-canceled,
+  .lc-badge--status-cancelled { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-failed { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-demo { background: #eef0ff; color: #3730a3; }
+  .lc-badge--status-urgent { background: #ffedd5; color: #9a3412; }
+  .lc-badge--status-new { background: #e8f4f8; color: #045a6f; }
+  .lc-badge--status-contacted { background: var(--lc-warning-bg); color: var(--lc-warning); }
+  .lc-badge--status-won { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-lost { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-qualifying { background: #eef0ff; color: #3730a3; }
+  .lc-badge--status-qualified { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-booked { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-converted { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-rejected { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-inactive { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-paid { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-none { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-checkout_created { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-not_started { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-sent { background: var(--lc-success-bg); color: var(--lc-success); }
+  .lc-badge--status-skipped { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-spam { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-archived { background: #f1f1f4; color: var(--lc-secondary); }
+  .lc-badge--status-applied { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-admin_review { background: #ffedd5; color: #9a3412; }
+  .lc-badge--status-referred { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-recorded { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-submitted { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-applied { background: var(--lc-info-bg); color: var(--lc-primary); }
+  .lc-badge--status-clawed_back { background: var(--lc-danger-bg); color: var(--lc-danger); }
+  .lc-badge--status-not_needed { background: #f1f1f4; color: #64748b; }
+  .lc-badge--status-received { background: var(--lc-info-bg); color: var(--lc-primary); }
+
+  .lc-pre-block {
+    white-space: pre-wrap;
+    font-family: var(--lc-font-mono);
+    font-size: 0.85rem;
+    background: var(--lc-bg-muted);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius);
+    padding: var(--lc-space-4);
+    overflow-x: auto;
+  }
+
+  .lc-form-section-title {
+    font-size: 1rem;
+    margin: var(--lc-space-6) 0 var(--lc-space-3);
+    padding-top: var(--lc-space-4);
+    border-top: 1px solid var(--lc-border);
+    color: var(--lc-primary-dark);
+  }
+
+  .lc-form-section-title:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .lc-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--lc-space-4);
+    counter-reset: step;
+  }
+
+  .lc-steps li {
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: var(--lc-space-4);
+  }
+
+  .lc-steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--lc-primary);
+    color: var(--lc-text-on-primary);
+    border-radius: 999px;
+  }
+  .lc-badge--status-hot { background: #fde8ee; color: var(--lc-danger); }
+  .lc-badge--status-warm { background: #fff6e0; color: var(--lc-warning); }
+  .lc-badge--status-cold { background: #e8f4f8; color: var(--lc-primary); }
+</style>

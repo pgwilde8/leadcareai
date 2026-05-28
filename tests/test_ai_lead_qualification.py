@@ -15,7 +15,10 @@ from app.schemas.lead_ai import LeadAIAnalysis
 from app.services.ai_service import analyze_inbound_sms_for_lead
 from app.services.business_service import create_business
 from app.services.phone_number_service import create_phone_number
-from app.services.sms_service import _ai_guided_response_body
+from app.models.business import Business
+from app.services.business_settings_service import resolve_outbound_sms_label
+from app.services.lead_service import recommended_action_for_lead
+from app.services.sms_service import SMS_TEMPLATE_LIBRARY, _ai_guided_response_body
 from app.services.twilio_service import SendSmsResult
 
 TWILIO_SMS_URL = "/webhooks/twilio/sms"
@@ -110,14 +113,92 @@ def test_next_question_capped_at_160_chars() -> None:
     assert len(capped) <= 160
 
 
+def test_resolve_outbound_sms_label_prefers_signature_then_name() -> None:
+    business = Business(name="Long Business Name LLC", sms_signature="Joe's Plumbing")
+    assert resolve_outbound_sms_label(business) == "Joe's Plumbing"
+    assert resolve_outbound_sms_label(Business(name="Only Name Co")) == "Only Name Co"
+    assert resolve_outbound_sms_label() == "LeadCare AI"
+
+
+def test_sms_signature_used_as_outbound_opener_over_business_name() -> None:
+    business = Business(name="Acme HVAC Services", sms_signature="Joe's Plumbing")
+    analysis = LeadAIAnalysis(
+        summary="s",
+        next_question="What town are you in?",
+        confidence=0.9,
+    )
+    body = _ai_guided_response_body(business, analysis, "no heat at home")
+    assert body.startswith("Joe's Plumbing:")
+    assert "Acme HVAC" not in body.split(":", 1)[0]
+
+
 def test_forbidden_next_question_omitted_from_sms_body() -> None:
     analysis = LeadAIAnalysis(
         summary="s",
         next_question="We can call you back in 5 minutes with a $99 price",
     )
-    body = _ai_guided_response_body("Acme Co", analysis)
+    business = Business(name="Acme Co")
+    body = _ai_guided_response_body(business, analysis, "Need help")
     assert "$99" not in body
     assert "call you back in" not in body.lower()
+    assert "What service is needed" in body
+
+
+def test_one_question_per_message_is_enforced() -> None:
+    analysis = LeadAIAnalysis(
+        summary="s",
+        next_question="What service? What town are you in? Is this urgent?",
+        confidence=0.9,
+    )
+    body = _ai_guided_response_body(Business(name="Acme Co"), analysis, "Need service")
+    assert body.count("?") == 1
+
+
+def test_urgent_routing_adds_safety_line() -> None:
+    analysis = LeadAIAnalysis(
+        summary="s",
+        urgency="urgent",
+        next_question="What town are you in?",
+        confidence=0.9,
+    )
+    body = _ai_guided_response_body(Business(name="Acme Co"), analysis, "leak now at home")
+    assert "call 911" in body.lower()
+    assert body.startswith("Acme Co:")
+    assert len(body) <= 160
+
+
+def test_low_confidence_uses_safe_fallback_template() -> None:
+    analysis = LeadAIAnalysis(
+        summary="s",
+        next_question="Tell me everything in detail?",
+        confidence=0.1,
+    )
+    body = _ai_guided_response_body(Business(name="Acme Co"), analysis, "Need help")
+    assert "What service is needed and what town are you in?" in body
+    assert body.endswith("Reply STOP to opt out.")
+    assert len(body) <= 160
+
+
+def test_template_library_contains_phase_1q_keys() -> None:
+    keys = {"missed_call", "inbound_sms", "urgent", "fallback", "handoff"}
+    assert keys.issubset(set(SMS_TEMPLATE_LIBRARY.keys()))
+
+
+def test_recommended_action_helper_behavior() -> None:
+    hot_urgent = Lead(ai_temperature="hot", urgency="urgent")
+    assert recommended_action_for_lead(hot_urgent) == "Call immediately"
+
+    hot = Lead(ai_temperature="hot", urgency="unknown")
+    assert recommended_action_for_lead(hot) == "Call as soon as possible"
+
+    warm = Lead(ai_temperature="warm")
+    assert recommended_action_for_lead(warm) == "Follow up today"
+
+    cold = Lead(ai_temperature="cold")
+    assert recommended_action_for_lead(cold) == "Review when available"
+
+    no_ai = Lead()
+    assert recommended_action_for_lead(no_ai) == "Review lead details"
 
 
 def _setup_phone(db_session: Session) -> None:
@@ -197,6 +278,8 @@ def test_inbound_sms_sends_ai_guided_next_question(
     assert "AI SMS Co" in body
     assert "Is water actively pooling" in body
     assert "STOP" in body
+    assert body.count("?") <= 1
+    assert len(body) <= 160
 
 
 @patch("app.services.ai_service._call_openai")
@@ -254,5 +337,6 @@ def test_inbound_without_next_question_uses_simple_reply(
     )
 
     body = mock_twilio_send_sms.call_args.kwargs["body"]
-    assert "follow up shortly" in body
+    assert "What service is needed and what town are you in?" in body
     assert "STOP" in body
+    assert len(body) <= 160

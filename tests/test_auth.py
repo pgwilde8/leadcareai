@@ -11,7 +11,8 @@ from app.services.user_service import create_admin_user
 def test_login_page_returns_200(client: TestClient) -> None:
     response = client.get("/login")
     assert response.status_code == 200
-    assert "Sign in" in response.text
+    assert "Log in" in response.text
+    assert "Business login" in response.text
 
 
 def test_login_wrong_credentials_shows_generic_error(

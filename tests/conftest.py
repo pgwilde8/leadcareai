@@ -47,6 +47,21 @@ def openai_disabled_in_tests(request: pytest.FixtureRequest, monkeypatch: pytest
 
 
 @pytest.fixture(autouse=True)
+def smtp_disabled_in_tests(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch):
+    """Prevent tests from sending real SMTP email unless explicitly allowed."""
+    if request.node.get_closest_marker("allow_real_smtp"):
+        yield None
+        return
+    monkeypatch.setenv("SMTP_HOST", "")
+    monkeypatch.setenv("SMTP_FROM_EMAIL", "")
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
+    yield None
+    get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
 def mock_twilio_send_sms(request: pytest.FixtureRequest):
     """Prevent tests from calling the real Twilio REST API (uses .env credentials)."""
     if request.node.get_closest_marker("allow_real_twilio_send"):
@@ -54,7 +69,8 @@ def mock_twilio_send_sms(request: pytest.FixtureRequest):
         return
     with patch("app.services.sms_service.send_sms") as mocked:
         mocked.return_value = SendSmsResult(sid="SM_TEST_MOCK", status="queued")
-        yield mocked
+        with patch("app.services.demo_intake_service.send_sms", new=mocked):
+            yield mocked
 
 
 @pytest.fixture

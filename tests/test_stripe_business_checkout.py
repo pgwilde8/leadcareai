@@ -12,8 +12,11 @@ from sqlalchemy.orm import Session
 
 from app.models.business import Business
 from app.models.business_lead import BusinessLead
+from app.models.business_user import BusinessUser
 from app.models.partner import Partner
 from app.models.partner_customer import PartnerCustomer
+from app.models.user import User
+from app.models.user_invite_token import UserInviteToken
 from app.services import business_lead_checkout_service
 from app.services.business_lead_service import create_demo_lead
 from app.services.partner_document_service import seed_default_document_templates
@@ -254,6 +257,47 @@ def test_checkout_session_completed_marks_lead_paid_and_converted(
     assert business.status == "active"
     assert business.stripe_customer_id == "cus_paid_1"
     assert business.stripe_subscription_id == "sub_paid_1"
+    user = db_session.query(User).filter(User.email == "paid@example.com").one_or_none()
+    assert user is not None
+    assert user.role == "business_user"
+    link = (
+        db_session.query(BusinessUser)
+        .filter(BusinessUser.business_id == business.id, BusinessUser.user_id == user.id)
+        .one_or_none()
+    )
+    assert link is not None
+    invite = (
+        db_session.query(UserInviteToken)
+        .filter(UserInviteToken.user_id == user.id, UserInviteToken.purpose == "business_invite")
+        .one_or_none()
+    )
+    assert invite is not None
+    assert invite.token_hash
+
+
+def test_checkout_existing_admin_email_does_not_convert_admin_role(db_session: Session) -> None:
+    from app.services.user_service import create_admin_user
+
+    create_admin_user(db_session, email="owner-admin@example.com", password="admin-secret")
+    lead = _qualified_lead(db_session, email="owner-admin@example.com")
+    business = business_lead_checkout_service.ensure_business_from_lead(db_session, lead)
+    db_session.commit()
+    session_payload = {
+        "metadata": {
+            "business_lead_id": str(lead.id),
+            "business_id": str(business.id),
+        },
+        "customer": "cus_admin",
+        "subscription": "sub_admin",
+    }
+    business_lead_checkout_service.handle_checkout_session_completed(
+        db_session,
+        stripe_event_id="evt_test_checkout_admin",
+        session_payload=session_payload,
+    )
+    db_session.commit()
+    admin = db_session.query(User).filter(User.email == "owner-admin@example.com").one()
+    assert admin.role == "admin"
 
 
 def test_checkout_session_completed_updates_partner_customer(

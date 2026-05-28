@@ -1,0 +1,45 @@
+{% extends "layout/base.html" %}
+
+{% block title %}FAQ — {{ settings.app_name }}{% endblock %}
+
+{% block container_class %}lc-container--sm{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .lc-faq { margin: 0; }
+    .lc-faq__item { margin-bottom: var(--lc-space-5); }
+    .lc-faq__item dt {
+      font-weight: 700;
+      color: var(--lc-primary-dark);
+      margin-bottom: var(--lc-space-2);
+    }
+    .lc-faq__item dd {
+      margin: 0;
+      color: var(--lc-text-muted);
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <header class="lc-page-header">
+    <h1 class="lc-page-header__title">Frequently asked questions</h1>
+    <p class="lc-page-header__lead">
+      Common questions about missed-call SMS follow-up, setup, and compliance.
+    </p>
+  </header>
+
+  <div class="lc-card">
+    <div class="lc-card__body">
+      {% include "public/_faq_items.html" %}
+    </div>
+  </div>
+
+  <div class="lc-btn-group">
+    <a class="lc-btn lc-btn--primary" href="/demo">Try the missed-call demo</a>
+    <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+  </div>
+
+  <p class="lc-text-muted">
+    <a href="/">← Back to home</a>
+  </p>
+{% endblock %}

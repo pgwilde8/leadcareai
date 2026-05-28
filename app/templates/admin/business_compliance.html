@@ -1,127 +1,190 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
 
 {% block title %}SMS compliance — {{ business.name }}{% endblock %}
 
-{% block content %}
-  <h1>SMS compliance (A2P 10DLC)</h1>
-  <p>Business: <a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a></p>
+{% block container_class %}lc-container--wide{% endblock %}
 
-  <nav>
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">SMS compliance (A2P 10DLC)</h1>
+    <p class="lc-admin-header__lead">
+      Business: <a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a>
+      · Current status: {{ status_badge(profile.status) }}
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Compliance">
     <a href="/admin">Dashboard</a>
     <a href="/admin/businesses">Businesses</a>
     <a href="/admin/businesses/{{ business.id }}">Business detail</a>
   </nav>
 
-  <p><em>A2P 10DLC submission coming later.</em></p>
+  <div class="lc-alert lc-alert--info">
+    <em>A2P 10DLC submission coming later.</em> Save profile fields here; update workflow status separately below.
+  </div>
 
   {% if error %}
-    <p class="error"><strong>{{ error }}</strong></p>
+    <div class="lc-alert lc-alert--error" role="alert"><strong>{{ error }}</strong></div>
   {% endif %}
 
-  <p><strong>Current status:</strong> {{ profile.status }}</p>
+  <div class="lc-card lc-admin-section">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Compliance profile</h2>
+    </div>
+    <div class="lc-card__body">
+      <form method="post" action="/admin/businesses/{{ business.id }}/compliance" class="lc-form lc-form--wide">
+        <h3 class="lc-form-section-title">Business identity</h3>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="legal_business_name">Legal business name</label>
+            <input id="legal_business_name" name="legal_business_name" type="text" value="{{ profile.legal_business_name or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="dba_name">DBA</label>
+            <input id="dba_name" name="dba_name" type="text" value="{{ profile.dba_name or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="business_type">Business type</label>
+            <input id="business_type" name="business_type" type="text" value="{{ profile.business_type or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="ein">EIN</label>
+            <input id="ein" name="ein" type="text" value="{{ profile.ein or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="website_url">Website URL</label>
+            <input id="website_url" name="website_url" type="url" value="{{ profile.website_url or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="business_phone">Business phone</label>
+            <input id="business_phone" name="business_phone" type="text" value="{{ profile.business_phone or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="business_email">Business email</label>
+            <input id="business_email" name="business_email" type="email" value="{{ profile.business_email or '' }}" />
+          </div>
+        </div>
 
-  <form method="post" action="/admin/businesses/{{ business.id }}/compliance">
-    <h2>Business identity</h2>
+        <h3 class="lc-form-section-title">Address</h3>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="address_line1">Address line 1</label>
+            <input id="address_line1" name="address_line1" type="text" value="{{ profile.address_line1 or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="address_line2">Address line 2</label>
+            <input id="address_line2" name="address_line2" type="text" value="{{ profile.address_line2 or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="city">City</label>
+            <input id="city" name="city" type="text" value="{{ profile.city or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="state">State</label>
+            <input id="state" name="state" type="text" value="{{ profile.state or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="postal_code">Postal code</label>
+            <input id="postal_code" name="postal_code" type="text" value="{{ profile.postal_code or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="country">Country</label>
+            <input id="country" name="country" type="text" maxlength="2" value="{{ profile.country or 'US' }}" />
+          </div>
+        </div>
 
-    <label for="legal_business_name">Legal business name</label>
-    <input id="legal_business_name" name="legal_business_name" type="text" value="{{ profile.legal_business_name or '' }}" />
+        <h3 class="lc-form-section-title">Authorized representative</h3>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="authorized_rep_name">Name</label>
+            <input id="authorized_rep_name" name="authorized_rep_name" type="text" value="{{ profile.authorized_rep_name or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="authorized_rep_title">Title</label>
+            <input id="authorized_rep_title" name="authorized_rep_title" type="text" value="{{ profile.authorized_rep_title or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="authorized_rep_email">Email</label>
+            <input id="authorized_rep_email" name="authorized_rep_email" type="email" value="{{ profile.authorized_rep_email or '' }}" />
+          </div>
+        </div>
 
-    <label for="dba_name">DBA</label>
-    <input id="dba_name" name="dba_name" type="text" value="{{ profile.dba_name or '' }}" />
+        <h3 class="lc-form-section-title">SMS program</h3>
+        <div class="lc-field">
+          <label for="sms_use_case">SMS use case</label>
+          <input id="sms_use_case" name="sms_use_case" type="text" value="{{ profile.sms_use_case or '' }}" />
+        </div>
+        <div class="lc-field">
+          <label for="opt_in_description">Opt-in description</label>
+          <textarea id="opt_in_description" name="opt_in_description" rows="4">{{ profile.opt_in_description or '' }}</textarea>
+        </div>
+        <div class="lc-field">
+          <label for="sample_message_1">Sample message 1</label>
+          <textarea id="sample_message_1" name="sample_message_1" rows="3">{{ profile.sample_message_1 or '' }}</textarea>
+        </div>
+        <div class="lc-field">
+          <label for="sample_message_2">Sample message 2</label>
+          <textarea id="sample_message_2" name="sample_message_2" rows="3">{{ profile.sample_message_2 or '' }}</textarea>
+        </div>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="privacy_policy_url">Privacy policy URL</label>
+            <input id="privacy_policy_url" name="privacy_policy_url" type="url" value="{{ profile.privacy_policy_url or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="terms_url">Terms URL</label>
+            <input id="terms_url" name="terms_url" type="url" value="{{ profile.terms_url or '' }}" />
+          </div>
+        </div>
 
-    <label for="business_type">Business type</label>
-    <input id="business_type" name="business_type" type="text" value="{{ profile.business_type or '' }}" />
+        <h3 class="lc-form-section-title">Twilio references (manual)</h3>
+        <div class="lc-grid lc-grid--2">
+          <div class="lc-field">
+            <label for="twilio_brand_sid">Twilio brand SID</label>
+            <input id="twilio_brand_sid" name="twilio_brand_sid" type="text" value="{{ profile.twilio_brand_sid or '' }}" />
+          </div>
+          <div class="lc-field">
+            <label for="twilio_campaign_sid">Twilio campaign SID</label>
+            <input id="twilio_campaign_sid" name="twilio_campaign_sid" type="text" value="{{ profile.twilio_campaign_sid or '' }}" />
+          </div>
+        </div>
 
-    <label for="ein">EIN</label>
-    <input id="ein" name="ein" type="text" value="{{ profile.ein or '' }}" />
+        <button type="submit" class="lc-btn lc-btn--primary">Save compliance profile</button>
+      </form>
+    </div>
+  </div>
 
-    <label for="website_url">Website URL</label>
-    <input id="website_url" name="website_url" type="url" value="{{ profile.website_url or '' }}" />
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Update status</h2>
+    </div>
+    <div class="lc-card__body">
+      {% if status_error %}
+        <div class="lc-alert lc-alert--error" role="alert"><strong>{{ status_error }}</strong></div>
+      {% endif %}
 
-    <label for="business_phone">Business phone</label>
-    <input id="business_phone" name="business_phone" type="text" value="{{ profile.business_phone or '' }}" />
-
-    <label for="business_email">Business email</label>
-    <input id="business_email" name="business_email" type="email" value="{{ profile.business_email or '' }}" />
-
-    <h2>Address</h2>
-
-    <label for="address_line1">Address line 1</label>
-    <input id="address_line1" name="address_line1" type="text" value="{{ profile.address_line1 or '' }}" />
-
-    <label for="address_line2">Address line 2</label>
-    <input id="address_line2" name="address_line2" type="text" value="{{ profile.address_line2 or '' }}" />
-
-    <label for="city">City</label>
-    <input id="city" name="city" type="text" value="{{ profile.city or '' }}" />
-
-    <label for="state">State</label>
-    <input id="state" name="state" type="text" value="{{ profile.state or '' }}" />
-
-    <label for="postal_code">Postal code</label>
-    <input id="postal_code" name="postal_code" type="text" value="{{ profile.postal_code or '' }}" />
-
-    <label for="country">Country</label>
-    <input id="country" name="country" type="text" maxlength="2" value="{{ profile.country or 'US' }}" />
-
-    <h2>Authorized representative</h2>
-
-    <label for="authorized_rep_name">Name</label>
-    <input id="authorized_rep_name" name="authorized_rep_name" type="text" value="{{ profile.authorized_rep_name or '' }}" />
-
-    <label for="authorized_rep_title">Title</label>
-    <input id="authorized_rep_title" name="authorized_rep_title" type="text" value="{{ profile.authorized_rep_title or '' }}" />
-
-    <label for="authorized_rep_email">Email</label>
-    <input id="authorized_rep_email" name="authorized_rep_email" type="email" value="{{ profile.authorized_rep_email or '' }}" />
-
-    <h2>SMS program</h2>
-
-    <label for="sms_use_case">SMS use case</label>
-    <input id="sms_use_case" name="sms_use_case" type="text" value="{{ profile.sms_use_case or '' }}" />
-
-    <label for="opt_in_description">Opt-in description</label>
-    <textarea id="opt_in_description" name="opt_in_description" rows="4">{{ profile.opt_in_description or '' }}</textarea>
-
-    <label for="sample_message_1">Sample message 1</label>
-    <textarea id="sample_message_1" name="sample_message_1" rows="3">{{ profile.sample_message_1 or '' }}</textarea>
-
-    <label for="sample_message_2">Sample message 2</label>
-    <textarea id="sample_message_2" name="sample_message_2" rows="3">{{ profile.sample_message_2 or '' }}</textarea>
-
-    <label for="privacy_policy_url">Privacy policy URL</label>
-    <input id="privacy_policy_url" name="privacy_policy_url" type="url" value="{{ profile.privacy_policy_url or '' }}" />
-
-    <label for="terms_url">Terms URL</label>
-    <input id="terms_url" name="terms_url" type="url" value="{{ profile.terms_url or '' }}" />
-
-    <h2>Twilio references (manual)</h2>
-
-    <label for="twilio_brand_sid">Twilio brand SID</label>
-    <input id="twilio_brand_sid" name="twilio_brand_sid" type="text" value="{{ profile.twilio_brand_sid or '' }}" />
-
-    <label for="twilio_campaign_sid">Twilio campaign SID</label>
-    <input id="twilio_campaign_sid" name="twilio_campaign_sid" type="text" value="{{ profile.twilio_campaign_sid or '' }}" />
-
-    <button type="submit">Save compliance profile</button>
-  </form>
-
-  <h2>Update status</h2>
-  {% if status_error %}
-    <p class="error"><strong>{{ status_error }}</strong></p>
-  {% endif %}
-
-  <form method="post" action="/admin/businesses/{{ business.id }}/compliance/status">
-    <label for="status">Status</label>
-    <select id="status" name="status">
-      {% for s in statuses %}
-        <option value="{{ s }}" {% if profile.status == s %}selected{% endif %}>{{ s }}</option>
-      {% endfor %}
-    </select>
-
-    <label for="rejection_reason">Rejection reason (if rejected)</label>
-    <textarea id="rejection_reason" name="rejection_reason" rows="3">{{ profile.rejection_reason or '' }}</textarea>
-
-    <button type="submit">Update status</button>
-  </form>
+      <form method="post" action="/admin/businesses/{{ business.id }}/compliance/status" class="lc-form">
+        <div class="lc-field">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            {% for s in statuses %}
+              <option value="{{ s }}" {% if profile.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="lc-field">
+          <label for="rejection_reason">Rejection reason (if rejected)</label>
+          <textarea id="rejection_reason" name="rejection_reason" rows="3">{{ profile.rejection_reason or '' }}</textarea>
+        </div>
+        <button type="submit" class="lc-btn lc-btn--secondary">Update status</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

@@ -1,0 +1,92 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Notification Log Detail — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Notification Log Detail</h1>
+    <p class="lc-admin-header__lead">
+      Status: {{ status_badge(log.status) }}
+      · Channel: <strong>{{ log.channel }}</strong>
+      · Event: <strong>{{ log.event_type }}</strong>
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Log detail">
+    <a href="/admin/notification-logs">← Back to notification logs</a>
+  </nav>
+
+  {% if log.status == 'failed' %}
+    <div class="lc-alert lc-alert--error">
+      <strong>Delivery failed.</strong> Review the error message below.
+    </div>
+  {% elif log.status == 'skipped' %}
+    <div class="lc-alert lc-alert--warning">
+      <strong>Notification skipped.</strong> No delivery attempted for this event.
+    </div>
+  {% elif log.status == 'sent' %}
+    <div class="lc-alert lc-alert--success">
+      <strong>Sent successfully.</strong>
+    </div>
+  {% endif %}
+
+  <div class="lc-grid lc-grid--2">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Delivery</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Created</dt>
+            <dd>{{ log.created_at }}</dd>
+          </div>
+          <div>
+            <dt>Recipient (masked)</dt>
+            <dd>{{ masked_recipient }}</dd>
+          </div>
+          <div>
+            <dt>Provider SID</dt>
+            <dd><code>{{ log.provider_sid or "—" }}</code></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Related records</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Business</dt>
+            <dd><a href="/admin/businesses/{{ business.id }}">{{ business.name }}</a></dd>
+          </div>
+          <div>
+            <dt>Lead</dt>
+            <dd><a href="/admin/leads/{{ lead.id }}">{{ lead.phone or lead.id }}</a></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="lc-card lc-admin-section">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Error message</h2>
+    </div>
+    <div class="lc-card__body">
+      <pre class="lc-pre-block">{{ log.error_message or "—" }}</pre>
+    </div>
+  </div>
+{% endblock %}

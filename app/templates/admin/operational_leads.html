@@ -1,0 +1,89 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar, status_badge %}
+
+{% block title %}Operational leads — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">Operational leads</h1>
+    <p class="lc-admin-header__lead">Live missed-call and SMS workflow leads (<code>leads</code> table).</p>
+  </header>
+
+  <div class="lc-admin-filter-bar">
+    <span class="lc-admin-filter-bar__label">Navigate</span>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/businesses">Businesses</a>
+    <a href="/admin/business-leads">Prospect pipeline</a>
+  </div>
+
+  {% if rows %}
+    {% set summary_preview_len = 64 %}
+    <div class="lc-table-wrap">
+      <table class="lc-table">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th>Business</th>
+            <th>Phone</th>
+            <th>Source</th>
+            <th>Status</th>
+            <th>AI</th>
+            <th>Service / Location</th>
+            <th>Summary</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead, business in rows %}
+            <tr>
+              <td>{{ lead.created_at }}</td>
+              <td>{{ business.name }}</td>
+              <td>{{ lead.phone or "—" }}</td>
+              <td>{{ lead.source }}</td>
+              <td>{{ status_badge(lead.status) }}</td>
+              <td>
+                {% if lead.ai_temperature %}
+                  <span class="lc-badge lc-badge--status-{{ lead.ai_temperature|lower }}">{{ lead.ai_temperature|upper }}</span>
+                {% endif %}
+                {% if lead.urgency %}
+                  {{ status_badge(lead.urgency) }}
+                {% endif %}
+                {% if not lead.ai_temperature and not lead.urgency %}—{% endif %}
+              </td>
+              <td>
+                {% if lead.service_needed or lead.location %}
+                  {{ lead.service_needed or "Unknown service" }}{% if lead.location %} · {{ lead.location }}{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="lc-summary-cell" title="{{ lead.summary or '' }}">
+                {% if lead.summary %}
+                  {{ lead.summary[:summary_preview_len] }}{% if lead.summary|length > summary_preview_len %}…{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                <a class="lc-btn lc-btn--secondary lc-btn--sm" href="/admin/leads/{{ lead.id }}">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="lc-empty">
+      <p class="lc-empty__title">No operational leads yet</p>
+      <p class="lc-empty__text">Leads appear here when missed-call or SMS workflows run for active businesses.</p>
+    </div>
+  {% endif %}
+{% endblock %}
