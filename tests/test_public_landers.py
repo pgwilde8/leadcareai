@@ -400,6 +400,15 @@ def test_priority_landers_include_shared_cta(client: TestClient) -> None:
         assert "Try the interactive demo" in text, path
 
 
+def test_all_landers_include_marketing_infographic(client: TestClient) -> None:
+    for path, _label in LANDER_ROUTES:
+        slug = path.strip("/").replace("/", "-")
+        response = client.get(path)
+        assert response.status_code == 200, path
+        assert f"marketing/images/{slug}.jpg" in response.text, path
+        assert "lc-lander-infographic" in response.text, path
+
+
 def test_priority_landers_cta_has_analytics_attributes(client: TestClient) -> None:
     for path in PHASE_C_PRIORITY_LANDERS:
         response = client.get(path)

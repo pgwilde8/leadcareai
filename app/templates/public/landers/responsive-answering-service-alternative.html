@@ -120,8 +120,12 @@
   <section class="lc-section" aria-labelledby="ras-does-title">
     <header class="lc-page-header">
       <h2 id="ras-does-title" class="lc-page-header__title">What {{ settings.app_name }} Does</h2>
+      <p class="lc-page-header__lead">
+        Fast missed-call text-back, qualification, and team alerts — response time without a live call center.
+      </p>
     </header>
     <p class="lc-text-muted">When your business misses a call, {{ settings.app_name }} texts the caller right away:</p>
+    {% include "public/landers/_lander_infographic.html" %}
     <div class="lc-lander-chat" role="group" aria-label="Sample responsive answering SMS thread">
       <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
         Sorry we missed your call. What can we help with today?

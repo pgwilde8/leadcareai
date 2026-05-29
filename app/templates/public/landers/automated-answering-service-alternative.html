@@ -116,8 +116,12 @@
   <section class="lc-section" aria-labelledby="aas-does-title">
     <header class="lc-page-header">
       <h2 id="aas-does-title" class="lc-page-header__title">What {{ settings.app_name }} Does</h2>
+      <p class="lc-page-header__lead">
+        Automated missed-call recovery — text-back, qualification, and team alerts without a heavy CRM.
+      </p>
     </header>
     <p class="lc-text-muted">{{ settings.app_name }} automatically responds when a missed call reaches your {{ settings.app_name }} number:</p>
+    {% include "public/landers/_lander_infographic.html" %}
     <div class="lc-lander-chat" role="group" aria-label="Sample automated answering SMS thread">
       <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
         Sorry we missed your call. What can we help with today?

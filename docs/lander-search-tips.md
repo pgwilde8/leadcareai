@@ -8,6 +8,14 @@ Backup Mode for missed calls — not a full live answering service.
 
 **Recommendation:** Pause new lander pages until Google Search Console shows which URLs earn impressions. Do not add thin duplicate pages.
 
+## Marketing infographics (all landers)
+
+Each lander includes a shared journey infographic via `public/landers/_lander_infographic.html`.
+
+- **CDN path:** `leadcareai/marketing/images/{slug}.jpg` where `slug` matches the URL path (`/for/plumbers` → `for-plumbers.jpg`).
+- **Placement:** “What it does” / “How it works” / Backup Mode section — before the SMS example or step list.
+- Upload a `{slug}.jpg` for every route in `LANDER_ROUTES` before deploy.
+
 ## Phase D completed (indexing readiness & CTA tracking)
 
 - **Robots / sitemap:** `GET /robots.txt` and `GET /sitemap.xml` use `PUBLIC_BASE_URL` (or `APP_BASE_URL`) for absolute sitemap URLs; all `LANDER_ROUTES` are in `PUBLIC_SITEMAP_PATHS`.

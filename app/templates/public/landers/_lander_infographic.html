@@ -1,0 +1,17 @@
+{# Lead capture journey infographic — image slug matches URL path (e.g. /phone-answering-service → phone-answering-service.jpg). #}
+{% set _slug = lander_infographic_slug|default(request.url.path.strip('/').replace('/', '-')) %}
+{% set _img_url = "https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/images/" ~ _slug ~ ".jpg" %}
+<figure class="lc-lander-figure lc-lander-center">
+  <img
+    class="lc-lander-infographic"
+    src="{{ _img_url }}"
+    alt="How {{ settings.app_name }} captures every opportunity: instant SMS text-back on missed calls, AI-assisted qualification, real-time staff alerts, centralized lead dashboard, follow-up automation, and monthly performance reports"
+    width="1200"
+    height="630"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption class="lc-text-muted" style="margin-top: var(--lc-space-3); font-size: 0.9rem;">
+    Never miss a customer again — automated lead capture from missed call to team alert and dashboard.
+  </figcaption>
+</figure>
