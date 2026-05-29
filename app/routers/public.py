@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.services import business_lead_service, contact_service, demo_live_service
+from app.services import business_lead_checkout_service, business_lead_service, contact_service, demo_live_service
+from app.services.stripe_service import growth_checkout_configured
 from app.services.referral_service import (
     capture_referral_code,
     get_active_partner_by_referral_code,
@@ -154,14 +155,47 @@ def referral_landing_page(
 def landing_page(request: Request, db: Annotated[Session, Depends(get_db)]):
     referral_code, _ = get_referral_from_session(request)
     partner = resolve_referral_partner(db, request)
+    checkout_cancelled = request.query_params.get("checkout") == "cancelled"
     return templates.TemplateResponse(
         request,
         "public/landing.html",
         {
             "referral_code": referral_code,
             "referral_partner_name": partner.display_name if partner else None,
+            "checkout_cancelled": checkout_cancelled,
         },
     )
+
+
+@router.get("/checkout/growth", response_model=None)
+def public_growth_checkout(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Start Stripe Checkout for Growth ($199 setup + $147/mo) from the public site."""
+    if not growth_checkout_configured():
+        return RedirectResponse(url="/demo/book", status_code=303)
+
+    referral_code, _ = get_referral_from_session(request)
+    partner = resolve_referral_partner(db, request)
+
+    try:
+        result = business_lead_checkout_service.start_public_growth_checkout(
+            db,
+            partner=partner,
+            referral_code=partner.referral_code if partner else referral_code,
+        )
+        db.commit()
+    except ValueError:
+        db.rollback()
+        return RedirectResponse(url="/demo/book", status_code=303)
+    except Exception:
+        db.rollback()
+        return RedirectResponse(url="/?checkout=error#pricing", status_code=303)
+
+    if not result.checkout_url:
+        return RedirectResponse(url="/demo/book", status_code=303)
+    return RedirectResponse(url=result.checkout_url, status_code=303)
 
 
 @router.get("/demo", response_class=HTMLResponse, response_model=None)

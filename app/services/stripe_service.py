@@ -28,11 +28,15 @@ def _stripe_client():
 
 def _build_line_items() -> list[dict[str, Any]]:
     settings = get_settings()
-    if not settings.stripe_price_id_growth_monthly:
-        raise ValueError("STRIPE_PRICE_ID_GROWTH_MONTHLY is not configured")
+    growth_price_id = settings.stripe_growth_monthly_price_id
+    if not growth_price_id:
+        raise ValueError(
+            "Growth monthly Price ID is not configured "
+            "(set STRIPE_PRICE_ID_GROWTH_MONTHLY or STRIPE_PRICE_ID_GROWTH_PRODUCT)"
+        )
 
     line_items: list[dict[str, Any]] = [
-        {"price": settings.stripe_price_id_growth_monthly, "quantity": 1},
+        {"price": growth_price_id, "quantity": 1},
     ]
 
     if settings.stripe_price_id_setup_fee:
@@ -51,24 +55,31 @@ def _build_line_items() -> list[dict[str, Any]]:
     return line_items
 
 
+def growth_checkout_configured() -> bool:
+    settings = get_settings()
+    return bool(settings.stripe_secret_key and settings.stripe_growth_monthly_price_id)
+
+
 def create_growth_checkout_session(
     *,
-    customer_email: str,
+    customer_email: str | None,
     metadata: dict[str, str],
     success_url: str,
     cancel_url: str,
 ) -> CheckoutSessionResult:
     """Create Stripe Checkout (subscription + optional one-time setup fee)."""
     stripe = _stripe_client()
-    session = stripe.checkout.Session.create(
-        mode="subscription",
-        customer_email=customer_email.strip().lower(),
-        line_items=_build_line_items(),
-        metadata=metadata,
-        subscription_data={"metadata": metadata},
-        success_url=success_url,
-        cancel_url=cancel_url,
-    )
+    session_kwargs: dict[str, Any] = {
+        "mode": "subscription",
+        "line_items": _build_line_items(),
+        "metadata": metadata,
+        "subscription_data": {"metadata": metadata},
+        "success_url": success_url,
+        "cancel_url": cancel_url,
+    }
+    if customer_email and customer_email.strip():
+        session_kwargs["customer_email"] = customer_email.strip().lower()
+    session = stripe.checkout.Session.create(**session_kwargs)
     customer_id = session.customer
     if isinstance(customer_id, str):
         pass

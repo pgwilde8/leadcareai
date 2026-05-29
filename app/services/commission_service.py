@@ -19,6 +19,14 @@ MONTHLY_RESIDUAL_CENTS = 2500
 RETENTION_BONUS_CENTS = 10000
 REFUND_REVIEW_NOTE = "Refund/dispute detected; review for clawback"
 
+REFERRAL_METADATA_KEYS = (
+    "partner_id",
+    "referral_code",
+    "partner_customer_id",
+    "business_lead_id",
+    "business_id",
+)
+
 
 @dataclass(frozen=True)
 class InvoiceCommissionResult:
@@ -52,6 +60,95 @@ def extract_stripe_id(value) -> str | None:
     if isinstance(value, dict):
         return str(value.get("id")) if value.get("id") else None
     return str(value)
+
+
+def _metadata_dict(value) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def _merge_referral_metadata(merged: dict[str, str], source: dict | None) -> None:
+    for key in REFERRAL_METADATA_KEYS:
+        raw = _metadata_dict(source).get(key)
+        if raw is not None and str(raw).strip():
+            merged[key] = str(raw).strip()
+
+
+def extract_invoice_referral_metadata(invoice_payload: dict) -> dict[str, str]:
+    """Merge referral attribution from invoice and nested Stripe subscription metadata."""
+    merged: dict[str, str] = {}
+    _merge_referral_metadata(merged, invoice_payload.get("metadata"))
+
+    parent = _metadata_dict(invoice_payload.get("parent"))
+    _merge_referral_metadata(merged, _metadata_dict(parent.get("subscription_details")).get("metadata"))
+
+    _merge_referral_metadata(merged, _metadata_dict(invoice_payload.get("subscription_details")).get("metadata"))
+
+    lines = _metadata_dict(invoice_payload.get("lines"))
+    for line in lines.get("data") or []:
+        if not isinstance(line, dict):
+            continue
+        line_meta = _metadata_dict(line.get("metadata"))
+        if line_meta:
+            _merge_referral_metadata(merged, line_meta)
+            break
+
+    return merged
+
+
+def extract_invoice_subscription_id(invoice_payload: dict) -> str | None:
+    subscription_id = extract_stripe_id(invoice_payload.get("subscription"))
+    if subscription_id:
+        return subscription_id
+    parent = _metadata_dict(invoice_payload.get("parent"))
+    sub_details = _metadata_dict(parent.get("subscription_details"))
+    return extract_stripe_id(sub_details.get("subscription"))
+
+
+def _parse_metadata_uuid(metadata: dict, key: str) -> uuid.UUID | None:
+    raw = metadata.get(key)
+    if not raw:
+        return None
+    try:
+        return uuid.UUID(str(raw))
+    except ValueError:
+        return None
+
+
+def _resolve_business_for_partner_customer(
+    db: Session,
+    *,
+    partner_customer: PartnerCustomer,
+    business_id: uuid.UUID | None,
+    customer_id: str | None,
+    subscription_id: str | None,
+) -> Business | None:
+    business: Business | None = None
+    if partner_customer.business_id is not None:
+        business = db.get(Business, partner_customer.business_id)
+
+    if business is None and business_id is not None:
+        candidate = db.get(Business, business_id)
+        if candidate is not None:
+            if partner_customer.business_id is None:
+                partner_customer.business_id = candidate.id
+                business = candidate
+            elif partner_customer.business_id == candidate.id:
+                business = candidate
+
+    if business is None and customer_id:
+        business = db.query(Business).filter(Business.stripe_customer_id == customer_id).one_or_none()
+    if business is None and subscription_id:
+        business = db.query(Business).filter(Business.stripe_subscription_id == subscription_id).one_or_none()
+
+    if business is not None and partner_customer.business_id is None:
+        partner_customer.business_id = business.id
+
+    return business
+
+
+def _ensure_partner_customer_paying(partner_customer: PartnerCustomer, business: Business | None) -> None:
+    if business is not None and partner_customer.status == "referred":
+        partner_customer.status = "paying"
 
 
 def resolve_business_and_partner_customer(
@@ -106,11 +203,11 @@ def _resolve_partner_customer_from_invoice(
     *,
     invoice_payload: dict,
 ) -> tuple[PartnerCustomer | None, Business | None]:
-    metadata = invoice_payload.get("metadata") or {}
+    metadata = extract_invoice_referral_metadata(invoice_payload)
     return resolve_business_and_partner_customer(
         db,
         customer_id=extract_stripe_id(invoice_payload.get("customer")),
-        subscription_id=extract_stripe_id(invoice_payload.get("subscription")),
+        subscription_id=extract_invoice_subscription_id(invoice_payload),
         metadata=metadata,
     )
 

@@ -154,6 +154,42 @@ def create_demo_lead(
     return lead, partner_customer
 
 
+def create_website_checkout_lead(
+    db: Session,
+    *,
+    partner: Partner | None = None,
+    referral_code: str | None = None,
+) -> tuple[BusinessLead, PartnerCustomer | None]:
+    """Placeholder lead for public pricing checkout; Stripe collects real contact info."""
+    lead_id = uuid.uuid4()
+    lead = BusinessLead(
+        business_name="Website checkout (pending)",
+        contact_name="Website checkout",
+        email=f"checkout.{lead_id.hex}@pending.leadcareai.com",
+        phone="+10000000001",
+        city="Online",
+        state="—",
+        source="website_checkout",
+        referral_code=referral_code,
+        partner_id=partner.id if partner else None,
+        status="qualified",
+        notes="Created from public pricing page; contact details pending Stripe Checkout.",
+    )
+    db.add(lead)
+    db.flush()
+
+    partner_customer: PartnerCustomer | None = None
+    if partner is not None:
+        partner_customer = _get_or_create_partner_customer(
+            db,
+            partner=partner,
+            business_lead=lead,
+            referral_code=partner.referral_code,
+        )
+    db.flush()
+    return lead, partner_customer
+
+
 def _get_or_create_partner_customer(
     db: Session,
     *,

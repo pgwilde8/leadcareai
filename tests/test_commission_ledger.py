@@ -12,6 +12,7 @@ from app.models.business import Business
 from app.models.commission import Commission
 from app.models.partner import Partner
 from app.models.partner_customer import PartnerCustomer
+from app.services import business_lead_checkout_service, commission_service
 from app.services.business_lead_checkout_service import ensure_business_from_lead
 from app.services.business_lead_service import create_demo_lead
 from app.services.stripe_service import CheckoutSessionResult
@@ -75,6 +76,42 @@ def _invoice_event(event_id: str, invoice_id: str, *, customer: str = "cus_comm_
             }
         },
     }
+
+
+def _nested_referral_invoice_payload(
+    *,
+    invoice_id: str,
+    partner: Partner,
+    pc: PartnerCustomer,
+    business: Business,
+    customer: str = "cus_early_1",
+    billing_reason: str = "subscription_create",
+    amount_paid: int = 34600,
+) -> dict:
+    """Stripe test-mode shape: empty invoice.metadata, nested subscription_details metadata."""
+    return {
+        "id": invoice_id,
+        "customer": customer,
+        "metadata": {},
+        "amount_paid": amount_paid,
+        "billing_reason": billing_reason,
+        "parent": {
+            "subscription_details": {
+                "subscription": "sub_early_1",
+                "metadata": {
+                    "partner_id": str(partner.id),
+                    "referral_code": partner.referral_code,
+                    "partner_customer_id": str(pc.id),
+                    "business_lead_id": str(pc.business_lead_id),
+                    "business_id": str(business.id),
+                },
+            },
+        },
+    }
+
+
+def _nested_referral_invoice_event(event_id: str, invoice_id: str, invoice_object: dict) -> dict:
+    return {"id": event_id, "type": "invoice.paid", "data": {"object": invoice_object}}
 
 
 def test_invoice_paid_for_referred_business_creates_monthly_residual(client: TestClient, db_session: Session) -> None:
@@ -302,6 +339,163 @@ def test_partner_dashboard_shows_own_commissions_only(client: TestClient, db_ses
     assert "Commissions" in response.text
     assert "Partner One Biz" in response.text
     assert "Partner Two Biz" not in response.text
+
+
+def test_extract_invoice_referral_metadata_reads_nested_parent_fields() -> None:
+    payload = {
+        "metadata": {},
+        "parent": {
+            "subscription_details": {
+                "metadata": {
+                    "partner_id": "dda1d0ac-e35a-48f9-8db4-1b3a297b1538",
+                    "referral_code": "LC58E04477",
+                    "partner_customer_id": "22b8d7ef-47ac-47d8-b43e-041a9cd0bc05",
+                    "business_id": "e6142660-e9d4-4464-b18a-29aee7ca8405",
+                }
+            }
+        },
+    }
+    merged = commission_service.extract_invoice_referral_metadata(payload)
+    assert merged["partner_id"] == "dda1d0ac-e35a-48f9-8db4-1b3a297b1538"
+    assert merged["referral_code"] == "LC58E04477"
+    assert merged["partner_customer_id"] == "22b8d7ef-47ac-47d8-b43e-041a9cd0bc05"
+    assert merged["business_id"] == "e6142660-e9d4-4464-b18a-29aee7ca8405"
+
+
+def test_invoice_paid_with_nested_metadata_creates_commissions(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    partner, pc, business = _setup_referred_business(db_session, email="nested-meta@example.com")
+    business.stripe_customer_id = None
+    business.stripe_subscription_id = None
+    pc.status = "referred"
+    db_session.commit()
+
+    invoice = _nested_referral_invoice_payload(
+        invoice_id="in_nested_1",
+        partner=partner,
+        pc=pc,
+        business=business,
+    )
+    event = _nested_referral_invoice_event("evt_nested_1", "in_nested_1", invoice)
+    with patch("app.services.stripe_service.construct_webhook_event", return_value=event):
+        response = client.post("/webhooks/stripe", content=json.dumps(event).encode())
+    assert response.status_code == 200
+
+    db_session.refresh(pc)
+    assert pc.status == "paying"
+    assert pc.business_id == business.id
+
+    rows = (
+        db_session.query(Commission)
+        .filter(Commission.partner_customer_id == pc.id)
+        .order_by(Commission.commission_type)
+        .all()
+    )
+    types = {row.commission_type: row for row in rows}
+    assert types["monthly_residual"].amount_cents == 2500
+    assert types["monthly_residual"].status == "pending"
+    assert types["activation_bonus"].amount_cents == 10000
+    assert types["activation_bonus"].status == "pending"
+
+
+def test_invoice_paid_before_checkout_completed_creates_commissions_from_metadata(
+    db_session: Session,
+) -> None:
+    partner = Partner(
+        display_name="Race Partner",
+        email="race-partner@example.com",
+        phone="+15557770099",
+        referral_code="LCRACE01",
+        status="active",
+    )
+    db_session.add(partner)
+    db_session.flush()
+    lead, pc = create_demo_lead(
+        db_session,
+        business_name="Race Biz",
+        contact_name="Race Owner",
+        email="race-biz@example.com",
+        phone="+15557779999",
+        city="Austin",
+        state="TX",
+        partner=partner,
+        referral_code=partner.referral_code,
+    )
+    lead.status = "qualified"
+    business = ensure_business_from_lead(db_session, lead)
+    pc.business_id = business.id
+    pc.status = "referred"
+    db_session.commit()
+
+    invoice = _nested_referral_invoice_payload(
+        invoice_id="in_race_1",
+        partner=partner,
+        pc=pc,
+        business=business,
+        customer="cus_race_unlinked",
+    )
+    business_lead_checkout_service.handle_invoice_paid(
+        db_session,
+        stripe_event_id="evt_race_invoice",
+        invoice_payload=invoice,
+    )
+    db_session.commit()
+
+    assert db_session.query(Commission).filter(Commission.partner_customer_id == pc.id).count() == 2
+
+    session_payload = {
+        "id": "cs_race_1",
+        "customer": "cus_race_unlinked",
+        "subscription": "sub_early_1",
+        "amount_total": 34600,
+        "metadata": {
+            "business_lead_id": str(lead.id),
+            "business_id": str(business.id),
+            "partner_customer_id": str(pc.id),
+            "partner_id": str(partner.id),
+            "referral_code": partner.referral_code,
+        },
+    }
+    business_lead_checkout_service.handle_checkout_session_completed(
+        db_session,
+        stripe_event_id="evt_race_checkout",
+        session_payload=session_payload,
+    )
+    db_session.commit()
+
+    monthly = db_session.query(Commission).filter(Commission.commission_type == "monthly_residual").all()
+    activation = db_session.query(Commission).filter(Commission.commission_type == "activation_bonus").all()
+    assert len(monthly) == 1
+    assert len(activation) == 1
+
+
+def test_invoice_paid_replay_backfills_commissions_without_duplicates(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    partner, pc, business = _setup_referred_business(db_session, email="replay@example.com")
+    business.stripe_customer_id = None
+    business.stripe_subscription_id = None
+    db_session.commit()
+
+    invoice = _nested_referral_invoice_payload(
+        invoice_id="in_replay_1",
+        partner=partner,
+        pc=pc,
+        business=business,
+    )
+    event = _nested_referral_invoice_event("evt_replay_1", "in_replay_1", invoice)
+    payload = json.dumps(event).encode()
+
+    with patch("app.services.stripe_service.construct_webhook_event", return_value=event):
+        first = client.post("/webhooks/stripe", content=payload)
+        second = client.post("/webhooks/stripe", content=payload)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert db_session.query(Commission).filter(Commission.partner_customer_id == pc.id).count() == 2
 
 
 def test_webhook_duplicate_event_ignored(client: TestClient, db_session: Session) -> None:

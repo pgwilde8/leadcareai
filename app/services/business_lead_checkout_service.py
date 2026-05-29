@@ -13,10 +13,11 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.config import get_settings
 from app.models.business import Business
 from app.models.business_lead import PAYMENT_STATUSES, BusinessLead
+from app.models.partner import Partner
 from app.models.partner_customer import PartnerCustomer
 from app.models.payment_event import PaymentEvent
 from app.services import commission_service, stripe_service
-from app.services.business_lead_service import get_business_lead
+from app.services.business_lead_service import create_website_checkout_lead, get_business_lead
 from app.services.business_service import create_business
 from app.services.user_invite_service import create_or_invite_business_user_for_business
 
@@ -127,15 +128,19 @@ def create_checkout_for_lead(db: Session, lead_id: uuid.UUID) -> LeadCheckoutRes
     settings = get_settings()
     base_url = settings.effective_public_base_url or settings.app_base_url.rstrip("/")
     success_url = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = f"{base_url}/demo?checkout=cancelled"
+    cancel_url = f"{base_url}/?checkout=cancelled#pricing"
 
     metadata = _build_checkout_metadata(
         lead=lead,
         business=business,
         partner_customer=partner_customer,
     )
+    customer_email = lead.email
+    if customer_email.endswith("@pending.leadcareai.com"):
+        customer_email = None
+
     session = stripe_service.create_growth_checkout_session(
-        customer_email=lead.email,
+        customer_email=customer_email,
         metadata=metadata,
         success_url=success_url,
         cancel_url=cancel_url,
@@ -156,6 +161,42 @@ def create_checkout_for_lead(db: Session, lead_id: uuid.UUID) -> LeadCheckoutRes
         checkout_session_id=session.session_id,
         reused_existing=False,
     )
+
+
+def start_public_growth_checkout(
+    db: Session,
+    *,
+    partner: Partner | None = None,
+    referral_code: str | None = None,
+) -> LeadCheckoutResult:
+    """Create a website lead and Stripe Checkout for the public Growth plan."""
+    if not stripe_service.growth_checkout_configured():
+        raise ValueError("Online checkout is not configured. Please book a demo instead.")
+
+    lead, _ = create_website_checkout_lead(
+        db,
+        partner=partner,
+        referral_code=referral_code,
+    )
+    return create_checkout_for_lead(db, lead.id)
+
+
+def _sync_lead_contact_from_checkout_session(lead: BusinessLead, session_payload: dict) -> None:
+    details = session_payload.get("customer_details") or {}
+    if not isinstance(details, dict):
+        details = {}
+
+    email = details.get("email") or session_payload.get("customer_email")
+    if email:
+        lead.email = str(email).strip().lower()
+
+    name = details.get("name")
+    if name:
+        lead.contact_name = str(name).strip()
+
+    phone = details.get("phone")
+    if phone:
+        lead.phone = str(phone).strip()
 
 
 def _record_payment_event(
@@ -220,6 +261,7 @@ def handle_checkout_session_completed(
 
     lead_id = uuid.UUID(str(lead_id_raw))
     lead = get_business_lead(db, lead_id)
+    _sync_lead_contact_from_checkout_session(lead, session_payload)
 
     business: Business | None = None
     if business_id_raw:
@@ -288,8 +330,11 @@ def handle_invoice_paid(
     invoice_payload: dict,
 ) -> PaymentEvent:
     """Idempotent webhook handler for invoice.paid."""
-    if _payment_event_exists(db, stripe_event_id):
-        return db.query(PaymentEvent).filter(PaymentEvent.stripe_event_id == stripe_event_id).one()
+    existing_event = (
+        db.query(PaymentEvent).filter(PaymentEvent.stripe_event_id == stripe_event_id).one_or_none()
+        if _payment_event_exists(db, stripe_event_id)
+        else None
+    )
 
     customer_id = invoice_payload.get("customer")
     subscription_id = invoice_payload.get("subscription")
@@ -305,6 +350,9 @@ def handle_invoice_paid(
         stripe_event_id=stripe_event_id,
         invoice_payload=invoice_payload,
     )
+    if existing_event is not None:
+        return existing_event
+
     business_id = result.business.id if result.business is not None else None
 
     return _record_payment_event(

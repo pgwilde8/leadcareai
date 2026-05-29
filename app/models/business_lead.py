@@ -70,7 +70,7 @@ class BusinessLead(Base):
         index=True,
     )
     stripe_checkout_session_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-    stripe_checkout_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    stripe_checkout_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
     converted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(

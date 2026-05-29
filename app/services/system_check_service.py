@@ -207,7 +207,10 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
         items=[
             SystemCheckItem("STRIPE_SECRET_KEY", stripe_mode_value, stripe_mode_status),
             _yes_no("STRIPE_WEBHOOK_SECRET", settings.stripe_webhook_secret),
-            _yes_no("STRIPE_PRICE_ID_GROWTH_MONTHLY", settings.stripe_price_id_growth_monthly),
+            _yes_no(
+                "STRIPE_PRICE_ID_GROWTH_MONTHLY / GROWTH_PRODUCT",
+                settings.stripe_growth_monthly_price_id,
+            ),
             SystemCheckItem(
                 "STRIPE_PRICE_ID_SETUP_FEE",
                 setup_display,

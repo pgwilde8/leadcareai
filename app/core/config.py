@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     stripe_secret_key: str | None = None
     stripe_webhook_secret: str | None = None
     stripe_price_id_growth_monthly: str | None = None
+    stripe_price_id_growth_product: str | None = None
     stripe_price_id_setup_fee: str | None = None
     stripe_setup_amount_cents: int = 19900
 
@@ -63,6 +64,15 @@ class Settings(BaseSettings):
         """Public URL for links in notifications (PUBLIC_BASE_URL or APP_BASE_URL)."""
         raw = (self.public_base_url or self.app_base_url or "").strip()
         return raw.rstrip("/") if raw else None
+
+    @property
+    def stripe_growth_monthly_price_id(self) -> str | None:
+        """Recurring Growth plan Price ID (price_...), from GROWTH_MONTHLY or GROWTH_PRODUCT env."""
+        for candidate in (self.stripe_price_id_growth_monthly, self.stripe_price_id_growth_product):
+            value = (candidate or "").strip()
+            if value:
+                return value
+        return None
 
 
 @lru_cache

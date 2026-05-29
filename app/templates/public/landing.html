@@ -63,6 +63,23 @@
     .lc-pricing-card {
       text-align: center;
     }
+    .lc-pricing-bundle {
+      padding: var(--lc-space-8);
+    }
+    .lc-pricing-bundle__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: var(--lc-space-6);
+      margin-bottom: var(--lc-space-6);
+    }
+    .lc-pricing-bundle__cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--lc-space-3);
+      justify-content: center;
+      padding-top: var(--lc-space-2);
+      border-top: 1px solid var(--lc-border);
+    }
     .lc-pricing-card__price {
       font-size: 2rem;
       font-weight: 700;
@@ -133,6 +150,58 @@
     .lc-referral-banner {
       margin-bottom: var(--lc-space-6);
     }
+    .lc-hero--split .lc-hero__layout {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--lc-space-8);
+    }
+    .lc-hero--split .lc-hero__content {
+      flex: 1;
+      min-width: 0;
+    }
+    .lc-hero--split .lc-hero__visual {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .lc-hero--split .lc-hero__logo {
+      display: block;
+      background: #ffffff;
+      border-radius: var(--lc-radius);
+      padding: var(--lc-space-3) var(--lc-space-4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .lc-hero--split .lc-hero__logo img {
+      display: block;
+      height: auto;
+      width: auto;
+      max-height: 7rem;
+      max-width: min(16rem, 36vw);
+      object-fit: contain;
+      object-position: right center;
+    }
+    @media (max-width: 900px) {
+      .lc-hero--split .lc-hero__layout {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .lc-hero--split .lc-hero__visual {
+        justify-content: center;
+        order: -1;
+        width: 100%;
+        margin-bottom: var(--lc-space-4);
+      }
+      .lc-hero--split .lc-hero__logo {
+        margin: 0 auto;
+      }
+      .lc-hero--split .lc-hero__logo img {
+        max-height: 5rem;
+        max-width: min(14rem, 85vw);
+        object-position: center center;
+      }
+    }
   </style>
 {% endblock %}
 
@@ -144,20 +213,35 @@
   {% endif %}
 
   {# —— Hero —— #}
-  <section class="lc-hero" aria-labelledby="hero-title">
-    <p class="lc-hero__eyebrow">Missed-call recovery for local service businesses</p>
-    <h1 id="hero-title" class="lc-hero__title">Stop Losing Customers When You Miss Calls</h1>
-    <p class="lc-hero__lead">
-      LeadCare AI instantly texts missed callers, collects the details, and alerts your team before the customer moves on.
-    </p>
-    <div class="lc-hero__actions">
-      <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
-      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+  <section class="lc-hero lc-hero--split" aria-labelledby="hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Missed-call recovery for local service businesses</p>
+        <h1 id="hero-title" class="lc-hero__title">Stop Losing Customers When You Miss Calls</h1>
+        <p class="lc-hero__lead">
+          LeadCare AI instantly texts missed callers, collects the details, and alerts your team before the customer moves on.
+        </p>
+        <div class="lc-hero__actions">
+          <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+        </div>
+        <p class="lc-text-muted lc-mt-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;"><p>
+          <strong style="color: var(--lc-accent-warm);">1-833-669-1335</strong>
+          · <a href="/demo" style="color: var(--lc-accent-warm);">Try the missed-call demo</a></p>
+        </p>
+      </div>
+      <div class="lc-hero__visual" aria-hidden="true">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt=""
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
     </div>
-    <p class="lc-text-muted lc-mt-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
-      Demo line: <strong style="color: var(--lc-accent-warm);">1-833-669-1335</strong>
-      · <a href="/demo" style="color: var(--lc-accent-warm);">Try the missed-call demo</a>
-    </p>
   </section>
 
   {# —— How it works —— #}
@@ -294,20 +378,42 @@
       <h2 id="pricing-title" class="lc-page-header__title">Pricing</h2>
       <p class="lc-page-header__lead">Straightforward pricing for teams that want missed calls handled automatically.</p>
     </header>
-    <div class="lc-grid lc-grid--2">
-      <div class="lc-card lc-pricing-card">
-        <p class="lc-pricing-card__label">One-Time Setup</p>
-        <p class="lc-pricing-card__price">$199</p>
-        <p class="lc-text-muted lc-mb-0">Configuration, messaging templates, forwarding setup, and team notifications.</p>
+    {% if checkout_cancelled %}
+      <div class="lc-alert lc-alert--info" role="status" style="margin-bottom: var(--lc-space-4);">
+        Checkout was cancelled. You can try again below or <a href="/demo/book">book a demo</a> first.
       </div>
-      <div class="lc-card lc-pricing-card">
-        <p class="lc-pricing-card__label">Monthly Service</p>
-        <p class="lc-pricing-card__price">$147<span style="font-size: 1rem; font-weight: 500;">/month</span></p>
-        <p class="lc-text-muted lc-mb-0">Ongoing missed-call SMS follow-up, lead intake, and dashboard access.</p>
+    {% endif %}
+    {% if request.query_params.get('checkout') == 'error' %}
+      <div class="lc-alert lc-alert--error" role="alert" style="margin-bottom: var(--lc-space-4);">
+        Checkout could not be started. Please try again or <a href="/demo/book">book a demo</a>.
+      </div>
+    {% endif %}
+    <div class="lc-card lc-pricing-bundle">
+      <div class="lc-pricing-bundle__grid">
+        <div class="lc-pricing-card">
+          <p class="lc-pricing-card__label">One-Time Setup</p>
+          <p class="lc-pricing-card__price">$199</p>
+          <p class="lc-text-muted lc-mb-0">Configuration, messaging templates, forwarding setup, and team notifications.</p>
+        </div>
+        <div class="lc-pricing-card">
+          <p class="lc-pricing-card__label">Monthly Service</p>
+          <p class="lc-pricing-card__price">$147<span style="font-size: 1rem; font-weight: 500;">/month</span></p>
+          <p class="lc-text-muted lc-mb-0">Ongoing missed-call SMS follow-up, lead intake, and dashboard access.</p>
+        </div>
+      </div>
+      <div class="lc-pricing-bundle__cta">
+        <a class="lc-btn lc-btn--accent" href="/checkout/growth">Buy Growth plan — $199 setup + $147/mo</a>
+        <a class="lc-btn lc-btn--secondary" href="/demo">Try the live demo</a>
       </div>
     </div>
-    <p class="lc-text-muted" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+    <p class="lc-text-muted" style="margin-top: var(--lc-space-4); font-size: 0.9rem; text-align: center;">
+      Secure Stripe checkout for the full Growth plan ($199 one-time setup + $147/month).
+      {% if not is_checkout_available() %}
+        <strong> Note:</strong> online checkout is not configured on this server — you will be sent to book a demo instead.
+      {% endif %}
       <a href="/demo/book">Book a demo</a> to discuss volume, multiple locations, or partner referrals.
+      ·
+      <a href="/refund-policy">Refund policy</a>
     </p>
   </section>
 
