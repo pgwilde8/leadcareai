@@ -1,0 +1,44 @@
+{# Shared conversion CTA band (Phase C). Place before FAQ on priority landers. #}
+{% set lander_path = request.url.path %}
+<section class="lc-section lc-lander-cta-primary lc-lander-cta-band" aria-labelledby="lander-cta-primary-title">
+  <h2 id="lander-cta-primary-title">Stop letting missed calls become lost jobs.</h2>
+  <p>
+    Try the interactive demo and see how {{ settings.app_name }} responds when a customer calls and nobody can answer.
+  </p>
+  <div class="lc-btn-group" style="justify-content: center;">
+    <a
+      class="lc-btn lc-btn--accent"
+      href="/demo"
+      data-analytics="lander_cta"
+      data-lander="{{ lander_path }}"
+      data-cta="interactive_demo"
+    >Try the interactive demo</a>
+    {% if is_checkout_available() %}
+      <a
+        class="lc-btn lc-btn--secondary"
+        href="/checkout/growth"
+        data-analytics="lander_cta"
+        data-lander="{{ lander_path }}"
+        data-cta="see_pricing"
+      >See pricing</a>
+    {% else %}
+      <a
+        class="lc-btn lc-btn--secondary"
+        href="/demo/book"
+        data-analytics="lander_cta"
+        data-lander="{{ lander_path }}"
+        data-cta="book_setup_call"
+      >Book a setup call</a>
+    {% endif %}
+  </div>
+  <p class="lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+    <strong>1-833-669-1335</strong>
+    · <a
+      href="tel:+18336691335"
+      style="color: inherit;"
+      data-analytics="lander_cta"
+      data-lander="{{ lander_path }}"
+      data-cta="call_demo_number"
+    >Call the demo number</a>
+  </p>
+</section>

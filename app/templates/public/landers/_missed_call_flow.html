@@ -1,0 +1,57 @@
+{# Reusable 4-step missed-call flow diagram (Phase C). #}
+<section class="lc-section lc-lander-flow" aria-labelledby="lander-flow-title">
+  <header class="lc-page-header">
+    <h2 id="lander-flow-title" class="lc-page-header__title">
+      How {{ settings.app_name }} catches the calls that slip through
+    </h2>
+    <p class="lc-page-header__lead">
+      When a call is missed, {{ settings.app_name }} starts the conversation by text, collects the details, and alerts your team.
+    </p>
+  </header>
+  <ol class="lc-lander-flow__steps">
+    <li class="lc-lander-flow__step">
+      <span class="lc-lander-flow__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28" focusable="false">
+          <path fill="currentColor" d="M8 6h10l2 3h8v15H8V6zm2 5v10h16V11H18l-2-3H10v13z"/>
+        </svg>
+      </span>
+      <div>
+        <strong class="lc-lander-flow__label">Missed call</strong>
+        <p class="lc-text-muted lc-mb-0">Busy, unanswered, or after-hours — the caller does not reach a person.</p>
+      </div>
+    </li>
+    <li class="lc-lander-flow__step">
+      <span class="lc-lander-flow__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28" focusable="false">
+          <path fill="currentColor" d="M6 8h20v3H6V8zm0 6h14v3H6v-3zm0 6h18v3H6v-3z"/>
+        </svg>
+      </span>
+      <div>
+        <strong class="lc-lander-flow__label">Instant text-back</strong>
+        <p class="lc-text-muted lc-mb-0">A friendly SMS goes out while the customer is still engaged.</p>
+      </div>
+    </li>
+    <li class="lc-lander-flow__step">
+      <span class="lc-lander-flow__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28" focusable="false">
+          <path fill="currentColor" d="M8 6h16v20H8V6zm2 2v16h12V8H10zm2 3h8v2h-8v-2zm0 4h8v2h-8v-2zm0 4h6v2h-6v-2z"/>
+        </svg>
+      </span>
+      <div>
+        <strong class="lc-lander-flow__label">Job details captured</strong>
+        <p class="lc-text-muted lc-mb-0">Issue, location, and urgency are collected in a simple text thread.</p>
+      </div>
+    </li>
+    <li class="lc-lander-flow__step">
+      <span class="lc-lander-flow__icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28" focusable="false">
+          <path fill="currentColor" d="M16 4a6 6 0 0 1 6 6v1h2a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V14a3 3 0 0 1 3-3h2v-1a6 6 0 0 1 6-6zm0 3a3 3 0 0 0-3 3v1h6v-1a3 3 0 0 0-3-3zm-8 7v9h16v-9H8z"/>
+        </svg>
+      </span>
+      <div>
+        <strong class="lc-lander-flow__label">Owner/team alerted</strong>
+        <p class="lc-text-muted lc-mb-0">Your crew gets SMS or email with a clean lead summary to call back faster.</p>
+      </div>
+    </li>
+  </ol>
+</section>

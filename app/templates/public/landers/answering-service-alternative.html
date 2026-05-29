@@ -14,27 +14,81 @@
     twitter_description="Catch missed calls before they become lost jobs. " ~ settings.app_name ~ " texts missed callers, captures job details, and alerts your team.",
     json_ld='{
       "@context": "https://schema.org",
-      "@type": "Service",
-      "name": "' ~ settings.app_name ~ '",
-      "serviceType": "Missed-call recovery and answering service alternative",
-      "provider": {
-        "@type": "Organization",
-        "name": "' ~ settings.app_name ~ '",
-        "url": "' ~ absolute_public_url("/") ~ '"
-      },
-      "areaServed": "United States",
-      "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls with instant text-back, AI-assisted lead intake, staff alerts, and a simple dashboard.",
-      "offers": {
-        "@type": "Offer",
-        "price": "147",
-        "priceCurrency": "USD",
-        "description": "$147/month Growth plan with $199 setup fee"
-      }
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Answering Service Alternative",
+          "url": "' ~ absolute_public_url("/answering-service-alternative") ~ '",
+          "description": "For businesses comparing alternatives to traditional answering services — missed-call text-back without a full call center."
+        },
+        {
+          "@type": "Service",
+          "name": "' ~ settings.app_name ~ '",
+          "serviceType": "Missed-call recovery and answering service alternative",
+          "provider": {
+            "@type": "Organization",
+            "name": "' ~ settings.app_name ~ '",
+            "url": "' ~ absolute_public_url("/") ~ '"
+          },
+          "areaServed": "United States",
+          "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls with instant text-back, AI-assisted lead intake, staff alerts, and a simple dashboard.",
+          "offers": {
+            "@type": "Offer",
+            "price": "147",
+            "priceCurrency": "USD",
+            "description": "$147/month Growth plan with $199 setup fee"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "' ~ absolute_public_url("/") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Answering service guide",
+              "item": "' ~ absolute_public_url("/answering-service") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Answering service alternative",
+              "item": "' ~ absolute_public_url("/answering-service-alternative") ~ '"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is ' ~ settings.app_name ~ ' an answering service?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "' ~ settings.app_name ~ ' is an answering service alternative for missed calls — not a live human receptionist. It texts missed callers, collects job details, and alerts your team."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does this compare to an after hours answering service?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Many businesses use answering services after hours. ' ~ settings.app_name ~ ' Backup Mode can cover missed and unanswered calls with instant SMS follow-up without per-minute operator fees for every short call."
+              }
+            }
+          ]
+        }
+      ]
     }'
   ) }}
 {% endblock %}
 
-{% block content %}
+{% block lander_body %}
   <section class="lc-hero lc-lander-hero" aria-labelledby="asa-hero-title">
     <div class="lc-hero__layout">
       <div class="lc-hero__content">
@@ -42,6 +96,13 @@
         <h1 id="asa-hero-title" class="lc-hero__title">
           A Simpler Answering Service Alternative for Small Service Businesses
         </h1>
+        <p class="lc-hero__lead">
+          This page is for businesses comparing alternatives to traditional answering services — when you want missed-call text-back and lead capture without a full live call center.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          Not sure which page fits your search?
+          <a href="/answering-service">Read the broader answering service guide</a> (traditional vs. missed-call recovery).
+        </p>
         <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
           <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
           <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a setup call</a>
@@ -65,6 +126,9 @@
     </div>
   </section>
 
+  {% include "public/landers/_missed_call_flow.html" %}
+  {% include "public/landers/_lander_fit.html" %}
+
   <section class="lc-section" aria-labelledby="asa-catch-title">
     <header class="lc-page-header">
       <h2 id="asa-catch-title" class="lc-page-header__title">Catch Missed Calls Without Hiring a Full Answering Service</h2>
@@ -76,7 +140,27 @@
       No complicated CRM. No full-time receptionist. No calling an answering service every time you need an hour of coverage — including
       <strong>after hours</strong> or when you need a <strong>business phone answering service</strong> backup, not a full call center.
     </p>
-    <p class="lc-lander-emphasis lc-mb-0">Just a simple missed-call safety net for contractors and local trades.</p>
+    <p class="lc-lander-emphasis">Just a simple missed-call safety net for contractors and local trades.</p>
+    {% include "public/landers/_lander_video_intro.html" %}
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive.</p>
   </section>
 
   <section class="lc-section" aria-labelledby="asa-problem-title">
@@ -148,6 +232,7 @@
       </p>
     </header>
     <ul class="lc-lander-industry-list">
+      <li><a href="/contractors-answering-service-alternative">Contractors</a> — umbrella answering service for contractors</li>
       <li><a href="/for/plumbers">Plumbers</a> — answering service for plumbers</li>
       <li><a href="/for/roofers">Roofers</a> — answering service for roofers</li>
       <li>HVAC answering service</li>
@@ -219,8 +304,24 @@
         </table>
       </div>
     </div>
-    <p class="lc-text-muted lc-mb-0">
+    <p class="lc-text-muted">
       {{ settings.app_name }} is a practical <strong>answering service alternative</strong> and <strong>contractor answering service alternative</strong> for teams that want missed-call text-back without a complicated CRM.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      Related: <a href="/answering-service">answering service</a> hub ·
+      Related landers:
+      <a href="/business-answering-service-alternative">business answering service alternative</a> ·
+      <a href="/phone-answering-service">phone answering service alternative</a> ·
+      <a href="/small-business-answering-service-alternative">small business answering service alternative</a> ·
+      <a href="/small-business-phone-answering-service-alternative">small business phone answering service alternative</a> ·
+      <a href="/answering-call-service-alternative">answering call service alternative</a> ·
+      <a href="/telephone-answering-service-alternative">telephone answering service alternative</a> ·
+      <a href="/virtual-answering-service-alternative">virtual answering service alternative</a> ·
+      <a href="/responsive-answering-service-alternative">responsive answering service alternative</a> ·
+      <a href="/contractors-answering-service-alternative">contractors answering service alternative</a> ·
+      <a href="/automated-answering-service-alternative">automated answering service alternative</a> ·
+      <a href="/after-hours-answering-service-alternative">after-hours answering service alternative</a> ·
+      <a href="/247-answering-service-alternative">24/7 answering service alternative</a>
     </p>
   </section>
 
@@ -259,6 +360,8 @@
       <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
     </div>
   </section>
+
+  {% include "public/landers/_lander_cta.html" %}
 
   <section class="lc-section" aria-labelledby="asa-faq-title">
     <header class="lc-page-header">

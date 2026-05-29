@@ -29,13 +29,57 @@
           },
           "areaServed": "US",
           "description": "Instant text-back for missed plumbing calls, lead intake, and team alerts without a complicated CRM."
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "' ~ absolute_public_url("/") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Answering service guide",
+              "item": "' ~ absolute_public_url("/answering-service") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Plumbers",
+              "item": "' ~ absolute_public_url("/for/plumbers") ~ '"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How is this different from an answering service for plumbers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Traditional answering services charge per minute and use live operators. ' ~ settings.app_name ~ ' texts missed callers immediately, collects job details by SMS, and alerts your crew."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this only for plumbers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "This page is tailored for plumbing contractors. ' ~ settings.app_name ~ ' also works for roofers, HVAC, electricians, and other field-service trades."
+              }
+            }
+          ]
         }
       ]
     }'
   ) }}
 {% endblock %}
 
-{% block content %}
+{% block lander_body %}
   <section class="lc-hero lc-lander-hero" aria-labelledby="plumbers-hero-title">
     <div class="lc-hero__layout">
       <div class="lc-hero__content">
@@ -70,13 +114,13 @@
     </div>
   </section>
 
+  {% include "public/landers/_missed_call_flow.html" %}
+  {% include "public/landers/_lander_fit.html" %}
+
   <section class="lc-section" aria-labelledby="plumbers-video-title">
-    <header class="lc-page-header">
-      <h2 id="plumbers-video-title" class="lc-page-header__title">Built for plumbers in the field</h2>
-      <p class="lc-page-header__lead">
-        Why missed calls cost plumbing businesses money — and how instant text-back keeps the lead alive.
-      </p>
-    </header>
+    {% set lander_video_section_id = "plumbers-video-title" %}
+    {% set lander_video_heading = "See what happens when a caller gets missed" %}
+    {% include "public/landers/_lander_video_intro.html" %}
     <div class="lc-lander-video-wrap">
       <video
         class="lc-lander-video"
@@ -213,6 +257,12 @@
         </div>
       </div>
     </div>
+    <p class="lc-text-muted lc-mb-0">
+      Related trades:
+      <a href="/contractors-answering-service-alternative">contractors answering service</a> ·
+      <a href="/for/roofers">roofers</a> ·
+      <a href="/answering-service">answering service guides</a>
+    </p>
   </section>
 
   <section class="lc-section">
@@ -244,6 +294,8 @@
     </div>
   </section>
 
+  {% include "public/landers/_lander_cta.html" %}
+
   <section class="lc-section" aria-labelledby="plumbers-faq-title">
     <header class="lc-page-header">
       <h2 id="plumbers-faq-title" class="lc-page-header__title">Quick answers</h2>
@@ -273,8 +325,9 @@
         <dt>Is this only for plumbers?</dt>
         <dd>
           This page is tailored for plumbing contractors. {{ settings.app_name }} also works for
-          <a href="/for/roofers">roofers</a>, HVAC, electricians, and other local service businesses —
-          <a href="/">see the main site</a>.
+          <a href="/for/roofers">roofers</a>, HVAC, electricians, and other trades —
+          see the <a href="/contractors-answering-service-alternative">contractors answering service</a> page and
+          <a href="/answering-service">answering service hub</a>.
         </dd>
       </div>
     </dl>

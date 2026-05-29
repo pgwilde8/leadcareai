@@ -1,0 +1,415 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Contractors Answering Service Alternative for Missed Calls | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Need an answering service for contractors? " ~ settings.app_name ~ " helps contractors recover missed calls with instant text-back, job detail capture, staff alerts, and a simple dashboard.",
+    keywords="contractors answering service, answering service for contractors, contractor answering service, contractor phone answering service, contractor missed call service, contractor missed call text back, missed call recovery for contractors, phone answering service for contractors, contractors answering service alternative, answering service alternative for contractors, LeadCare AI",
+    canonical_path="/contractors-answering-service-alternative",
+    og_title="A Simpler Answering Service Alternative for Contractors",
+    og_description=settings.app_name ~ " texts missed callers, captures job details, and alerts your crew — a contractors answering service alternative without a full call center or heavy CRM.",
+    twitter_title="Contractors Answering Service Alternative for Missed Calls",
+    twitter_description="Catch missed calls before they become lost jobs. " ~ settings.app_name ~ " keeps contractor leads alive with instant text-back.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Contractors Answering Service Alternative",
+          "url": "' ~ absolute_public_url("/contractors-answering-service-alternative") ~ '",
+          "description": "Answering service alternative for contractors — missed-call text-back when crews are on jobsites."
+        },
+        {
+          "@type": "Service",
+          "name": "' ~ settings.app_name ~ ' for Contractors",
+          "serviceType": "Contractors answering service alternative and missed-call recovery",
+          "provider": {
+            "@type": "Organization",
+            "name": "' ~ settings.app_name ~ '",
+            "url": "' ~ absolute_public_url("/") ~ '"
+          },
+          "areaServed": "United States",
+          "description": "' ~ settings.app_name ~ ' helps contractors recover missed calls with instant text-back, job detail capture, staff alerts, and a simple dashboard.",
+          "offers": {
+            "@type": "Offer",
+            "price": "147",
+            "priceCurrency": "USD",
+            "description": "$147/month Growth plan with $199 setup fee"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "' ~ absolute_public_url("/") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Answering service guide",
+              "item": "' ~ absolute_public_url("/answering-service") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Contractors answering service",
+              "item": "' ~ absolute_public_url("/contractors-answering-service-alternative") ~ '"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is ' ~ settings.app_name ~ ' a contractors answering service?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "' ~ settings.app_name ~ ' is an answering service alternative for contractors focused on missed calls — not live operators answering every call."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does this work for plumbers and roofers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Contractors, plumbers, roofers, and other field-service trades use ' ~ settings.app_name ~ ' for missed-call recovery when crews cannot safely answer the phone."
+              }
+            }
+          ]
+        }
+      ]
+    }'
+  ) }}
+{% endblock %}
+
+{% block lander_body %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="cas-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Contractors answering service alternative · field-service businesses</p>
+        <h1 id="cas-hero-title" class="lc-hero__title">
+          A Simpler Answering Service Alternative for Contractors
+        </h1>
+        <p class="lc-hero__lead">
+          Catch missed calls before they become lost jobs. Contractors cannot always answer the phone —
+          on a roof, under a sink, driving to a job, or finally taking lunch. When a homeowner calls, they may not wait.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          {{ settings.app_name }} helps contractors recover missed calls with instant text-back, job detail capture, and staff alerts.
+        </p>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/backup-mode">See how Backup Mode works</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {% include "public/landers/_missed_call_flow.html" %}
+  {% include "public/landers/_lander_fit.html" %}
+
+  <section class="lc-section" aria-labelledby="cas-catch-title">
+    <header class="lc-page-header">
+      <h2 id="cas-catch-title" class="lc-page-header__title">Missed-Call Recovery Built for Busy Contractors</h2>
+    </header>
+    <p class="lc-text-muted">
+      No full call center. No complicated CRM. No voicemail waiting game. Just missed-call recovery built for contractors in the field.
+    </p>
+    {% set lander_video_heading = "See Backup Mode in action" %}
+    {% include "public/landers/_lander_video_intro.html" %}
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} contractors answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive.</p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-miss-title">
+    <header class="lc-page-header">
+      <h2 id="cas-miss-title" class="lc-page-header__title">Contractors Miss Calls for Real Reasons</h2>
+    </header>
+    <p class="lc-text-muted">
+      Missed calls do not happen because contractors are careless. They happen because contractors are working.
+    </p>
+    <ul class="lc-text-muted">
+      <li>On a ladder, in a crawl space, under a sink, or inside an attic</li>
+      <li>Driving between jobs, on another call, or meeting with a customer</li>
+      <li>Picking up supplies, eating lunch, or with family</li>
+      <li>Relying on your spouse or office helper to catch what they can</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      A customer with a leak, broken HVAC, damaged roof, or urgent repair may call the next contractor if nobody responds quickly.
+      That is how missed calls become lost jobs.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-does-title">
+    <header class="lc-page-header">
+      <h2 id="cas-does-title" class="lc-page-header__title">What {{ settings.app_name }} Does</h2>
+    </header>
+    <p class="lc-text-muted">{{ settings.app_name }} gives contractors a simple missed-call safety net. When a call is missed, we text the caller immediately.</p>
+    <div class="lc-lander-chat" role="group" aria-label="Sample contractor SMS thread">
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+        Sorry we missed your call. What can we help with today?
+      </div>
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+        I have water leaking through the ceiling.
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} captures job details, saves the conversation, helps identify urgency, and alerts your team by SMS or email.
+      The missed call becomes a lead you can follow up on.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-backup-title">
+    <header class="lc-page-header">
+      <h2 id="cas-backup-title" class="lc-page-header__title">Backup Mode for Contractor Calls</h2>
+    </header>
+    <p class="lc-text-muted">
+      Most mobile business lines support call forwarding through your carrier. When Backup Mode is on, your phone rings like normal.
+      If nobody answers, the line is busy, or the phone is unreachable, the call forwards to your {{ settings.app_name }} number — then we text the caller.
+    </p>
+    <p class="lc-lander-emphasis lc-mb-0">
+      Your phone already has the switch. {{ settings.app_name }} turns that switch into a lead-saving system.
+      <a href="/backup-mode">Backup Mode details</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-not-full-title">
+    <header class="lc-page-header">
+      <h2 id="cas-not-full-title" class="lc-page-header__title">Not a Full Answering Service. A Missed-Call Recovery System.</h2>
+    </header>
+    <p class="lc-text-muted">
+      Traditional contractors answering services can be useful if you need live people answering every call.
+      Many contractors only need backup for calls they miss while working.
+    </p>
+    <p class="lc-text-muted">
+      {{ settings.app_name }} does not pretend to be a live receptionist or force you to learn a complicated CRM.
+      It focuses on one job: <strong>when you miss the call, keep the lead alive.</strong>
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      Broader options:
+      <a href="/answering-service">answering service hub</a> ·
+      <a href="/answering-service-alternative">answering service alternative</a> ·
+      <a href="/business-answering-service-alternative">business answering service alternative</a>
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-industries-title">
+    <header class="lc-page-header">
+      <h2 id="cas-industries-title" class="lc-page-header__title">Built for Contractors and Field-Service Businesses</h2>
+      <p class="lc-page-header__lead">Industry-specific pages for campaigns and niche outreach.</p>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/roofers">Roofers</a></li>
+      <li><a href="/for/plumbers">Plumbers</a> — answering service for plumbers</li>
+      <li>HVAC contractors</li>
+      <li>Electricians</li>
+      <li>Garage door repair</li>
+      <li>Locksmiths</li>
+      <li>Pest control</li>
+      <li>Appliance repair</li>
+      <li>Landscapers</li>
+      <li>Cleaners</li>
+      <li>Mobile mechanics</li>
+      <li>Water damage contractors</li>
+      <li>Remodelers</li>
+      <li>Handyman businesses</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-family-title">
+    <header class="lc-page-header">
+      <h2 id="cas-family-title" class="lc-page-header__title">Give Your Family and Team Backup</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      Many contractor businesses are family-run. {{ settings.app_name }} does not replace your spouse, family helper, or office staff —
+      it gives them backup when life gets busy, so missed callers still get a fast response.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-compare-title">
+    <header class="lc-page-header">
+      <h2 id="cas-compare-title" class="lc-page-header__title">Contractors Answering Service vs {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">Contractors answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Live operators may answer calls</td>
+              <td>Instant text-back to missed callers</td>
+            </tr>
+            <tr>
+              <td>Often priced by call, minute, or package</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>Good for full call coverage</td>
+              <td>Built for missed-call backup</td>
+            </tr>
+            <tr>
+              <td>Scripts and handoffs</td>
+              <td>Captures job details by SMS</td>
+            </tr>
+            <tr>
+              <td>Can feel like a call center</td>
+              <td>Backup Mode for your phone</td>
+            </tr>
+            <tr>
+              <td>Human receptionist model</td>
+              <td>Missed-call recovery model</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a simpler <strong>answering service for contractors</strong> when your main problem is missed calls.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="cas-voicemail-title">
+    <header class="lc-page-header">
+      <h2 id="cas-voicemail-title" class="lc-page-header__title">Why Voicemail Is Too Slow</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      Voicemail waits. {{ settings.app_name }} responds immediately. A homeowner with an urgent repair may not leave voicemail and wait —
+      a fast text-back keeps the conversation alive while they are still interested.
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Simple pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup fee · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Setup includes onboarding, number assignment, Backup Mode guidance, and launch verification.
+          One recovered job can often pay for the service.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="cas-demo-title">
+    <h2 id="cas-demo-title">Try the interactive demo</h2>
+    <p>See what happens when a missed caller gets an instant text-back.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
+    </div>
+  </section>
+
+  {% include "public/landers/_lander_cta.html" %}
+
+  <section class="lc-section" aria-labelledby="cas-faq-title">
+    <header class="lc-page-header">
+      <h2 id="cas-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} an answering service for contractors?</dt>
+        <dd>
+          {{ settings.app_name }} is an <strong>answering service alternative for contractors</strong> for missed calls — not live human receptionists.
+          It texts missed callers, captures job details, and alerts your team.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does {{ settings.app_name }} replace voicemail?</dt>
+        <dd>
+          For many missed calls, yes. Instead of waiting for voicemail, {{ settings.app_name }} starts a text conversation immediately.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace my wife, office helper, or receptionist?</dt>
+        <dd>
+          No. It gives them backup when they are busy, away, asleep, or already helping someone else.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this a contractor CRM?</dt>
+        <dd>
+          No. {{ settings.app_name }} focuses on missed-call text-back, job details, alerts, and a simple dashboard.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How does Backup Mode work?</dt>
+        <dd>
+          You forward missed, busy, or unanswered calls to your {{ settings.app_name }} number.
+          We text those callers and capture the details. Setup is verified with a live test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does call forwarding work with every phone?</dt>
+        <dd>
+          Carrier settings vary. Most mobile-first contractors on major carriers can use call forwarding —
+          we guide setup and test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this for emergencies?</dt>
+        <dd>
+          No. {{ settings.app_name }} is not 911 or emergency dispatch. Dangerous or life-threatening situations require emergency services.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="cas-final-cta">
+    <h2 id="cas-final-cta">You are busy doing the work</h2>
+    <p>{{ settings.app_name }} catches the calls that slip through.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try {{ settings.app_name }} today</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+{% endblock %}

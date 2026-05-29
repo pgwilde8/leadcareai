@@ -1,0 +1,7 @@
+{# Video section intro copy (Phase C). Set lander_video_heading / lander_video_intro before include to override. #}
+{% set _video_heading = lander_video_heading|default("Watch the missed-call safety net in action") %}
+{% set _video_intro = lander_video_intro|default("This short demo shows how a missed call becomes a text conversation your team can follow up on.") %}
+<header class="lc-page-header lc-lander-video-intro">
+  <h2 id="{{ lander_video_section_id|default('lander-video-title') }}" class="lc-page-header__title">{{ _video_heading }}</h2>
+  <p class="lc-page-header__lead">{{ _video_intro }}</p>
+</header>

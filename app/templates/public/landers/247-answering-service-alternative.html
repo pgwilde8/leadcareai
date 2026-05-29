@@ -1,0 +1,319 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}24/7 Answering Service Alternative for Service Businesses | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Need 24/7 call coverage without hiring a full answering service? " ~ settings.app_name ~ " texts missed callers, captures job details, and alerts your team — day, night, weekends, and after hours.",
+    keywords="247 answering service, 24/7 answering service alternative, 24 7 answering service, 24/7 phone answering service, after hours answering service, after hours answering service alternative, business phone answering service, answering service alternative, missed call text back, missed call recovery, after hours call answering, phone answering service for small business",
+    canonical_path="/247-answering-service-alternative",
+    og_title="24/7 Answering Service Alternative for Busy Service Businesses",
+    og_description=settings.app_name ~ " is a 24/7 answering service alternative for missed calls — instant SMS follow-up when you are not available, without a live call center.",
+    twitter_title="24/7 Answering Service Alternative for Service Businesses",
+    twitter_description="Your business can be covered even when you are not available. " ~ settings.app_name ~ " texts missed callers and alerts your team.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "' ~ settings.app_name ~ '",
+      "serviceType": "24/7 answering service alternative and missed-call recovery",
+      "provider": {
+        "@type": "Organization",
+        "name": "' ~ settings.app_name ~ '",
+        "url": "' ~ absolute_public_url("/") ~ '"
+      },
+      "areaServed": "United States",
+      "description": "' ~ settings.app_name ~ ' helps service businesses cover missed calls after hours, on weekends, and when the team is busy — with instant text-back, not a live 24/7 receptionist.",
+      "offers": {
+        "@type": "Offer",
+        "price": "147",
+        "priceCurrency": "USD",
+        "description": "$147/month Growth plan with $199 setup fee"
+      }
+    }'
+  ) }}
+{% endblock %}
+
+{% block lander_body %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="tf-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">24/7 answering service alternative · missed-call backup</p>
+        <h1 id="tf-hero-title" class="lc-hero__title">
+          24/7 Answering Service Alternative for Busy Service Businesses
+        </h1>
+        <p class="lc-hero__lead">
+          Need 24/7 call backup without a full answering service? When you or your team can’t answer,
+          {{ settings.app_name }} texts the caller right away, asks what they need, captures the job details, and alerts you.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          So after-hours calls, lunch breaks, weekends, and busy moments do not turn into lost jobs.
+        </p>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/backup-mode">See how Backup Mode works</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-problem-title">
+    <header class="lc-page-header">
+      <h2 id="tf-problem-title" class="lc-page-header__title">Calls Don’t Only Come In When You’re Sitting by the Phone</h2>
+    </header>
+    <p class="lc-text-muted">
+      They come in while you are driving, on a job, with your family, eating dinner, asleep, or already helping another customer.
+      You may think you need someone to cover calls whenever you are not available.
+    </p>
+    <p class="lc-lander-emphasis">
+      You may not need a full 24/7 answering service. You may just need a missed-call backup that responds instantly by text.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      A traditional 24/7 answering service may be more than you need. Voicemail alone is often too slow — callers move on to the next company.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-solution-title">
+    <header class="lc-page-header">
+      <h2 id="tf-solution-title" class="lc-page-header__title">{{ settings.app_name }} Backup Mode</h2>
+      <p class="lc-page-header__lead">24/7 missed-call backup — when your phone cannot be answered, the lead still gets a response.</p>
+    </header>
+    <p class="lc-text-muted">
+      Your phone can still ring like normal. If nobody answers, {{ settings.app_name }} texts the caller immediately and collects the details by SMS.
+      Your business can be covered even when you are not available — without your business phone controlling your life.
+    </p>
+    <p>
+      <a href="/backup-mode">Learn how Backup Mode works</a> with your existing call forwarding.
+    </p>
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} 24/7 answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive — even after hours.</p>
+  </section>
+
+  <section class="lc-section lc-card" aria-labelledby="tf-honest-title">
+    <div class="lc-card__body">
+      <h2 id="tf-honest-title" class="lc-card__title">Important: Not a Live 24/7 Call Center</h2>
+      <p class="lc-text-muted">
+        {{ settings.app_name }} is <strong>not</strong> a live receptionist, emergency dispatch service, or human operator answering every ring 24 hours a day.
+      </p>
+      <p class="lc-text-muted lc-mb-0">
+        It is a <strong>24/7 answering service alternative</strong> in the honest sense: missed-call recovery that can respond by text whenever a call is missed —
+        day, night, weekends, and after hours — so you are not promising something we do not deliver.
+      </p>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-usecases-title">
+    <header class="lc-page-header">
+      <h2 id="tf-usecases-title" class="lc-page-header__title">When Owners Search for 24/7 Coverage</h2>
+    </header>
+    <ul class="lc-lander-pain">
+      <li>
+        <strong>After-hours calls</strong>
+        Evenings and nights when the office is closed but homeowners still need help.
+      </li>
+      <li>
+        <strong>Weekend calls</strong>
+        Saturday and Sunday jobs without chaining yourself to the phone.
+      </li>
+      <li>
+        <strong>Lunch breaks &amp; family time</strong>
+        Coverage without asking your spouse to be on call every minute.
+      </li>
+      <li>
+        <strong>Driving or on a job</strong>
+        Hands busy — the caller still gets an instant text-back.
+      </li>
+      <li>
+        <strong>Already on another call</strong>
+        Second and third rings do not have to become voicemails.
+      </li>
+      <li>
+        <strong>Office helper is busy</strong>
+        Backup when your team cannot grab every ring.
+      </li>
+    </ul>
+    <p class="lc-lander-emphasis lc-mb-0">
+      You need a way to make sure missed callers get a fast response before they call someone else. That is what this page is for.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-compare-title">
+    <header class="lc-page-header">
+      <h2 id="tf-compare-title" class="lc-page-header__title">Traditional 24/7 Answering Service vs {{ settings.app_name }}</h2>
+      <p class="lc-page-header__lead">
+        Compare honestly — we are an alternative for missed-call backup, not a replacement for every live operator scenario.
+      </p>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">Traditional 24/7 answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Live human operator</td>
+              <td>Instant SMS text-back on missed calls</td>
+            </tr>
+            <tr>
+              <td>Per-call or per-minute pricing</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>Full call handling</td>
+              <td>Missed-call recovery focus</td>
+            </tr>
+            <tr>
+              <td>Coverage scheduling</td>
+              <td>Backup Mode via call forwarding</td>
+            </tr>
+            <tr>
+              <td>Human scripts</td>
+              <td>SMS job detail capture</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-industries-title">
+    <header class="lc-page-header">
+      <h2 id="tf-industries-title" class="lc-page-header__title">Built for Local Service Businesses</h2>
+      <p class="lc-page-header__lead">After-hours and weekend backup across trades — not just one vertical.</p>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/plumbers">Plumbers</a></li>
+      <li><a href="/for/roofers">Roofers</a></li>
+      <li>HVAC</li>
+      <li>Electricians</li>
+      <li>Garage door repair</li>
+      <li>Pest control</li>
+      <li>Landscapers</li>
+      <li>Cleaners</li>
+      <li>Mobile mechanics</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      Related: <a href="/after-hours-answering-service-alternative">after-hours answering service alternative</a> ·
+      <a href="/business-answering-service-alternative">business answering service alternative</a> ·
+      <a href="/phone-answering-service">phone answering service alternative</a> ·
+      <a href="/virtual-answering-service-alternative">virtual answering service alternative</a> ·
+      <a href="/responsive-answering-service-alternative">responsive answering service alternative</a> ·
+      <a href="/answering-service-alternative">answering service alternative</a>
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Straightforward monthly pricing vs. unpredictable 24/7 operator bills for businesses that mainly need missed-call text-back.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="tf-demo-title">
+    <h2 id="tf-demo-title">See what a missed caller receives</h2>
+    <p>Try the missed-call demo and see what your customers would experience.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tf-faq-title">
+    <header class="lc-page-header">
+      <h2 id="tf-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} a 24/7 answering service with live operators?</dt>
+        <dd>
+          No. {{ settings.app_name }} is a <strong>24/7 answering service alternative</strong> for missed calls: when a call is missed, we text back immediately.
+          We do not staff live receptionists around the clock.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this work after hours and on weekends?</dt>
+        <dd>
+          Yes — when missed or unanswered calls forward to {{ settings.app_name }}, callers get instant SMS follow-up nights, weekends, and holidays.
+          That is the common reason owners search for <strong>after hours answering service</strong> and <strong>247 answering service</strong> options.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How is this different from the phone answering service page?</dt>
+        <dd>
+          <a href="/phone-answering-service">Phone answering service alternative</a> focuses on replacing traditional phone answering services broadly.
+          This page focuses on always-on backup when you are not available — after hours, weekends, and busy moments.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Why not just use voicemail?</dt>
+        <dd>
+          Voicemail waits. Most urgent callers want to know someone heard them. Text-back keeps the conversation alive while they still care.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Can I turn Backup Mode off?</dt>
+        <dd>
+          Yes. Forwarding is controlled by your carrier — turn it off when you want every call to ring through to you directly.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="tf-final-cta">
+    <h2 id="tf-final-cta">Coverage when you are not available</h2>
+    <p class="lc-mb-0">
+      You may not need a full 24/7 answering service. You need missed callers to get a fast response before the job goes somewhere else.
+    </p>
+    <div class="lc-btn-group" style="justify-content: center; margin-top: var(--lc-space-5);">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the demo</a>
+      <a class="lc-btn lc-btn--secondary" href="/backup-mode">Backup Mode setup</a>
+    </div>
+  </section>
+{% endblock %}

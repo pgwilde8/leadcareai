@@ -158,6 +158,16 @@ def roofers_lander_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/landers/roofers.html", {})
 
 
+@router.get("/answering-service", response_class=HTMLResponse, response_model=None)
+def answering_service_lander_page(request: Request) -> HTMLResponse:
+    """Hub page for answering service searches — honest missed-call recovery positioning."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/answering-service.html",
+        {},
+    )
+
+
 @router.get("/answering-service-alternative", response_class=HTMLResponse, response_model=None)
 def answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
     """Answering service alternative for small local service businesses."""
@@ -172,6 +182,126 @@ def answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
 def answering_service_alternative_legacy_redirect() -> RedirectResponse:
     """Permanent redirect from earlier /for/ path to canonical URL."""
     return RedirectResponse(url="/answering-service-alternative", status_code=301)
+
+
+@router.get("/phone-answering-service", response_class=HTMLResponse, response_model=None)
+def phone_answering_service_lander_page(request: Request) -> HTMLResponse:
+    """Phone answering service alternative for small local service businesses."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/phone-answering-service.html",
+        {},
+    )
+
+
+@router.get("/247-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def answering_service_247_lander_page(request: Request) -> HTMLResponse:
+    """24/7 answering service alternative — honest missed-call backup positioning."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/247-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/business-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def business_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Business answering service alternative for small local service businesses."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/business-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/virtual-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def virtual_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Virtual answering service alternative — missed-call backup, not a live remote receptionist."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/virtual-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/responsive-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def responsive_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Responsive answering service alternative — fast missed-call text-back, not a live call center."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/responsive-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/contractors-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def contractors_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Umbrella contractors answering service alternative for missed-call recovery."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/contractors-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/automated-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def automated_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Automated answering service alternative — SMS missed-call recovery, not a voice bot call center."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/automated-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/after-hours-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def after_hours_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """After-hours answering service alternative — missed-call text-back when the workday is over."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/after-hours-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/answering-call-service-alternative", response_class=HTMLResponse, response_model=None)
+def answering_call_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Answering call service alternative — missed-call text-back vs traditional call answering services."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/answering-call-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/telephone-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def telephone_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Telephone answering service alternative — classic answering search, missed-call SMS backup."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/telephone-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/small-business-phone-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def small_business_phone_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Small business phone answering service alternative — owner-focused missed-call backup."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/small-business-phone-answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/small-business-answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def small_business_answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Small business answering service alternative — broader owner-focused missed-call recovery."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/small-business-answering-service-alternative.html",
+        {},
+    )
 
 
 @router.get("/r/{referral_code}", response_class=HTMLResponse, response_model=None)

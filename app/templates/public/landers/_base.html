@@ -186,6 +186,64 @@
     .lc-lander-industry-list a {
       font-weight: 600;
     }
+    .lc-lander-guides {
+      border-top: 1px solid var(--lc-border);
+      padding-top: var(--lc-space-6);
+    }
+    .lc-lander-flow__steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+      gap: var(--lc-space-4);
+      counter-reset: lander-flow;
+    }
+    .lc-lander-flow__step {
+      position: relative;
+      padding: var(--lc-space-4);
+      padding-top: var(--lc-space-5);
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-radius: var(--lc-radius-md);
+      counter-increment: lander-flow;
+    }
+    .lc-lander-flow__step::before {
+      content: counter(lander-flow);
+      position: absolute;
+      top: var(--lc-space-3);
+      right: var(--lc-space-3);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--lc-text-subtle);
+    }
+    .lc-lander-flow__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: var(--lc-space-3);
+      border-radius: var(--lc-radius-md);
+      background: var(--lc-primary);
+      color: var(--lc-text-on-primary);
+    }
+    .lc-lander-flow__label {
+      display: block;
+      color: var(--lc-primary-dark);
+      margin-bottom: var(--lc-space-2);
+      font-size: 0.95rem;
+    }
+    .lc-lander-video-intro {
+      margin-bottom: var(--lc-space-4);
+    }
+    .lc-lander-cta-primary {
+      margin-top: var(--lc-space-2);
+    }
+    .lc-lander-fit .lc-section__title {
+      font-size: 1rem;
+      margin-top: 0;
+    }
     @media (max-width: 768px) {
       .lc-lander-hero .lc-hero__layout {
         flex-direction: column;
@@ -196,4 +254,9 @@
       }
     }
   </style>
+{% endblock %}
+
+{% block content %}
+  {% block lander_body %}{% endblock %}
+  {% include "public/landers/_lander_guides.html" %}
 {% endblock %}

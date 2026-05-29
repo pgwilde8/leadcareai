@@ -1,0 +1,37 @@
+{# Shared internal links for answering-service lander cluster. Included from _base.html after page body. #}
+{% set path = request.url.path %}
+<section class="lc-section lc-lander-guides" aria-labelledby="lander-guides-title">
+  <header class="lc-page-header">
+    <h2 id="lander-guides-title" class="lc-page-header__title">More answering service guides</h2>
+    <p class="lc-page-header__lead">Compare options for missed-call backup — not a full live call center.</p>
+  </header>
+  <ul class="lc-lander-industry-list">
+    {% if path != "/answering-service" %}
+      <li><a href="/answering-service">Answering service hub</a></li>
+    {% endif %}
+    {% if path != "/answering-service-alternative" %}
+      <li><a href="/answering-service-alternative">Answering service alternative</a></li>
+    {% endif %}
+    {% if path != "/phone-answering-service" %}
+      <li><a href="/phone-answering-service">Phone answering service</a></li>
+    {% endif %}
+    {% if path != "/business-answering-service-alternative" %}
+      <li><a href="/business-answering-service-alternative">Business answering service</a></li>
+    {% endif %}
+    {% if path != "/after-hours-answering-service-alternative" %}
+      <li><a href="/after-hours-answering-service-alternative">After-hours answering service</a></li>
+    {% endif %}
+    {% if path != "/247-answering-service-alternative" %}
+      <li><a href="/247-answering-service-alternative">24/7 answering service</a></li>
+    {% endif %}
+    {% if path != "/contractors-answering-service-alternative" %}
+      <li><a href="/contractors-answering-service-alternative">Contractors answering service</a></li>
+    {% endif %}
+    {% if path != "/for/plumbers" %}
+      <li><a href="/for/plumbers">Plumbers</a></li>
+    {% endif %}
+    {% if path != "/for/roofers" %}
+      <li><a href="/for/roofers">Roofers</a></li>
+    {% endif %}
+  </ul>
+</section>

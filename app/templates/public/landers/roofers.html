@@ -1,28 +1,96 @@
 {% extends "public/landers/_base.html" %}
 {% from "layout/_seo_tags.html" import seo_tags %}
 
-{% block title %}Answering Service Alternative for Roofers | {{ settings.app_name }}{% endblock %}
+{% block title %}Answering Service for Roofers — A Simpler Alternative | {{ settings.app_name }}{% endblock %}
 
 {% block seo_meta %}
   {{ seo_tags(
-    description="LeadCareAI helps roofing contractors recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard. Built for roofers who need backup without a complicated CRM.",
-    keywords="roofing contractor answering service, roofer missed call text back, storm damage lead capture, roofing CRM alternative, missed call recovery roofers, call forwarding roofing business, LeadCareAI roofers",
+    description="Looking for an answering service for roofers? " ~ settings.app_name ~ " texts missed callers instantly, captures job details, and alerts your crew — missed-call recovery and Backup Mode, not a live call center.",
+    keywords="answering service for roofers, roofer answering service alternative, roofing missed call text back, storm damage lead capture, missed call recovery roofers, call forwarding roofing business, LeadCare AI roofers",
     canonical_path="/for/roofers",
-    og_title="Answering Service Alternative for Roofers | " ~ settings.app_name,
+    og_title="Answering Service for Roofers — A Simpler Alternative | " ~ settings.app_name,
+    json_ld='{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Answering Service for Roofers",
+          "url": "' ~ absolute_public_url("/for/roofers") ~ '",
+          "description": "Missed-call recovery and answering service alternative for roofing contractors — instant SMS follow-up when you miss a call."
+        },
+        {
+          "@type": "Service",
+          "name": "' ~ settings.app_name ~ ' for Roofers",
+          "serviceType": "Missed-call recovery and answering service for roofers",
+          "provider": {
+            "@type": "Organization",
+            "name": "' ~ settings.app_name ~ '",
+            "url": "' ~ absolute_public_url("/") ~ '"
+          },
+          "areaServed": "US",
+          "description": "Instant text-back for missed roofing calls, lead intake, and team alerts without a complicated CRM or live receptionist."
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "' ~ absolute_public_url("/") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Answering service guide",
+              "item": "' ~ absolute_public_url("/answering-service") ~ '"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Roofers",
+              "item": "' ~ absolute_public_url("/for/roofers") ~ '"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is ' ~ settings.app_name ~ ' an answering service for roofers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "' ~ settings.app_name ~ ' is an answering service alternative for roofers focused on missed calls. It is not a live receptionist or full call center. It texts missed callers, captures job details, and alerts your team via Backup Mode."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this only for roofers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "This page is tailored for roofing contractors. ' ~ settings.app_name ~ ' also works for plumbers, HVAC, electricians, and other trades."
+              }
+            }
+          ]
+        }
+      ]
+    }'
   ) }}
 {% endblock %}
 
-{% block content %}
+{% block lander_body %}
   <section class="lc-hero lc-lander-hero" aria-labelledby="roofers-hero-title">
     <div class="lc-hero__layout">
       <div class="lc-hero__content">
         <p class="lc-hero__eyebrow">Missed-call recovery for roofing contractors</p>
         <h1 id="roofers-hero-title" class="lc-hero__title">
-          A Simpler Answering Service Alternative for Roofers
+          Answering Service for Roofers — Without the Call Center Bill
         </h1>
         <p class="lc-hero__lead">
-          When you’re on a roof and can’t answer, {{ settings.app_name }} texts missed callers, captures the job details,
-          and alerts you — without making you learn a full CRM.
+          Looking for an answering service for roofers? When you’re on a roof and can’t answer,
+          {{ settings.app_name }} texts missed callers, captures job details, and alerts your crew —
+          missed-call recovery and Backup Mode, not a full live answering service.
         </p>
         <div class="lc-hero__actions">
           <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
@@ -47,21 +115,21 @@
     </div>
   </section>
 
+  {% include "public/landers/_missed_call_flow.html" %}
+  {% include "public/landers/_lander_fit.html" %}
+
   <section class="lc-section" aria-labelledby="roofers-video-title">
-    <header class="lc-page-header">
-      <h2 id="roofers-video-title" class="lc-page-header__title">Built for roofers on the job</h2>
-      <p class="lc-page-header__lead">
-        See how {{ settings.app_name }} turns missed calls into captured leads while your crew stays focused on the roof.
-      </p>
-    </header>
+    {% set lander_video_section_id = "roofers-video-title" %}
+    {% set lander_video_heading = "See Backup Mode in action" %}
+    {% set lander_video_intro = "This short demo shows how a missed call becomes a text conversation your crew can follow up on — even from the roof." %}
+    {% include "public/landers/_lander_video_intro.html" %}
     <div class="lc-lander-video-wrap">
       <video
         class="lc-lander-video"
         controls
         preload="metadata"
         playsinline
-        poster=""
-        aria-label="{{ settings.app_name }} for roofers overview video"
+        aria-label="{{ settings.app_name }} answering service for roofers overview video"
       >
         <source
           src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/LeadCareAI_for_Roofers.mp4"
@@ -190,6 +258,12 @@
         </div>
       </div>
     </div>
+    <p class="lc-text-muted lc-mb-0">
+      Related trades:
+      <a href="/contractors-answering-service-alternative">contractors answering service</a> ·
+      <a href="/for/plumbers">plumbers</a> ·
+      <a href="/answering-service">answering service guides</a>
+    </p>
   </section>
 
   <section class="lc-section">
@@ -221,11 +295,20 @@
     </div>
   </section>
 
+  {% include "public/landers/_lander_cta.html" %}
+
   <section class="lc-section" aria-labelledby="roofers-faq-title">
     <header class="lc-page-header">
       <h2 id="roofers-faq-title" class="lc-page-header__title">Quick answers</h2>
     </header>
     <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} an answering service for roofers?</dt>
+        <dd>
+          {{ settings.app_name }} is an <strong>answering service alternative for roofers</strong> focused on missed calls.
+          It is not a live receptionist or full call center. It texts missed callers, captures job details, and alerts your team via Backup Mode.
+        </dd>
+      </div>
       <div class="lc-faq__item">
         <dt>Do I need a new business phone number?</dt>
         <dd>
@@ -243,8 +326,9 @@
         <dt>Is this only for roofers?</dt>
         <dd>
           This page is tailored for roofing contractors. {{ settings.app_name }} also works for
-          <a href="/for/plumbers">plumbers</a>, HVAC, electricians, and other local service businesses —
-          <a href="/">see the main site</a>.
+          <a href="/for/plumbers">plumbers</a>, HVAC, electricians, and other trades —
+          see the <a href="/contractors-answering-service-alternative">contractors answering service</a> page and
+          <a href="/answering-service">answering service hub</a>.
         </dd>
       </div>
     </dl>

@@ -1,0 +1,369 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Virtual Answering Service Alternative for Small Service Businesses | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Looking for a virtual answering service? " ~ settings.app_name ~ " helps small service businesses recover missed calls with instant text-back, AI-assisted lead intake, staff alerts, and a simple dashboard.",
+    keywords="virtual answering service alternative, virtual answering service, virtual receptionist alternative, virtual phone answering service, remote receptionist alternative, virtual assistant answering service, contractor answering service alternative, missed call text back, missed call recovery, LeadCare AI",
+    canonical_path="/virtual-answering-service-alternative",
+    og_title="A Simpler Virtual Answering Service Alternative",
+    og_description=settings.app_name ~ " texts missed callers, captures job details, and alerts your team — a virtual answering service alternative without hiring a remote receptionist or heavy CRM.",
+    twitter_title="Virtual Answering Service Alternative for Small Service Businesses",
+    twitter_description="Catch missed calls without a virtual receptionist. " ~ settings.app_name ~ " keeps leads alive with instant text-back for busy service businesses.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "' ~ settings.app_name ~ '",
+      "serviceType": "Virtual answering service alternative and missed-call recovery",
+      "provider": {
+        "@type": "Organization",
+        "name": "' ~ settings.app_name ~ '",
+        "url": "' ~ absolute_public_url("/") ~ '"
+      },
+      "areaServed": "United States",
+      "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard.",
+      "offers": {
+        "@type": "Offer",
+        "price": "147",
+        "priceCurrency": "USD",
+        "description": "$147/month Growth plan with $199 setup fee"
+      }
+    }'
+  ) }}
+{% endblock %}
+
+{% block lander_body %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="vas-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Virtual answering service alternative · small service businesses</p>
+        <h1 id="vas-hero-title" class="lc-hero__title">
+          A Simpler Virtual Answering Service Alternative
+        </h1>
+        <p class="lc-hero__lead">
+          Catch missed calls without hiring a virtual receptionist. You may not need a remote receptionist —
+          you may just need missed callers to get an instant text-back when you, your family, or your team cannot answer.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          {{ settings.app_name }} texts missed callers right away, asks what they need, captures job details, and alerts your business.
+        </p>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/backup-mode">See how Backup Mode works</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-catch-title">
+    <header class="lc-page-header">
+      <h2 id="vas-catch-title" class="lc-page-header__title">Missed-Call Recovery Without a Virtual Receptionist</h2>
+    </header>
+    <p class="lc-text-muted">
+      No full virtual receptionist. No complicated CRM. No voicemail waiting game. Just fast missed-call recovery for busy service businesses.
+    </p>
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} virtual answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive.</p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-why-title">
+    <header class="lc-page-header">
+      <h2 id="vas-why-title" class="lc-page-header__title">Why Businesses Look for a Virtual Answering Service</h2>
+    </header>
+    <p class="lc-text-muted">
+      Most small businesses do not start looking for a virtual answering service because they want more software.
+      They look because calls are being missed.
+    </p>
+    <ul class="lc-text-muted">
+      <li>The owner is in the field or driving</li>
+      <li>Family or office help is busy with another customer</li>
+      <li>The phone rings after hours, on weekends, or during lunch</li>
+      <li>Nobody can answer every call — and urgent callers may dial the next company</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      The real problem is simple: <strong>missed calls become lost jobs.</strong>
+      {{ settings.app_name }} focuses on recovering those calls, not replacing a full remote receptionist team.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-does-title">
+    <header class="lc-page-header">
+      <h2 id="vas-does-title" class="lc-page-header__title">{{ settings.app_name }} Is Built for the Calls That Slip Through</h2>
+    </header>
+    <p class="lc-text-muted">
+      {{ settings.app_name }} does not try to replace a full virtual receptionist. It focuses on one high-value job:
+      <strong>recover missed calls before they become lost jobs.</strong>
+    </p>
+    <div class="lc-lander-chat" role="group" aria-label="Sample virtual answering SMS thread">
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+        Sorry we missed your call. What can we help with today?
+      </div>
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+        Water heater leaking in the garage.
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} saves the conversation, captures lead details, helps identify urgency, and alerts your team by SMS or email.
+      The lead appears in your dashboard so you can follow up.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-not-full-title">
+    <header class="lc-page-header">
+      <h2 id="vas-not-full-title" class="lc-page-header__title">Not a Live Remote Receptionist. A Missed-Call Safety Net.</h2>
+    </header>
+    <p class="lc-text-muted">
+      Traditional virtual answering services can be useful when you need live people answering every call with scripts and handoffs.
+      Many small service businesses only need backup when nobody can pick up.
+    </p>
+    <p class="lc-text-muted">
+      {{ settings.app_name }} is a <strong>virtual answering service alternative</strong> for missed calls — not a live call center or virtual assistant answering every ring.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      Related angles:
+      <a href="/business-answering-service-alternative">business answering service alternative</a> ·
+      <a href="/phone-answering-service">phone answering service alternative</a> ·
+      <a href="/responsive-answering-service-alternative">responsive answering service alternative</a> ·
+      <a href="/247-answering-service-alternative">24/7 answering service alternative</a>
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-backup-title">
+    <header class="lc-page-header">
+      <h2 id="vas-backup-title" class="lc-page-header__title">Backup Mode for Your Business Phone</h2>
+    </header>
+    <p class="lc-text-muted">
+      Most mobile business lines support call forwarding through your carrier. When Backup Mode is on, your phone rings like normal.
+      If nobody answers, the line is busy, or the phone is unreachable, the call forwards to your {{ settings.app_name }} number — then we text the caller.
+    </p>
+    <p class="lc-lander-emphasis lc-mb-0">
+      Your phone already has the switch. {{ settings.app_name }} turns that switch into a lead-saving system.
+      <a href="/backup-mode">Backup Mode details</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-industries-title">
+    <header class="lc-page-header">
+      <h2 id="vas-industries-title" class="lc-page-header__title">Built for Service Businesses</h2>
+      <p class="lc-page-header__lead">Where a missed call can mean a missed job.</p>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/plumbers">Plumbers</a></li>
+      <li><a href="/for/roofers">Roofers</a></li>
+      <li>HVAC companies</li>
+      <li>Electricians</li>
+      <li>Garage door repair</li>
+      <li>Locksmiths</li>
+      <li>Pest control</li>
+      <li>Appliance repair</li>
+      <li>Landscapers</li>
+      <li>Cleaners</li>
+      <li>Mobile mechanics</li>
+      <li>Water damage companies</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      Broader overview: <a href="/answering-service-alternative">answering service alternative</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-family-title">
+    <header class="lc-page-header">
+      <h2 id="vas-family-title" class="lc-page-header__title">Give Your Family and Team Backup</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      A lot of small service businesses are family-run. {{ settings.app_name }} does not replace your spouse, mom, or office helper —
+      it gives them backup when life gets busy, so missed callers still get a fast response.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-text-title">
+    <header class="lc-page-header">
+      <h2 id="vas-text-title" class="lc-page-header__title">Why Text-Back Works</h2>
+    </header>
+    <p class="lc-text-muted">
+      Voicemail asks the customer to wait. {{ settings.app_name }} starts a conversation immediately. A missed caller can quickly reply with:
+    </p>
+    <ul class="lc-text-muted">
+      <li>“Roof leak”</li>
+      <li>“No heat”</li>
+      <li>“Water heater leaking”</li>
+      <li>“Garage door stuck”</li>
+      <li>“Need pest control”</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      That gives you the information you need to follow up faster — without hiring a virtual receptionist for every missed ring.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-compare-title">
+    <header class="lc-page-header">
+      <h2 id="vas-compare-title" class="lc-page-header__title">Virtual Answering Service vs {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">Virtual answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Remote receptionist or call center model</td>
+              <td>Instant missed-call text-back</td>
+            </tr>
+            <tr>
+              <td>May answer calls live</td>
+              <td>Responds when calls are missed</td>
+            </tr>
+            <tr>
+              <td>Scripts and handoffs</td>
+              <td>Captures job details by SMS</td>
+            </tr>
+            <tr>
+              <td>Often priced by package, call, or minute</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>Useful for full call coverage</td>
+              <td>Ideal for missed-call backup</td>
+            </tr>
+            <tr>
+              <td>Call handling instructions required</td>
+              <td>Simple Backup Mode setup</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a simpler <strong>virtual answering service alternative</strong> when your main problem is missed calls, not live reception coverage all day.
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Simple pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup fee · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Setup includes onboarding, number assignment, Backup Mode guidance, and launch verification.
+          One recovered job can often pay for the service.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="vas-demo-title">
+    <h2 id="vas-demo-title">Try the interactive demo</h2>
+    <p>See what happens when a missed caller gets an instant text-back.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="vas-faq-title">
+    <header class="lc-page-header">
+      <h2 id="vas-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} a virtual answering service?</dt>
+        <dd>
+          {{ settings.app_name }} is a <strong>virtual answering service alternative</strong> for missed calls.
+          It does not provide a live remote receptionist. It texts missed callers, captures job details, and alerts your team.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace a receptionist or family helper?</dt>
+        <dd>
+          No. It gives them backup when they are busy, away, asleep, or already helping someone else.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this work after hours?</dt>
+        <dd>
+          Yes, if your business forwards missed or unanswered calls to {{ settings.app_name }}.
+          We can text missed callers and collect details even when you are not available.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Do I need a CRM?</dt>
+        <dd>
+          No. {{ settings.app_name }} is intentionally simple — missed-call text-back, lead details, alerts, and a basic dashboard.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How does Backup Mode work?</dt>
+        <dd>
+          You forward missed, busy, or unanswered calls to your {{ settings.app_name }} number.
+          We text those callers and capture the details. Setup is verified with a live test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does call forwarding work with every phone?</dt>
+        <dd>
+          Carrier settings vary. Most mobile-first service businesses on major carriers can use call forwarding —
+          we guide setup and test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this for emergencies?</dt>
+        <dd>
+          No. {{ settings.app_name }} is not 911 or emergency dispatch. Dangerous or life-threatening situations require emergency services.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="vas-final-cta">
+    <h2 id="vas-final-cta">You do not need to answer every call yourself</h2>
+    <p>But missed calls do not have to become lost jobs.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try {{ settings.app_name }} today</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Telephone Answering Service Alternative for Small Service Businesses | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Need a telephone answering service? " ~ settings.app_name ~ " helps small service businesses recover missed calls with instant text-back, AI-assisted lead intake, staff alerts, and a simple dashboard.",
+    keywords="telephone answering service alternative, telephone answering service, small business telephone answering service, telephone answering service for contractors, phone answering service, call answering service, business answering service, answering service alternative, missed call text back, missed call recovery, after hours telephone answering service, LeadCare AI",
+    canonical_path="/telephone-answering-service-alternative",
+    og_title="A Modern Telephone Answering Service Alternative",
+    og_description=settings.app_name ~ " texts missed callers, captures job details, and alerts your team — a telephone answering service alternative without a full call center or heavy CRM.",
+    twitter_title="Telephone Answering Service Alternative for Small Service Businesses",
+    twitter_description="Catch missed calls before they become lost jobs. " ~ settings.app_name ~ " keeps leads alive with instant text-back for busy service businesses.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "' ~ settings.app_name ~ '",
+      "serviceType": "Telephone answering service alternative and missed-call recovery",
+      "provider": {
+        "@type": "Organization",
+        "name": "' ~ settings.app_name ~ '",
+        "url": "' ~ absolute_public_url("/") ~ '"
+      },
+      "areaServed": "United States",
+      "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard.",
+      "offers": {
+        "@type": "Offer",
+        "price": "147",
+        "priceCurrency": "USD",
+        "description": "$147/month Growth plan with $199 setup fee"
+      }
+    }'
+  ) }}
+{% endblock %}
+
+{% block lander_body %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="tas-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Telephone answering service alternative · missed-call backup</p>
+        <h1 id="tas-hero-title" class="lc-hero__title">
+          A Modern Telephone Answering Service Alternative
+        </h1>
+        <p class="lc-hero__lead">
+          Need a telephone answering service? If customers call and nobody answers, they may dial the next company.
+          {{ settings.app_name }} helps you recover those missed calls with instant text-back — not a full call center.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          When you miss a call, {{ settings.app_name }} texts the caller right away, captures job details, and alerts your team.
+        </p>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/backup-mode">See how Backup Mode works</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-card" aria-labelledby="tas-fit-title">
+    <div class="lc-card__body">
+      <h2 id="tas-fit-title" class="lc-card__title">Classic Telephone Answering Service vs {{ settings.app_name }}</h2>
+      <p class="lc-text-muted">
+        <strong>If you need live operators answering every call,</strong> a traditional telephone answering service may be the right fit.
+        {{ settings.app_name }} does not provide live human receptionists.
+      </p>
+      <p class="lc-text-muted lc-mb-0">
+        <strong>If your main problem is missed calls turning into lost jobs,</strong> {{ settings.app_name }} may be simpler — instant SMS when nobody can pick up.
+      </p>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-catch-title">
+    <header class="lc-page-header">
+      <h2 id="tas-catch-title" class="lc-page-header__title">Telephone Answering Backup for Missed Calls</h2>
+    </header>
+    <p class="lc-text-muted">
+      No full call center. No complicated CRM. No voicemail waiting game. Just fast missed-call recovery for busy service businesses.
+    </p>
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} telephone answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive.</p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-why-title">
+    <header class="lc-page-header">
+      <h2 id="tas-why-title" class="lc-page-header__title">Why Businesses Look for a Telephone Answering Service</h2>
+    </header>
+    <p class="lc-text-muted">
+      Most owners do not want another system to manage. They search because calls are being missed — on a job, driving, with family, or after hours.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      Nobody can answer every call. If customers do not get a response, they may call someone else.
+      A <strong>telephone answering service alternative</strong> focused on missed-call text-back can close that gap.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-does-title">
+    <header class="lc-page-header">
+      <h2 id="tas-does-title" class="lc-page-header__title">What {{ settings.app_name }} Does</h2>
+    </header>
+    <div class="lc-lander-chat" role="group" aria-label="Sample telephone answering SMS thread">
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+        Sorry we missed your call. What can we help with today?
+      </div>
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+        Water is leaking through the ceiling.
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} captures job details, saves the conversation, helps identify urgency, and alerts your business by SMS or email.
+      The missed call becomes a lead you can follow up on — not voicemail waiting until morning.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-not-traditional-title">
+    <header class="lc-page-header">
+      <h2 id="tas-not-traditional-title" class="lc-page-header__title">Not a Traditional Telephone Answering Service</h2>
+    </header>
+    <p class="lc-text-muted">
+      A traditional telephone answering service usually uses live operators to answer calls. Many small businesses only need backup for calls that slip through.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} does not pretend to be a live telephone receptionist. It focuses on one job:
+      <strong>when you miss the call, keep the lead alive.</strong>
+      Compare: <a href="/phone-answering-service">phone answering service</a> ·
+      <a href="/answering-call-service-alternative">answering call service alternative</a>
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-backup-title">
+    <header class="lc-page-header">
+      <h2 id="tas-backup-title" class="lc-page-header__title">Backup Mode for Your Business Phone</h2>
+    </header>
+    <p class="lc-text-muted">
+      When Backup Mode is on, your phone rings like normal. If nobody answers, the line is busy, or the phone is unreachable,
+      the call forwards to your {{ settings.app_name }} number — then we text the caller and capture job details.
+    </p>
+    <p class="lc-lander-emphasis lc-mb-0">
+      Your phone already has the switch. {{ settings.app_name }} turns that switch into a lead-saving system.
+      <a href="/backup-mode">Backup Mode details</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-industries-title">
+    <header class="lc-page-header">
+      <h2 id="tas-industries-title" class="lc-page-header__title">Built for Local Service Businesses</h2>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/plumbers">Plumbers</a></li>
+      <li><a href="/for/roofers">Roofers</a></li>
+      <li><a href="/contractors-answering-service-alternative">Contractors</a></li>
+      <li>HVAC companies</li>
+      <li>Electricians</li>
+      <li>Garage door repair</li>
+      <li>Locksmiths</li>
+      <li>Pest control</li>
+      <li>Landscapers</li>
+      <li>Mobile mechanics</li>
+    </ul>
+    <p class="lc-text-muted lc-mb-0">
+      Hub: <a href="/answering-service">answering service</a> ·
+      <a href="/answering-service-alternative">answering service alternative</a>
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-family-title">
+    <header class="lc-page-header">
+      <h2 id="tas-family-title" class="lc-page-header__title">Give Your Family and Team Backup</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} does not replace your spouse, mom, or office helper — it gives them backup when life gets busy,
+      so missed callers still get a fast response.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-compare-title">
+    <header class="lc-page-header">
+      <h2 id="tas-compare-title" class="lc-page-header__title">Telephone Answering Service vs {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">Traditional telephone answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Live operators may answer calls</td>
+              <td>Instant text-back to missed callers</td>
+            </tr>
+            <tr>
+              <td>Often priced by call, minute, or package</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>Useful for full live call coverage</td>
+              <td>Built for missed-call recovery</td>
+            </tr>
+            <tr>
+              <td>Scripts and handoffs</td>
+              <td>Captures job details by SMS</td>
+            </tr>
+            <tr>
+              <td>Human receptionist model</td>
+              <td>Missed-call safety net model</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a simpler <strong>telephone answering service alternative</strong> when missed calls are the main problem.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-voicemail-title">
+    <header class="lc-page-header">
+      <h2 id="tas-voicemail-title" class="lc-page-header__title">Why Voicemail Is Too Slow</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      Voicemail waits. {{ settings.app_name }} responds immediately. A fast text-back keeps the conversation alive while the customer is still interested.
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Simple pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup fee · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Setup includes onboarding, number assignment, Backup Mode guidance, and launch verification.
+          One recovered job can often pay for the service.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="tas-demo-title">
+    <h2 id="tas-demo-title">Try the interactive demo</h2>
+    <p>See what happens when a missed caller gets an instant text-back.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="tas-faq-title">
+    <header class="lc-page-header">
+      <h2 id="tas-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} a telephone answering service?</dt>
+        <dd>
+          {{ settings.app_name }} is a <strong>telephone answering service alternative</strong> for missed calls — not live human receptionists.
+          It texts missed callers, captures job details, and alerts your team.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does {{ settings.app_name }} replace a live answering service?</dt>
+        <dd>
+          No. If you need live people answering every call, a traditional telephone answering service may be a better fit.
+          {{ settings.app_name }} focuses on missed-call recovery by text.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How is this different from a phone answering service?</dt>
+        <dd>
+          Same missed-call backup model — different search phrasing. See our <a href="/phone-answering-service">phone answering service</a> page for the phone-keyword angle.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace voicemail?</dt>
+        <dd>
+          For many missed calls, yes. Instead of waiting for voicemail, {{ settings.app_name }} starts a text conversation immediately.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this work after hours?</dt>
+        <dd>
+          Yes, when missed calls forward to {{ settings.app_name }}.
+          See <a href="/after-hours-answering-service-alternative">after-hours answering service alternative</a>.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How does Backup Mode work?</dt>
+        <dd>
+          You forward missed, busy, or unanswered calls to your {{ settings.app_name }} number.
+          We text those callers and capture the details. Setup is verified with a live test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this for emergencies?</dt>
+        <dd>
+          No. {{ settings.app_name }} is not 911 or emergency dispatch. Dangerous situations require emergency services.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="tas-final-cta">
+    <h2 id="tas-final-cta">You do not need to lose customers because nobody answered</h2>
+    <p>Try {{ settings.app_name }} today.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try {{ settings.app_name }}</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,361 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}After-Hours Answering Service Alternative for Small Service Businesses | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Need an after-hours answering service? " ~ settings.app_name ~ " helps small service businesses recover missed calls after hours with instant text-back, job detail capture, staff alerts, and a simple dashboard.",
+    keywords="after hours answering service, after-hours answering service, after hours answering service alternative, after-hours phone answering service, after hours call answering service, missed call text back after hours, after hours missed call service, contractor after hours answering service, business answering service after hours, answering service alternative, LeadCare AI",
+    canonical_path="/after-hours-answering-service-alternative",
+    og_title="A Simpler After-Hours Answering Service Alternative",
+    og_description=settings.app_name ~ " texts missed callers after hours, captures job details, and alerts your team — an after-hours answering service alternative without a full overnight call center.",
+    twitter_title="After-Hours Answering Service Alternative for Small Service Businesses",
+    twitter_description="Your business can be closed, but missed callers can still get a response. " ~ settings.app_name ~ " keeps after-hours leads alive with instant text-back.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "' ~ settings.app_name ~ '",
+      "serviceType": "After-hours answering service alternative and missed-call recovery",
+      "provider": {
+        "@type": "Organization",
+        "name": "' ~ settings.app_name ~ '",
+        "url": "' ~ absolute_public_url("/") ~ '"
+      },
+      "areaServed": "United States",
+      "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls after hours with instant text-back, job detail capture, staff alerts, and a simple dashboard.",
+      "offers": {
+        "@type": "Offer",
+        "price": "147",
+        "priceCurrency": "USD",
+        "description": "$147/month Growth plan with $199 setup fee"
+      }
+    }'
+  ) }}
+{% endblock %}
+
+{% block lander_body %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="ahas-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">After-hours answering service alternative · small service businesses</p>
+        <h1 id="ahas-hero-title" class="lc-hero__title">
+          A Simpler After-Hours Answering Service Alternative
+        </h1>
+        <p class="lc-hero__lead">
+          Catch missed calls after hours before they become lost jobs. Your business can be closed,
+          but missed callers can still get a response — without being tied to the phone all evening.
+        </p>
+        <p class="lc-text-muted lc-mb-0">
+          {{ settings.app_name }} helps you respond to missed calls at dinner, on weekends, and when the office is closed —
+          with instant text-back, job detail capture, and staff alerts.
+        </p>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/backup-mode">See how Backup Mode works</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {% include "public/landers/_missed_call_flow.html" %}
+
+  <section class="lc-section" aria-labelledby="ahas-catch-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-catch-title" class="lc-page-header__title">After-Hours Missed-Call Recovery Without a Call Center</h2>
+    </header>
+    <p class="lc-text-muted">
+      Customers call at dinner, on weekends, when your family is busy, and when you are done for the day.
+      No full call center. No complicated CRM. Just after-hours missed-call recovery for busy local businesses.
+    </p>
+    {% set lander_video_heading = "See what happens when a caller gets missed" %}
+    {% include "public/landers/_lander_video_intro.html" %}
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="{{ settings.app_name }} after-hours answering service alternative overview"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/Missed-Call_Safety_Net.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center lc-mb-0">When you miss the call, keep the lead alive — even after hours.</p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-problem-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-problem-title" class="lc-page-header__title">After-Hours Calls Can Be High-Value</h2>
+    </header>
+    <p class="lc-text-muted">
+      After-hours calls are often urgent: water through the ceiling, no heat, storm damage, electrical issues, or a job they want scheduled before tomorrow.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      If nobody responds, they may not wait until morning. They may call the next company.
+      That is how an after-hours missed call becomes a lost job.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-fit-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-fit-title" class="lc-page-header__title">When a Full After-Hours Answering Service Is More Than You Need</h2>
+    </header>
+    <p class="lc-text-muted">
+      Live overnight operators can be useful if you need every call answered by a human. Many small businesses only need backup when a call is missed —
+      without paying for full coverage, call scripts, handoffs, or a complicated CRM.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a simpler layer. Broader always-on angle:
+      <a href="/247-answering-service-alternative">24/7 answering service alternative</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-does-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-does-title" class="lc-page-header__title">What {{ settings.app_name }} Does After Hours</h2>
+    </header>
+    <p class="lc-text-muted">When an after-hours call is missed, {{ settings.app_name }} sends the caller a text right away:</p>
+    <div class="lc-lander-chat" role="group" aria-label="Sample after-hours SMS thread">
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+        Sorry we missed your call. What can we help with today?
+      </div>
+      <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+        Water heater leaking in the garage.
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} captures job details, saves the conversation, helps identify urgency, and alerts your team by SMS or email.
+      The missed call is not sitting in voicemail — it is a lead you can act on.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-backup-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-backup-title" class="lc-page-header__title">Backup Mode for Nights, Weekends, and Busy Moments</h2>
+    </header>
+    <p class="lc-text-muted">
+      Most mobile business lines support call forwarding through your carrier. When Backup Mode is on, your phone rings like normal.
+      If nobody answers, the line is busy, or the phone is unreachable, the call forwards to your {{ settings.app_name }} number — then we text the caller.
+    </p>
+    <p class="lc-text-muted">Use Backup Mode when the workday is over, you are at dinner, family needs attention, it is the weekend, or you want after-hours backup without a full answering service.</p>
+    <p class="lc-lander-emphasis lc-mb-0">
+      Your phone already has the switch. {{ settings.app_name }} turns that switch into a lead-saving system.
+      <a href="/backup-mode">Backup Mode details</a>.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-industries-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-industries-title" class="lc-page-header__title">Built for Local Service Businesses</h2>
+      <p class="lc-page-header__lead">Where after-hours calls can matter.</p>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/plumbers">Plumbers</a></li>
+      <li><a href="/for/roofers">Roofers</a></li>
+      <li><a href="/contractors-answering-service-alternative">Contractors</a></li>
+      <li>HVAC companies</li>
+      <li>Electricians</li>
+      <li>Garage door repair</li>
+      <li>Locksmiths</li>
+      <li>Pest control</li>
+      <li>Appliance repair</li>
+      <li>Landscapers</li>
+      <li>Cleaners</li>
+      <li>Mobile mechanics</li>
+      <li>Water damage companies</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-family-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-family-title" class="lc-page-header__title">Give Your Family and Team Breathing Room</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      After hours, everyone deserves breathing room. {{ settings.app_name }} does not replace your family or team —
+      it helps protect their time while keeping leads from disappearing.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-compare-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-compare-title" class="lc-page-header__title">After-Hours Answering Service vs {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">After-hours answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Live operators may answer overnight</td>
+              <td>Instant text-back to missed callers</td>
+            </tr>
+            <tr>
+              <td>Often priced by package, call, or minute</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>Useful for full overnight coverage</td>
+              <td>Built for missed-call backup</td>
+            </tr>
+            <tr>
+              <td>Scripts and handoffs</td>
+              <td>Captures job details by SMS</td>
+            </tr>
+            <tr>
+              <td>Human receptionist model</td>
+              <td>Backup Mode for your phone</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a simpler <strong>after-hours answering service alternative</strong> when your main problem is missed calls after the workday ends.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="ahas-voicemail-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-voicemail-title" class="lc-page-header__title">Why Voicemail Is Too Slow After Hours</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      Voicemail waits until someone checks it. {{ settings.app_name }} responds immediately.
+      A customer with an urgent repair may not wait for a callback the next morning —
+      a quick text-back keeps the conversation alive while they are still interested.
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Simple pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup fee · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Setup includes onboarding, number assignment, Backup Mode guidance, and launch verification.
+          One recovered after-hours job can often pay for the service.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="ahas-demo-title">
+    <h2 id="ahas-demo-title">Try the interactive demo</h2>
+    <p>See how {{ settings.app_name }} responds when a missed caller reaches out after hours.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
+    </div>
+  </section>
+
+  {% include "public/landers/_lander_cta.html" %}
+
+  <section class="lc-section" aria-labelledby="ahas-faq-title">
+    <header class="lc-page-header">
+      <h2 id="ahas-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} an after-hours answering service?</dt>
+        <dd>
+          {{ settings.app_name }} is an <strong>after-hours answering service alternative</strong> for missed calls — not live human receptionists.
+          It texts missed callers, captures job details, and alerts your team.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does {{ settings.app_name }} work overnight?</dt>
+        <dd>
+          {{ settings.app_name }} can respond by text when missed calls are forwarded to your {{ settings.app_name }} number.
+          Your team decides how and when to follow up.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace a live answering service?</dt>
+        <dd>
+          No. If you need live operators answering every call overnight, a traditional answering service may be a better fit.
+          {{ settings.app_name }} focuses on missed-call recovery by text.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace voicemail?</dt>
+        <dd>
+          For many missed calls, yes. Instead of waiting for voicemail, {{ settings.app_name }} starts a text conversation immediately.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace my wife, office helper, or receptionist?</dt>
+        <dd>
+          No. It gives them backup when they are busy, away, asleep, or already helping someone else.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Do I need a full CRM?</dt>
+        <dd>
+          No. {{ settings.app_name }} focuses on missed-call text-back, job details, alerts, and a simple dashboard.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How does Backup Mode work?</dt>
+        <dd>
+          You forward missed, busy, or unanswered calls to your {{ settings.app_name }} number.
+          We text those callers and capture the details. Setup is verified with a live test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does call forwarding work with every phone?</dt>
+        <dd>
+          Carrier settings vary. Most mobile-first businesses on major carriers can use call forwarding —
+          we guide setup and test before launch.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this for emergencies?</dt>
+        <dd>
+          No. {{ settings.app_name }} is not 911 or emergency dispatch. Dangerous or life-threatening situations require emergency services.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="ahas-final-cta">
+    <h2 id="ahas-final-cta">Your business may close for the day</h2>
+    <p>But missed calls do not have to turn into lost jobs.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try {{ settings.app_name }} today</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+{% endblock %}
