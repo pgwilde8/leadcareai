@@ -1,6 +1,55 @@
 {% extends "layout/base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
 
 {% block title %}{{ settings.app_name }} — Stop losing customers when you miss calls{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="LeadCare AI instantly texts missed callers, captures job details, and alerts your team. Missed-call recovery and answering service alternative for plumbers, roofers, HVAC, and local service businesses.",
+    keywords="missed call recovery, answering service alternative, missed call text back, local service business leads, SMS lead capture, call forwarding backup, plumber answering service, roofer missed calls, HVAC lead capture, LeadCare AI",
+    canonical_path="/",
+    og_title=settings.app_name ~ " — Stop losing customers when you miss calls",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "' ~ settings.app_name ~ '",
+          "url": "' ~ absolute_public_url("/") ~ '",
+          "description": "Missed-call recovery for local service businesses — instant SMS follow-up when you miss a call."
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "' ~ settings.app_name ~ '",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "url": "' ~ absolute_public_url("/") ~ '",
+          "description": "Missed-call recovery with instant text-back, lead intake, and team alerts for local service businesses.",
+          "offers": {
+            "@type": "Offer",
+            "price": "147",
+            "priceCurrency": "USD",
+            "description": "Growth plan monthly subscription (plus one-time setup)"
+          }
+        },
+        {
+          "@type": "Organization",
+          "name": "' ~ settings.app_name ~ '",
+          "url": "' ~ absolute_public_url("/") ~ '",
+          "logo": "' ~ default_og_image ~ '",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "sales",
+            "email": "' ~ settings.legal_contact_email ~ '",
+            "telephone": "+1-833-669-1335",
+            "areaServed": "US",
+            "availableLanguage": "English"
+          }
+        }
+      ]
+    }'
+  ) }}
+{% endblock %}
 
 {% block container_class %}lc-container--wide{% endblock %}
 
@@ -225,16 +274,16 @@
           <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
           <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
         </div>
-        <p class="lc-text-muted lc-mt-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;"><p>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
           <strong style="color: var(--lc-accent-warm);">1-833-669-1335</strong>
-          · <a href="/demo" style="color: var(--lc-accent-warm);">Try the missed-call demo</a></p>
+          · <a href="/demo" style="color: var(--lc-accent-warm);">Try the missed-call demo</a>
         </p>
       </div>
       <div class="lc-hero__visual" aria-hidden="true">
         <a class="lc-hero__logo" href="/" tabindex="-1">
           <img
             src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
-            alt=""
+            alt="{{ settings.app_name }} — missed-call recovery for local service businesses"
             width="280"
             height="80"
             decoding="async"

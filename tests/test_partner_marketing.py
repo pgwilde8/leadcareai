@@ -60,7 +60,9 @@ def test_active_partner_can_view_resources_playbook(
     assert "Do I have to change my number" in response.text
     assert "carrier" in response.text.lower()
     assert "New rep training videos" in response.text
-    assert "LeadCareAI_Sales_Playbook.mp4" in response.text
+    assert "The_Missed_Call_Problem.mp4" in response.text
+    assert "LeadCareAI_Sales_Playbook%20(1).mp4" in response.text
+    assert "objections.mp4" in response.text
     assert "training-videos" in response.text
 
 

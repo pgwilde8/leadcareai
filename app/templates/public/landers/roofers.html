@@ -1,0 +1,252 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Answering Service Alternative for Roofers | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="LeadCareAI helps roofing contractors recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard. Built for roofers who need backup without a complicated CRM.",
+    keywords="roofing contractor answering service, roofer missed call text back, storm damage lead capture, roofing CRM alternative, missed call recovery roofers, call forwarding roofing business, LeadCareAI roofers",
+    canonical_path="/for/roofers",
+    og_title="Answering Service Alternative for Roofers | " ~ settings.app_name,
+  ) }}
+{% endblock %}
+
+{% block content %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="roofers-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Missed-call recovery for roofing contractors</p>
+        <h1 id="roofers-hero-title" class="lc-hero__title">
+          A Simpler Answering Service Alternative for Roofers
+        </h1>
+        <p class="lc-hero__lead">
+          When you’re on a roof and can’t answer, {{ settings.app_name }} texts missed callers, captures the job details,
+          and alerts you — without making you learn a full CRM.
+        </p>
+        <div class="lc-hero__actions">
+          <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="/demo">Try the missed-call demo</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-video-title">
+    <header class="lc-page-header">
+      <h2 id="roofers-video-title" class="lc-page-header__title">Built for roofers on the job</h2>
+      <p class="lc-page-header__lead">
+        See how {{ settings.app_name }} turns missed calls into captured leads while your crew stays focused on the roof.
+      </p>
+    </header>
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        poster=""
+        aria-label="{{ settings.app_name }} for roofers overview video"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/LeadCareAI_for_Roofers.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/marketing/video/LeadCareAI_for_Roofers.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center">
+      When you miss the call, you don’t lose the customer.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-problem-title">
+    <header class="lc-page-header">
+      <h2 id="roofers-problem-title" class="lc-page-header__title">Sound familiar?</h2>
+    </header>
+    <ul class="lc-lander-pain">
+      <li>
+        <strong>On a steep roof</strong>
+        You can’t safely grab the phone — but the homeowner still needs an answer.
+      </li>
+      <li>
+        <strong>Storm season rush</strong>
+        Multiple calls stack up while your crew is already booked.
+      </li>
+      <li>
+        <strong>After-hours leaks</strong>
+        Urgent jobs call at night; voicemail feels too slow when water is coming in.
+      </li>
+      <li>
+        <strong>No time for a CRM</strong>
+        You need leads captured and texted back — not another system to manage.
+      </li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-how-title">
+    <header class="lc-page-header">
+      <h2 id="roofers-how-title" class="lc-page-header__title">How it works</h2>
+      <p class="lc-page-header__lead">
+        Your business number still rings like normal. When nobody answers, {{ settings.app_name }} Backup Mode catches the lead.
+      </p>
+    </header>
+    <ol class="lc-lander-steps">
+      <li>
+        <strong>Missed, busy, or unanswered call</strong>
+        <p class="lc-text-muted lc-mb-0">
+          Your phone provider forwards the call to your {{ settings.app_name }} recovery number (we guide setup and run a live test).
+        </p>
+      </li>
+      <li>
+        <strong>Instant text to the homeowner</strong>
+        <p class="lc-text-muted lc-mb-0">
+          The caller gets a friendly SMS asking about the roof issue, location, and urgency — while they’re still interested.
+        </p>
+      </li>
+      <li>
+        <strong>Lead saved and your team alerted</strong>
+        <p class="lc-text-muted lc-mb-0">
+          Replies become a clean lead summary in a simple dashboard so you can call back faster.
+        </p>
+      </li>
+    </ol>
+    <p class="lc-mb-0">
+      <a href="/backup-mode">Learn more about Backup Mode</a> — the safety net for calls your team misses.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-example-title">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 id="roofers-example-title" class="lc-card__title">Example: storm damage call</h2>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted">
+          A homeowner calls about shingles blown off after a storm. You’re tied up on another job site.
+        </p>
+        <div class="lc-lander-chat" role="group" aria-label="Sample roofing SMS thread">
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+            Hi, this is Summit Roofing. Sorry we missed your call. What roofing issue can we help with?
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+            Shingles blew off the back of the house — worried about rain tonight.
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+            Got it. What town are you in, and is it actively leaking right now?
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+            Toms River — not dripping yet but exposed.
+          </div>
+        </div>
+        <p class="lc-mb-0">
+          {{ settings.app_name }} flags urgency, saves the thread, and alerts your crew — so the job isn’t lost to the next roofer on Google.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-why-title">
+    <header class="lc-page-header">
+      <h2 id="roofers-why-title" class="lc-page-header__title">Why roofers choose {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-grid lc-grid--2">
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <h3 class="lc-section__title">Not a traditional answering service</h3>
+          <ul class="lc-text-muted">
+            <li>No per-minute phone bills or scripted operators to train.</li>
+            <li>Customers get an immediate text — most won’t leave voicemail.</li>
+            <li>You see issue, town, and urgency before you call back.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <h3 class="lc-section__title">Not a heavy CRM</h3>
+          <ul class="lc-text-muted">
+            <li>Simple lead list and conversation history.</li>
+            <li>Works with the phone and forwarding you already have.</li>
+            <li>One recovered storm job can cover the month.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Growth plan pricing</h2>
+        <p class="lc-lander-pricing__price">$199 one-time setup · $147/month</p>
+        <p class="lc-text-muted">
+          For many roofing contractors, one recovered estimate or repair pays for the entire month.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a demo to get started</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="roofers-cta-title">
+    <h2 id="roofers-cta-title">Try it before you commit</h2>
+    <p>
+      Call the demo line, let it ring through, reply to the text like a real homeowner, and see how a missed call becomes a lead.
+    </p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo">Open live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="roofers-faq-title">
+    <header class="lc-page-header">
+      <h2 id="roofers-faq-title" class="lc-page-header__title">Quick answers</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Do I need a new business phone number?</dt>
+        <dd>
+          No. You keep your current number. {{ settings.app_name }} provides a recovery number for missed, busy, or unanswered forwarding.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Will this work on my carrier?</dt>
+        <dd>
+          Most mobile and business carriers support call forwarding. We guide setup and perform a live test before launch.
+          See <a href="/backup-mode">Backup Mode</a> for details.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this only for roofers?</dt>
+        <dd>
+          This page is tailored for roofing contractors. {{ settings.app_name }} also works for
+          <a href="/for/plumbers">plumbers</a>, HVAC, electricians, and other local service businesses —
+          <a href="/">see the main site</a>.
+        </dd>
+      </div>
+    </dl>
+  </section>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Answering Service Alternative for Plumbers | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="LeadCareAI helps plumbing contractors recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard. Built for plumbers who need backup without a complicated CRM.",
+    keywords="plumber answering service alternative, plumbing missed call text back, emergency plumber lead capture, plumbing CRM alternative, missed call recovery plumbers, call forwarding plumbing business, water leak callback, LeadCareAI plumbers",
+    canonical_path="/for/plumbers",
+    og_title="Answering Service Alternative for Plumbers | " ~ settings.app_name,
+  ) }}
+{% endblock %}
+
+{% block content %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="plumbers-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Missed-call recovery for plumbing contractors</p>
+        <h1 id="plumbers-hero-title" class="lc-hero__title">
+          A Simpler Answering Service Alternative for Plumbers
+        </h1>
+        <p class="lc-hero__lead">
+          When you’re under a sink, on a job, or driving, {{ settings.app_name }} texts missed callers, captures the job details,
+          and alerts you — without making you learn a full CRM.
+        </p>
+        <div class="lc-hero__actions">
+          <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a demo</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="/demo">Try the missed-call demo</a> (Joe’s Plumbing Demo)
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-video-title">
+    <header class="lc-page-header">
+      <h2 id="plumbers-video-title" class="lc-page-header__title">Built for plumbers in the field</h2>
+      <p class="lc-page-header__lead">
+        Why missed calls cost plumbing businesses money — and how instant text-back keeps the lead alive.
+      </p>
+    </header>
+    <div class="lc-lander-video-wrap">
+      <video
+        class="lc-lander-video"
+        controls
+        preload="metadata"
+        playsinline
+        aria-label="The missed call problem — overview for local service businesses"
+      >
+        <source
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/training-sales/The_Missed_Call_Problem.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+        <a href="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/training-sales/The_Missed_Call_Problem.mp4">
+          Open the video
+        </a>.
+      </video>
+    </div>
+    <p class="lc-lander-emphasis lc-lander-center">
+      When you miss the call, you don’t lose the customer.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-problem-title">
+    <header class="lc-page-header">
+      <h2 id="plumbers-problem-title" class="lc-page-header__title">Sound familiar?</h2>
+    </header>
+    <ul class="lc-lander-pain">
+      <li>
+        <strong>Hands full on the job</strong>
+        You’re under a cabinet, in a crawl space, or helping another customer — the phone keeps ringing.
+      </li>
+      <li>
+        <strong>Urgent leak calls</strong>
+        Homeowners with water problems call three plumbers. The first to respond often wins.
+      </li>
+      <li>
+        <strong>Family helping answer</strong>
+        Your spouse or office helper covers when they can — but dinner, driving, and after-hours still get missed.
+      </li>
+      <li>
+        <strong>No time for a CRM</strong>
+        You need leads captured and texted back — not another platform to learn.
+      </li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-how-title">
+    <header class="lc-page-header">
+      <h2 id="plumbers-how-title" class="lc-page-header__title">How it works</h2>
+      <p class="lc-page-header__lead">
+        Your business number still rings like normal. When nobody answers, {{ settings.app_name }} Backup Mode catches the lead.
+      </p>
+    </header>
+    <ol class="lc-lander-steps">
+      <li>
+        <strong>Missed, busy, or unanswered call</strong>
+        <p class="lc-text-muted lc-mb-0">
+          Your phone provider forwards the call to your {{ settings.app_name }} recovery number (we guide setup and run a live test).
+        </p>
+      </li>
+      <li>
+        <strong>Instant text to the homeowner</strong>
+        <p class="lc-text-muted lc-mb-0">
+          The caller gets a friendly SMS asking about the plumbing issue, location, and urgency — while they’re still interested.
+        </p>
+      </li>
+      <li>
+        <strong>Lead saved and your team alerted</strong>
+        <p class="lc-text-muted lc-mb-0">
+          Replies become a clean lead summary in a simple dashboard so you can call back faster.
+        </p>
+      </li>
+    </ol>
+    <p class="lc-mb-0">
+      <a href="/backup-mode">Learn more about Backup Mode</a> — the safety net for calls your team misses.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-example-title">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 id="plumbers-example-title" class="lc-card__title">Example: ceiling leak at dinner</h2>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted">
+          Joe owns a plumbing company. His wife usually helps answer, but tonight they’re at dinner. Bob calls because water is leaking through his ceiling.
+        </p>
+        <div class="lc-lander-chat" role="group" aria-label="Sample plumbing SMS thread">
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+            Hi, this is Joe’s Plumbing. Sorry we missed your call. What can we help with today?
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+            Water is coming through the ceiling.
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+            Got it. What town are you in, and is it actively leaking right now?
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+            Round Rock — yes, still dripping.
+          </div>
+        </div>
+        <p class="lc-mb-0">
+          {{ settings.app_name }} flags urgency, saves the lead, and alerts Joe — so Bob doesn’t hang up and call the next plumber on the list.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-why-title">
+    <header class="lc-page-header">
+      <h2 id="plumbers-why-title" class="lc-page-header__title">Why plumbers choose {{ settings.app_name }}</h2>
+    </header>
+    <div class="lc-grid lc-grid--2">
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <h3 class="lc-section__title">Not a traditional answering service</h3>
+          <ul class="lc-text-muted">
+            <li>No per-minute phone bills or scripted operators to train.</li>
+            <li>Customers get an immediate text — most won’t leave voicemail.</li>
+            <li>You see issue, town, and urgency before you call back.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="lc-card">
+        <div class="lc-card__body">
+          <h3 class="lc-section__title">Not a heavy CRM</h3>
+          <ul class="lc-text-muted">
+            <li>Simple lead list and conversation history.</li>
+            <li>Works with the phone and forwarding you already have.</li>
+            <li>One recovered emergency job can cover the month.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Growth plan pricing</h2>
+        <p class="lc-lander-pricing__price">$199 one-time setup · $147/month</p>
+        <p class="lc-text-muted">
+          For many plumbing contractors, one recovered repair or estimate pays for the entire month.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a demo to get started</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="plumbers-cta-title">
+    <h2 id="plumbers-cta-title">Try it before you commit</h2>
+    <p>
+      Call the demo line, let it ring through, reply to the text like a real homeowner, and see how a missed call becomes a lead.
+    </p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo">Open live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="plumbers-faq-title">
+    <header class="lc-page-header">
+      <h2 id="plumbers-faq-title" class="lc-page-header__title">Quick answers</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Do I need a new business phone number?</dt>
+        <dd>
+          No. You keep your current number. {{ settings.app_name }} provides a recovery number for missed, busy, or unanswered forwarding.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Will this work on my carrier?</dt>
+        <dd>
+          Most mobile and business carriers support call forwarding. We guide setup and perform a live test before launch.
+          See <a href="/backup-mode">Backup Mode</a> for details.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Is this only for plumbers?</dt>
+        <dd>
+          This page is tailored for plumbing contractors. {{ settings.app_name }} also works for
+          <a href="/for/roofers">roofers</a>, HVAC, electricians, and other local service businesses —
+          <a href="/">see the main site</a>.
+        </dd>
+      </div>
+    </dl>
+  </section>
+{% endblock %}

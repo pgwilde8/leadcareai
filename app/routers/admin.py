@@ -36,6 +36,7 @@ from app.services import (
     partner_service,
     phone_number_service,
     a2p_packet_service,
+    live_test_runbook_service,
     system_check_service,
     user_invite_service,
 )
@@ -245,6 +246,31 @@ def a2p_packet_page(request: Request, db: Annotated[Session, Depends(get_db)]):
         request,
         "admin/a2p_packet.html",
         {"user": auth, "packet": packet},
+    )
+
+
+@router.get("/live-test-runbook", response_class=HTMLResponse, response_model=None)
+def live_test_runbook_page(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    business_id: str = "",
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    selected_id: uuid.UUID | None = None
+    if business_id.strip():
+        try:
+            selected_id = uuid.UUID(business_id.strip())
+        except ValueError:
+            selected_id = None
+
+    runbook = live_test_runbook_service.build_live_test_runbook(db, business_id=selected_id)
+    return templates.TemplateResponse(
+        request,
+        "admin/live_test_runbook.html",
+        {"user": auth, "runbook": runbook, "selected_business_id": business_id.strip()},
     )
 
 

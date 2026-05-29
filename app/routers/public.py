@@ -5,12 +5,13 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.services import business_lead_checkout_service, business_lead_service, contact_service, demo_live_service
+from app.services.public_seo_service import robots_txt_body, sitemap_xml_body
 from app.services.stripe_service import growth_checkout_configured
 from app.services.referral_service import (
     capture_referral_code,
@@ -21,6 +22,16 @@ from app.services.referral_service import (
 from app.templates import templates
 
 router = APIRouter(tags=["public"])
+
+
+@router.get("/robots.txt", response_class=PlainTextResponse, response_model=None)
+def robots_txt() -> PlainTextResponse:
+    return PlainTextResponse(robots_txt_body(), media_type="text/plain; charset=utf-8")
+
+
+@router.get("/sitemap.xml", response_model=None)
+def sitemap_xml() -> Response:
+    return Response(content=sitemap_xml_body(), media_type="application/xml; charset=utf-8")
 
 
 def _privacy(request: Request) -> HTMLResponse:
@@ -42,6 +53,11 @@ def _refund_policy(request: Request) -> HTMLResponse:
 @router.get("/about", response_class=HTMLResponse, response_model=None)
 def about_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/about.html", {})
+
+
+@router.get("/faq", response_class=HTMLResponse, response_model=None)
+def faq_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "public/faq.html", {})
 
 
 def _client_ip(request: Request) -> str | None:
@@ -122,6 +138,24 @@ def contact_success(request: Request) -> HTMLResponse:
 @router.get("/partners", response_class=HTMLResponse, response_model=None)
 def partners_opportunity_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/partners.html", {})
+
+
+@router.get("/backup-mode", response_class=HTMLResponse, response_model=None)
+def backup_mode_page(request: Request) -> HTMLResponse:
+    """Public Backup Mode sales / education page (logged-in setup is at /business/backup-mode)."""
+    return templates.TemplateResponse(request, "public/backup-mode.html", {})
+
+
+@router.get("/for/plumbers", response_class=HTMLResponse, response_model=None)
+def plumbers_lander_page(request: Request) -> HTMLResponse:
+    """Vertical landing page for plumbing contractors."""
+    return templates.TemplateResponse(request, "public/landers/plumbers.html", {})
+
+
+@router.get("/for/roofers", response_class=HTMLResponse, response_model=None)
+def roofers_lander_page(request: Request) -> HTMLResponse:
+    """Vertical landing page for roofing contractors."""
+    return templates.TemplateResponse(request, "public/landers/roofers.html", {})
 
 
 @router.get("/r/{referral_code}", response_class=HTMLResponse, response_model=None)

@@ -1,0 +1,23 @@
+{# Reusable SEO tags for public marketing pages. Import: {% from "layout/_seo_tags.html" import seo_tags %} #}
+{% macro seo_tags(description, canonical_path="/", keywords=none, og_title=none, og_type="website", og_image=none, robots="index, follow", json_ld=none) %}
+  <meta name="description" content="{{ description }}" />
+  {% if keywords %}
+    <meta name="keywords" content="{{ keywords }}" />
+  {% endif %}
+  <meta name="robots" content="{{ robots }}" />
+  <link rel="canonical" href="{{ absolute_public_url(canonical_path) }}" />
+  <meta property="og:site_name" content="{{ settings.app_name }}" />
+  <meta property="og:type" content="{{ og_type }}" />
+  <meta property="og:url" content="{{ absolute_public_url(canonical_path) }}" />
+  {% set resolved_og_title = og_title or settings.app_name %}
+  <meta property="og:title" content="{{ resolved_og_title }}" />
+  <meta property="og:description" content="{{ description }}" />
+  <meta property="og:image" content="{{ og_image or default_og_image }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{ resolved_og_title }}" />
+  <meta name="twitter:description" content="{{ description }}" />
+  <meta name="twitter:image" content="{{ og_image or default_og_image }}" />
+  {% if json_ld %}
+    <script type="application/ld+json">{{ json_ld|safe }}</script>
+  {% endif %}
+{% endmacro %}

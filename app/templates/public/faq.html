@@ -1,6 +1,16 @@
 {% extends "layout/base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
 
 {% block title %}FAQ — {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Frequently asked questions about LeadCare AI missed-call SMS follow-up, Backup Mode call forwarding, setup, pricing, and compliance for local service businesses.",
+    keywords="LeadCare AI FAQ, missed call recovery questions, call forwarding setup, SMS compliance local business",
+    canonical_path="/faq",
+    og_title="FAQ — " ~ settings.app_name,
+  ) }}
+{% endblock %}
 
 {% block container_class %}lc-container--sm{% endblock %}
 

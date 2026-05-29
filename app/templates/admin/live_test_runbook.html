@@ -1,0 +1,104 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
+
+{% block title %}Live test runbook — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+  <style>
+    .lc-runbook-check-complete { color: var(--lc-success, #0a7a3e); font-weight: 600; }
+    .lc-runbook-check-missing { color: var(--lc-danger, #b42318); font-weight: 600; }
+    .lc-runbook-check-warning { color: var(--lc-warning, #9a6700); font-weight: 600; }
+    .lc-runbook-check-manual { color: var(--lc-primary, #057093); font-weight: 600; }
+    .lc-runbook-manual { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+    .lc-runbook-manual li { margin: 0.35rem 0; }
+    .lc-runbook-links { margin: 0.75rem 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">End-to-end launch test runbook</h1>
+    <p class="lc-admin-header__lead">
+      Repeatable checklist for one complete test customer before real onboarding.
+      Uses database state only — no test SMS, email, or external API calls from this page.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="Launch test runbook">
+    <a href="/admin">← Admin dashboard</a>
+    <a href="/admin/system-check">System Check</a>
+    <a href="/admin/a2p-packet">A2P Packet</a>
+  </nav>
+
+  <div class="lc-alert lc-alert--info" role="note">
+    See <strong>docs/end-to-end-launch-test-v1.md</strong> for the full script, Stripe test card, and troubleshooting.
+  </div>
+
+  <section class="lc-admin-section">
+    <h2 class="lc-admin-section__title">Test business selector</h2>
+    <form method="get" action="/admin/live-test-runbook" class="lc-admin-filter-bar">
+      <label for="business_id">Business</label>
+      <select id="business_id" name="business_id">
+        <option value="">— Select to auto-check records —</option>
+        {% for bid, label in runbook.business_choices %}
+          <option value="{{ bid }}" {% if selected_business_id == bid %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="lc-btn lc-btn--secondary">Load checks</button>
+    </form>
+    {% if runbook.business %}
+      <p class="lc-mb-0"><strong>Selected:</strong> {{ runbook.business.name }} (<code>{{ runbook.business.id }}</code>)</p>
+    {% endif %}
+  </section>
+
+  {% for section in runbook.sections %}
+    <section class="lc-admin-section" id="{{ section.id }}">
+      <h2 class="lc-admin-section__title">{{ section.title }}</h2>
+      <p class="lc-text-muted">{{ section.intro }}</p>
+
+      {% if section.checks %}
+        <div class="lc-table-wrap">
+          <table class="lc-table">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>Status</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for check in section.checks %}
+                <tr>
+                  <td>{{ check.label }}</td>
+                  <td class="lc-runbook-check-{{ check.status }}">{{ check.status }}</td>
+                  <td>{{ check.detail }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      {% if section.manual_steps %}
+        <ol class="lc-runbook-manual">
+          {% for step in section.manual_steps %}
+            <li>{{ step }}</li>
+          {% endfor %}
+        </ol>
+      {% endif %}
+
+      {% if section.links %}
+        <div class="lc-runbook-links">
+          {% for link in section.links %}
+            <a class="lc-btn lc-btn--secondary lc-btn--sm" href="{{ link.href }}">{{ link.label }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </section>
+  {% endfor %}
+{% endblock %}

@@ -1,0 +1,379 @@
+{% extends "layout/base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Backup Mode — Missed Call Safety Net | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="LeadCare AI Backup Mode forwards missed, busy, and unanswered calls to instant SMS follow-up. Keep your business number, capture leads, and stop losing jobs when your team cannot answer.",
+    keywords="backup mode missed calls, call forwarding lead capture, missed call safety net, answering service alternative, local service business phone forwarding, LeadCare AI backup mode",
+    canonical_path="/backup-mode",
+    og_title="Backup Mode — Missed Call Safety Net | " ~ settings.app_name,
+  ) }}
+{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .lc-backup-letter .lc-lead-emphasis {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--lc-primary-dark);
+      line-height: 1.5;
+    }
+    .lc-backup-letter section {
+      margin-bottom: var(--lc-space-8);
+    }
+    .lc-backup-letter h2 {
+      color: var(--lc-primary-dark);
+      margin-top: var(--lc-space-6);
+      margin-bottom: var(--lc-space-3);
+    }
+    .lc-backup-letter ul {
+      margin: 0.5rem 0 1rem 1.25rem;
+      color: var(--lc-text-muted);
+    }
+    .lc-backup-letter li { margin: 0.35rem 0; }
+    .lc-backup-chat {
+      display: flex;
+      flex-direction: column;
+      gap: var(--lc-space-3);
+      max-width: 24rem;
+      margin: var(--lc-space-4) 0;
+    }
+    .lc-backup-chat__bubble {
+      padding: var(--lc-space-3) var(--lc-space-4);
+      border-radius: var(--lc-radius-lg);
+      font-size: 0.92rem;
+      max-width: 95%;
+    }
+    .lc-backup-chat__bubble--out {
+      align-self: flex-end;
+      background: var(--lc-primary);
+      color: var(--lc-text-on-primary);
+      border-bottom-right-radius: var(--lc-radius-sm);
+    }
+    .lc-backup-chat__bubble--in {
+      align-self: flex-start;
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-bottom-left-radius: var(--lc-radius-sm);
+    }
+    .lc-backup-example-lead {
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-radius: var(--lc-radius-md);
+      padding: var(--lc-space-4);
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .lc-backup-pricing {
+      text-align: center;
+      padding: var(--lc-space-6);
+    }
+    .lc-backup-pricing__price {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--lc-primary-dark);
+    }
+    .lc-subject-lines {
+      font-size: 0.9rem;
+      color: var(--lc-text-muted);
+    }
+    .lc-subject-lines li { margin: 0.25rem 0; }
+    .lc-backup-page-logo {
+      margin: var(--lc-space-4) 0 var(--lc-space-6);
+      text-align: left;
+    }
+    .lc-backup-page-logo a {
+      display: inline-block;
+      background: #fff;
+      border-radius: var(--lc-radius-md);
+      padding: var(--lc-space-3) var(--lc-space-4);
+      box-shadow: 0 2px 12px rgba(23, 24, 59, 0.08);
+    }
+    .lc-backup-page-logo img {
+      display: block;
+      max-height: 5rem;
+      max-width: min(16rem, 80vw);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <article class="lc-backup-letter">
+    <header class="lc-page-header">
+      <h1 class="lc-page-header__title">{{ settings.app_name }} Backup Mode</h1>
+      <p class="lc-page-header__lead">
+        Missed-call recovery for local service businesses — when you miss the call, you don’t lose the customer.
+      </p>
+    </header>
+
+    <p class="lc-backup-page-logo">
+      <a href="/" tabindex="-1">
+        <img
+          src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+          alt="{{ settings.app_name }}"
+          width="280"
+          height="80"
+          decoding="async"
+        />
+      </a>
+    </p>
+
+    <section>
+      <p>Dear Business Owner,</p>
+      <p>You already know the feeling.</p>
+      <p>
+        The phone rings while you’re on a job, driving, helping another customer, eating lunch, or finally trying
+        to spend a quiet evening with your family. Later, you look down and see the missed call. Then the question hits:
+      </p>
+      <p class="lc-lead-emphasis">“Was that a good job I just lost?”</p>
+      <p>
+        For local service businesses, missed calls are not just missed calls. They can be missed repairs, estimates,
+        emergencies, repeat customers, and revenue. Most callers do not wait around — if a homeowner has an urgent
+        problem, they usually call the next company.
+      </p>
+      <p>
+        That means a good business can lose money simply because nobody could answer at that exact moment — not because
+        you are careless, but because you are human. No owner, spouse, office helper, or family member should have to be
+        chained to the phone every minute of the day.
+      </p>
+      <p>That is why we built <strong>{{ settings.app_name }} Backup Mode</strong>.</p>
+    </section>
+
+    <section>
+      <h2>A backup system for the calls you miss</h2>
+      <p>
+        {{ settings.app_name }} is a missed-call recovery system for local service businesses. When your business
+        misses a call, {{ settings.app_name }} can instantly text the caller, ask what they need, collect job details,
+        save the lead, and alert you or your team.
+      </p>
+      <p class="lc-lead-emphasis">When you miss the call, you don’t lose the customer.</p>
+      <p>
+        {{ settings.app_name }} is not here to replace you, your spouse, office helper, answering service, or team.
+        It catches the calls that slip through — because even the best businesses miss calls. The difference is whether
+        those missed calls disappear or turn into leads.
+      </p>
+    </section>
+
+    <section>
+      <h2>Your phone already has the switch</h2>
+      <p>
+        Most service businesses already use a phone system that can send missed calls somewhere else — missed-call,
+        busy, or no-answer forwarding through a mobile carrier or phone provider. {{ settings.app_name }} turns that
+        existing feature into a lead-saving system.
+      </p>
+      <ol>
+        <li>Your business phone still rings like normal. You answer when you can.</li>
+        <li>When nobody answers, the line is busy, or the call goes unanswered, the call can forward to your {{ settings.app_name }} recovery number.</li>
+        <li>{{ settings.app_name }} texts the caller right away and starts collecting details.</li>
+      </ol>
+      <p>
+        That is <strong>Backup Mode</strong>. You keep your current business number and workflow.
+        {{ settings.app_name }} gives your missed calls a safety net.
+      </p>
+    </section>
+
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Imagine this</h2>
+      </div>
+      <div class="lc-card__body">
+        <p>
+          You own a plumbing company. Your wife usually helps answer when she can — but tonight she is with the kids,
+          and you are still on a job. A homeowner calls because water is leaking through the ceiling.
+        </p>
+        <p>With Backup Mode, that missed call forwards to your {{ settings.app_name }} recovery number.</p>
+        <div class="lc-backup-chat" aria-label="Example SMS conversation">
+          <div class="lc-backup-chat__bubble lc-backup-chat__bubble--out">
+            Hi, this is Joe’s Plumbing. Sorry we missed your call. What plumbing issue can we help with?
+          </div>
+          <div class="lc-backup-chat__bubble lc-backup-chat__bubble--in">
+            Water is leaking through the ceiling.
+          </div>
+          <div class="lc-backup-chat__bubble lc-backup-chat__bubble--out">
+            Got it. Is it actively leaking right now, and what town are you in?
+          </div>
+        </div>
+        <p class="lc-mb-0">
+          {{ settings.app_name }} saves the conversation, identifies urgency, and sends your team a clean lead summary.
+          The lead is not gone — and your family did not have to drop everything to protect the business phone.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Built for real local businesses</h2>
+      <p>
+        Many small service businesses are family-run: a spouse answers between tasks, you answer between jobs, one office
+        person covers the day — and calls still get missed at lunch, after hours, on weekends, or during busy moments.
+        {{ settings.app_name }} supports that reality. It does not say your team is failing; it gives your business backup.
+      </p>
+    </section>
+
+    <section>
+      <h2>Why voicemail is not enough</h2>
+      <p>Voicemail waits. {{ settings.app_name }} responds.</p>
+      <p>
+        When a customer needs help, they usually want to know someone heard them — not leave a long voicemail and hope
+        for a callback. {{ settings.app_name }} gives an immediate text response, opens a conversation while interest
+        is high, and alerts you so you can follow up faster.
+      </p>
+      <p><strong>Voicemail:</strong> “Leave a message.” · <strong>{{ settings.app_name }}:</strong> “How can we help?”</p>
+    </section>
+
+    <section>
+      <h2>What {{ settings.app_name }} captures</h2>
+      <p>When a missed, busy, or unanswered call reaches {{ settings.app_name }}, the system can text the caller and collect:</p>
+      <ul>
+        <li>Name and service needed</li>
+        <li>Problem or issue and urgency</li>
+        <li>Location or town</li>
+        <li>Preferred callback time</li>
+        <li>Email when needed</li>
+      </ul>
+      <p>Your team receives a clean summary instead of a mystery missed call.</p>
+      <div class="lc-backup-example-lead" role="figure" aria-label="Example lead summary">
+<strong>New urgent lead</strong>
+Water leaking through ceiling
+Customer: Mike
+Location: Toms River
+Urgency: Active leak
+Preferred callback: Tonight
+Summary: Customer needs urgent plumbing help for active ceiling leak.
+      </div>
+    </section>
+
+    <section>
+      <h2>Use Backup Mode when your team needs coverage</h2>
+      <ul>
+        <li>After hours, lunch, or while on another job</li>
+        <li>While driving or helping another customer</li>
+        <li>When the office is short-staffed or your phone is busy</li>
+        <li>When your family is unavailable — or life gets in the way</li>
+      </ul>
+      <p>Your phone can still ring like normal. When you are not available, Backup Mode helps catch the lead.</p>
+    </section>
+
+    <section>
+      <h2>Simple setup. Real support.</h2>
+      <p>
+        {{ settings.app_name }} does not replace your current business number. We provide a recovery number and guide
+        you through setup. In many cases, your phone provider forwards missed, busy, or unanswered calls to that number.
+        We perform a <strong>live test</strong> before marking your account launch-ready so you know it works.
+      </p>
+    </section>
+
+    <section>
+      <h2>What {{ settings.app_name }} does for your business</h2>
+      <ul>
+        <li>Respond instantly to missed callers</li>
+        <li>Capture more leads and reduce lost opportunities</li>
+        <li>Collect job details by text and identify urgent requests</li>
+        <li>Save conversation history and alert your team</li>
+        <li>Follow up faster and protect family time</li>
+        <li>Recover calls that would otherwise disappear</li>
+      </ul>
+      <p>
+        You do not need a complicated CRM, a full-time receptionist for every ring, or a new phone system —
+        just a backup system for missed calls.
+      </p>
+    </section>
+
+    <section class="lc-card lc-backup-pricing">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">The cost of one missed job</h2>
+        <p class="lc-backup-pricing__price">$199 one-time setup · $147/month</p>
+        <p class="lc-text-muted">
+          Growth plan pricing. For many local service businesses, one recovered job can pay for the entire month.
+        </p>
+        <p class="lc-lead-emphasis">Does one lost customer matter? If it does, {{ settings.app_name }} was built for you.</p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a demo to get started</a></p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="lc-alert lc-alert--info" role="note">
+      <h2 class="lc-card__title" style="margin-top: 0;">Important setup note</h2>
+      <p>
+        Call forwarding is controlled by your <strong>phone carrier or provider</strong>.
+        {{ settings.app_name }} cannot automatically turn forwarding on or off for every business phone.
+        We guide setup, provide Backup Mode instructions, and perform a live forwarding test before your system is marked ready.
+      </p>
+      <p class="lc-mb-0">
+        Most major providers support call forwarding, but exact settings, codes, and options vary by provider, plan, and device.
+        Already a customer? See <a href="/business/backup-mode">Backup Mode setup</a> in your business dashboard (login required).
+      </p>
+    </section>
+
+    <section>
+      <h2>Give your business a safety net</h2>
+      <p>
+        When you answer, great. When you cannot, Backup Mode helps catch the lead — so you can keep working, keep living,
+        and stop wondering how many missed calls turned into missed money.
+      </p>
+      <p class="lc-lead-emphasis">
+        {{ settings.app_name }} catches the calls your team misses.<br />
+        When you miss the call, you don’t lose the customer.
+      </p>
+    </section>
+
+    <div class="lc-card lc-mb-1">
+      <div class="lc-card__body">
+        <p class="lc-lead-emphasis lc-mb-0">
+          Your phone already has the switch. {{ settings.app_name }} turns that switch into a lead-saving system.
+        </p>
+      </div>
+    </div>
+
+    <div class="lc-btn-group lc-mb-1">
+      <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call the demo number</a>
+      <a class="lc-btn lc-btn--primary" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+      {% if is_checkout_available() %}
+        <a class="lc-btn lc-btn--secondary" href="/checkout/growth">Growth plan — $199 setup + $147/mo</a>
+      {% endif %}
+    </div>
+
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Email subject ideas (for outreach)</h2>
+      </div>
+      <div class="lc-card__body">
+        <ul class="lc-subject-lines">
+          <li>Your phone already has Backup Mode. {{ settings.app_name }} makes it save leads.</li>
+          <li>Missed calls should not become missed jobs.</li>
+          <li>When you miss the call, don’t lose the customer.</li>
+          <li>A simple backup system for the calls your team misses.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Try the missed-call demo</h2>
+      </div>
+      <div class="lc-card__body">
+        <ol>
+          <li>Call the demo number and let it go unanswered.</li>
+          <li>Reply to the text like a real customer.</li>
+          <li>See how {{ settings.app_name }} turns a missed call into a captured lead.</li>
+        </ol>
+        <div class="lc-btn-group">
+          <a class="lc-btn lc-btn--accent" href="tel:+18336691335">Call 1-833-669-1335</a>
+          <a class="lc-btn lc-btn--primary" href="/demo">Open live demo</a>
+        </div>
+      </div>
+    </section>
+  </article>
+{% endblock %}
