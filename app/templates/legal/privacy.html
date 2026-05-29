@@ -5,13 +5,14 @@
 {% block content %}
   <article>
     <h1>Privacy Policy</h1>
-    <p><strong>Last updated:</strong> May 27, 2026</p>
+    <p><strong>Last updated:</strong> May 28, 2026</p>
+    {% include "legal/_draft_notice.html" %}
 
     <p>
-      {{ settings.app_name }} (“we,” “us,” or “our”) provides software that helps local service businesses
-      follow up on missed calls and manage leads by SMS. This Privacy Policy describes how we collect,
-      use, and share information when you visit our website, use our platform, or interact with SMS
-      programs operated through our service.
+      {{ settings.app_name }} (“we,” “us,” or “our”), operated by Webwise Solutions LLC, provides software that helps
+      local service businesses follow up on missed calls and manage leads by SMS. This Privacy Policy describes how we
+      collect, use, and share information when you visit our website, use our platform, interact with SMS programs
+      operated through our service, or participate in our partner program.
     </p>
 
     <h2>1. Who this policy applies to</h2>
@@ -19,79 +20,111 @@
       <li><strong>Business customers</strong> who subscribe to {{ settings.app_name }}.</li>
       <li><strong>Business staff</strong> who log in to manage leads and messages.</li>
       <li><strong>End users (consumers)</strong> who call or text a business phone number connected to our service.</li>
+      <li><strong>Sales partners</strong> who apply for or participate in referral/commission programs.</li>
       <li><strong>Website visitors</strong> who browse our marketing site or contact us.</li>
     </ul>
 
     <h2>2. Information we collect</h2>
     <p>Depending on how you interact with us, we may collect:</p>
     <ul>
-      <li><strong>Account and business information</strong> — name, email, business name, phone numbers, billing details, and settings you provide.</li>
-      <li><strong>Lead and message data</strong> — phone numbers, message content, call/SMS metadata, lead status, notes, and timestamps when businesses use our platform.</li>
-      <li><strong>Communications</strong> — support requests and correspondence with us.</li>
+      <li><strong>Business contact information</strong> — business name, owner/contact name, email, phone numbers, address, industry, and account settings.</li>
+      <li><strong>Customer lead information</strong> — names, phone numbers, service requests, urgency, notes, lead status, and related intake fields stored in your dashboard.</li>
+      <li><strong>Phone numbers</strong> — business lines, LeadCareAI-assigned numbers, staff notification numbers, and consumer numbers involved in calls or SMS.</li>
+      <li><strong>SMS and call metadata</strong> — timestamps, direction (inbound/outbound), delivery status, carrier-related metadata, and call/SMS identifiers from telecommunications providers.</li>
+      <li><strong>Message content</strong> — text of SMS messages and related conversation history shown in lead timelines.</li>
+      <li><strong>Account and login information</strong> — user email, role, authentication/session data, and invite status for business and admin accounts.</li>
+      <li><strong>Payment and billing references</strong> — subscription status, Stripe customer/subscription identifiers, invoice/payment event references, and checkout-related records (we do not store full payment card numbers).</li>
+      <li><strong>Partner onboarding information</strong> — application details, signed document metadata, referral codes, commission records, and tax information (including encrypted storage of partner tax identification numbers where collected).</li>
+      <li><strong>Communications with us</strong> — support requests, contact form submissions, and correspondence.</li>
       <li><strong>Technical data</strong> — IP address, browser type, device information, and logs needed to operate and secure the service.</li>
     </ul>
 
-    <h2>3. SMS and telecommunications data</h2>
-    <p>
-      When a business uses {{ settings.app_name }} for missed-call recovery or lead follow-up, we process
-      SMS and related telephony data through providers such as Twilio. This may include the phone numbers
-      involved, message body, delivery status, and carrier metadata. Businesses are responsible for obtaining
-      appropriate consent from their customers before sending marketing or automated texts, as described in our
-      <a href="/sms">SMS Program Terms</a>.
-    </p>
-
-    <h2>4. How we use information</h2>
+    <h2>3. How we use information</h2>
     <ul>
-      <li>Provide, maintain, and improve the platform;</li>
-      <li>Route inbound and outbound SMS, create leads, and send notifications to business staff;</li>
-      <li>Process subscriptions and payments;</li>
+      <li>Provide missed-call recovery, SMS text-back, and lead intake;</li>
+      <li>Qualify and organize leads using automated intake and AI-assisted classification;</li>
+      <li>Display leads and message history in the business dashboard;</li>
+      <li>Send email and SMS notifications to business staff about new leads and replies;</li>
+      <li>Process subscriptions and payments through Stripe;</li>
+      <li>Manage partner referrals, commissions, and payout batches;</li>
+      <li>Operate onboarding, Backup Mode / call-forwarding guidance, and account support;</li>
       <li>Detect abuse, fraud, and security issues;</li>
       <li>Comply with law and enforce our agreements.</li>
     </ul>
 
-    <h2>5. How we share information</h2>
+    <h2>4. SMS consent and marketing use</h2>
     <p>
-      We do not sell personal information. We may share information with service providers that help us operate
-      the platform (for example, hosting, payment processing, SMS delivery, and email), subject to contractual
-      safeguards. We may also disclose information if required by law or to protect rights, safety, and security.
+      When end users interact with a participating business (for example, by calling, texting, or replying after a
+      missed-call text-back), messages are sent in connection with that service inquiry. Businesses are responsible for
+      obtaining any consent required by applicable law for their communications.
+    </p>
+    <p>
+      <strong>Mobile opt-in data and SMS consent are not sold, rented, or shared with third parties for their marketing
+      or promotional purposes.</strong> We use phone numbers and consent-related data to operate the service for the
+      business and end user involved in that interaction, not to build unrelated third-party marketing lists.
+    </p>
+    <p>See our <a href="/sms-terms">SMS Terms</a> for STOP/HELP instructions and program details.</p>
+
+    <h2>5. Third-party service providers</h2>
+    <p>We use service providers to help operate {{ settings.app_name }}, including:</p>
+    <ul>
+      <li><strong>Twilio</strong> — voice and SMS delivery, webhooks, and telephony metadata;</li>
+      <li><strong>Stripe</strong> — payment processing and subscription billing;</li>
+      <li><strong>OpenAI</strong> — optional AI-assisted lead text classification and intake assistance (message content may be sent for processing when enabled);</li>
+      <li><strong>SMTP / email providers</strong> — transactional email (notifications, invites, partner document copies);</li>
+      <li><strong>Hosting and database providers</strong> — application hosting, storage, and backups.</li>
+    </ul>
+    <p>
+      These providers process data on our behalf subject to their terms and our agreements where applicable. We do not
+      authorize them to use your data for their own unrelated marketing.
     </p>
 
-    <h2>6. Retention</h2>
+    <h2>6. How we share information</h2>
     <p>
-      We retain information for as long as needed to provide the service, meet legal obligations, resolve
-      disputes, and enforce agreements. Businesses may request deletion of certain data subject to applicable
-      law and technical constraints.
+      We do not sell personal information. We may share information with the service providers above, with the business
+      whose number you contacted (for consumer lead data), and as required by law or to protect rights, safety, and
+      security.
     </p>
 
-    <h2>7. Security</h2>
+    <h2>7. Data security</h2>
     <p>
-      We use reasonable administrative, technical, and organizational measures to protect information.
-      No method of transmission or storage is completely secure.
+      We use reasonable administrative, technical, and organizational safeguards designed to protect information,
+      including encrypted storage of partner tax identification numbers (TIN) where collected. No method of transmission
+      or storage is completely secure, and we cannot guarantee perfect security.
+    </p>
+    <p>{{ settings.app_name }} is not a HIPAA-covered entity and does not offer HIPAA compliance as a service feature.</p>
+
+    <h2>8. Retention</h2>
+    <p>
+      We retain information for as long as needed to provide the service, meet legal obligations, resolve disputes, and
+      enforce agreements. Businesses and partners may contact us to request correction or deletion of certain data
+      where applicable, subject to legal, billing, fraud-prevention, and technical constraints.
     </p>
 
-    <h2>8. Your choices</h2>
+    <h2>9. Your choices</h2>
     <ul>
       <li>Consumers can opt out of SMS from a business by replying <strong>STOP</strong> to that business’s messages.</li>
-      <li>Business users may access, update, or delete certain account information through the platform or by contacting us.</li>
+      <li>Consumers can reply <strong>HELP</strong> for assistance or contact the business directly.</li>
+      <li>Business users may update certain account information in the dashboard or by contacting us.</li>
       <li>You may have additional rights under applicable privacy laws depending on your location.</li>
     </ul>
 
-    <h2>9. Children</h2>
+    <h2>10. Children</h2>
     <p>
       Our service is not directed to children under 13, and we do not knowingly collect their personal information.
     </p>
 
-    <h2>10. Changes</h2>
+    <h2>11. Changes</h2>
     <p>
       We may update this Privacy Policy from time to time. The “Last updated” date above will change when we do.
       Continued use of the service after changes means you accept the updated policy.
     </p>
 
-    <h2>11. Contact</h2>
-    <p>For privacy-related questions, contact us at:</p>
+    <h2>12. Contact</h2>
+    <p>For privacy-related questions, contact:</p>
     <p>
-      <a href="/contact">leadcareai.com/contact</a><br />
-      
+      <a href="mailto:{{ settings.legal_contact_email }}">{{ settings.legal_contact_email }}</a><br />
+      <a href="/contact">Contact form</a>
     </p>
     <p>
       Webwise Solutions LLC<br />
@@ -102,7 +135,7 @@
 
     <p>
       <a href="/terms">Terms of Service</a> ·
-      <a href="/sms">SMS Program Terms</a> ·
+      <a href="/sms-terms">SMS Terms</a> ·
       <a href="/refund-policy">Refund &amp; Cancellation Policy</a>
     </p>
   </article>

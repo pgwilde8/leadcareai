@@ -1,0 +1,139 @@
+{% set lv = onboarding.launch_verification %}
+<section class="lc-admin-section" id="live-launch-test">
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Live launch test</h2>
+      <p class="lc-mb-0 lc-text-muted">Repeatable end-to-end smoke test for every new customer. Call forwarding is carrier-controlled — LeadCareAI cannot enable it.</p>
+    </div>
+    <div class="lc-card__body">
+      <dl class="lc-meta-grid lc-mb-1">
+        <div>
+          <dt>Launch verified</dt>
+          <dd>
+            {% if business.launch_verified_at %}
+              Yes — {{ business.launch_verified_at }}
+              {% if launch_verifier %} (by {{ launch_verifier.email }}){% endif %}
+            {% else %}
+              No
+            {% endif %}
+          </dd>
+        </div>
+        <div>
+          <dt>Active LeadCareAI number</dt>
+          <dd>{{ lv.active_twilio_number or "—" }}</dd>
+        </div>
+        <div>
+          <dt>Customer-facing number</dt>
+          <dd>{{ lv.customer_facing_phone or business.main_phone or "—" }}</dd>
+        </div>
+      </dl>
+      {% if business.launch_verification_notes %}
+        <p><strong>Verification notes:</strong> {{ business.launch_verification_notes }}</p>
+      {% endif %}
+
+      {% if launch_verify_error %}
+        <div class="lc-alert lc-alert--error" role="alert">{{ launch_verify_error }}</div>
+      {% endif %}
+
+      {% if lv.blockers %}
+        <div class="lc-alert lc-alert--warning" role="status">
+          <strong>Before you can mark launch verified:</strong>
+          <ul>
+            {% for blocker in lv.blockers %}
+              <li>{{ blocker }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if lv.warnings %}
+        <div class="lc-alert lc-alert--info" role="status">
+          <strong>Checks during test:</strong>
+          <ul>
+            {% for warning in lv.warnings %}
+              <li>{{ warning }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <h3 class="lc-admin-section__title">Test script</h3>
+      <ol class="lc-launch-script">
+        <li>
+          <strong>Confirm Twilio number.</strong>
+          Active inbound number:
+          {% if lv.active_twilio_number %}<code>{{ lv.active_twilio_number }}</code>{% else %}
+            <em>missing — <a href="/admin/businesses/{{ business.id }}/phone-numbers/new">assign one</a></em>
+          {% endif %}
+        </li>
+        <li>
+          <strong>Enable Backup Mode.</strong>
+          Ask the business owner to turn on call forwarding to the LeadCareAI number
+          (<a href="/business/backup-mode">customer guide</a>).
+        </li>
+        <li>
+          <strong>Call the business line.</strong>
+          From a separate phone, dial the customer-facing number
+          {% if lv.customer_facing_phone %}<code>{{ lv.customer_facing_phone }}</code>{% else %}
+            (main phone on file)
+          {% endif %}.
+        </li>
+        <li><strong>Do not answer</strong> the business mobile line.</li>
+        <li>
+          <strong>Confirm missed-call text-back.</strong>
+          Caller should receive the LeadCareAI SMS on the calling phone.
+        </li>
+        <li>
+          <strong>Reply as the customer:</strong>
+          <em>“I need help with a leak.”</em>
+        </li>
+        <li>
+          <strong>Confirm in LeadCareAI:</strong>
+          <ul>
+            <li>Lead appears in <a href="/admin/businesses/{{ business.id }}/leads">business leads</a>
+              {% if lv.has_lead %}<span class="lc-text-success"> (detected)</span>{% else %}<span class="lc-text-warning"> (not yet)</span>{% endif %}
+            </li>
+            <li>Inbound SMS on lead timeline
+              {% if lv.has_inbound_message %}<span class="lc-text-success"> (detected)</span>{% else %}<span class="lc-text-warning"> (not yet)</span>{% endif %}
+            </li>
+            <li>AI summary / next question on lead detail</li>
+            <li>Staff email/SMS notification attempted</li>
+            <li>
+              <a href="/admin/notification-logs?business_id={{ business.id }}">notification_logs</a> row
+              {% if lv.has_notification_log %}<span class="lc-text-success"> (detected)</span>{% else %}<span class="lc-text-warning"> (not yet)</span>{% endif %}
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Mark launch verified</strong> below when the full path succeeds.
+        </li>
+      </ol>
+
+      {% if business.launch_verified_at %}
+        <p class="lc-text-success"><strong>Launch already verified.</strong></p>
+      {% else %}
+        <form method="post" action="/admin/businesses/{{ business.id }}/mark-launch-verified" class="lc-form lc-form--wide">
+          <div class="lc-field">
+            <label for="launch_verification_notes">Launch verification notes (optional)</label>
+            <textarea id="launch_verification_notes" name="launch_verification_notes" rows="3" placeholder="e.g. Test call from 555-0100; text-back and AI intake OK."></textarea>
+          </div>
+          <button
+            type="submit"
+            class="lc-btn lc-btn--primary"
+            {% if not lv.can_mark_verified %}disabled{% endif %}
+          >
+            Mark launch verified
+          </button>
+          {% if not lv.can_mark_verified %}
+            <p class="hint lc-mb-0">Complete preconditions above before marking verified.</p>
+          {% endif %}
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .lc-launch-script { line-height: 1.5; }
+  .lc-launch-script ul { margin: 0.35rem 0 0.5rem 1.25rem; }
+</style>

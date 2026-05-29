@@ -7,6 +7,7 @@
   <p>Signed in as <strong>{{ user.email }}</strong></p>
 
   {% include "business/_nav.html" %}
+  {% include "business/_forwarding_banner.html" %}
 
   {% if saved %}
     <p class="success"><strong>Settings saved.</strong></p>
@@ -36,6 +37,35 @@
     <label for="sms_signature">SMS display name / signature</label>
     <input id="sms_signature" name="sms_signature" type="text" maxlength="120" value="{{ form.sms_signature }}" />
     <p><em>Used in default missed-call text when no custom message is set.</em></p>
+
+    <h2>Backup Mode (mobile line)</h2>
+    <p>
+      LeadCareAI V1 requires a <strong>mobile</strong> customer-facing line that supports call forwarding.
+      Complex office phone systems, landlines, Google Voice, Grasshopper, RingCentral, and other VoIP setups
+      may require manual review.
+    </p>
+
+    <label for="customer_phone_is_mobile">Is the number your customers call today a mobile phone?</label>
+    <select id="customer_phone_is_mobile" name="customer_phone_is_mobile">
+      <option value="" {% if not form.customer_phone_is_mobile %}selected{% endif %}>Select…</option>
+      <option value="yes" {% if form.customer_phone_is_mobile == 'yes' %}selected{% endif %}>Yes</option>
+      <option value="no" {% if form.customer_phone_is_mobile == 'no' %}selected{% endif %}>No</option>
+    </select>
+
+    <label for="customer_phone_carrier">Mobile carrier</label>
+    <select id="customer_phone_carrier" name="customer_phone_carrier">
+      <option value="" {% if not form.customer_phone_carrier %}selected{% endif %}>Select…</option>
+      {% for key, label in carrier_choices.items() %}
+        <option value="{{ key }}" {% if form.customer_phone_carrier == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <label>
+      <input type="checkbox" name="can_access_phone_during_onboarding" value="yes" />
+      I can access this phone during onboarding for a forwarding test call
+    </label>
+
+    <p><a href="/business/backup-mode">Open Backup Mode setup →</a></p>
 
     <h2>Assigned phone numbers</h2>
     <p><em>Read-only. Contact support to add or change Twilio numbers.</em></p>

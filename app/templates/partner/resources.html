@@ -4,16 +4,35 @@
 
 {% block container_class %}lc-container--sm{% endblock %}
 
+{% block extra_head %}
+  <style>
+    .lc-training-video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 8px;
+      background: #111;
+      margin-top: 0.75rem;
+    }
+    .lc-training-module + .lc-training-module {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--lc-border, #d8dee6);
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
   <header class="lc-page-header">
     <h1 class="lc-page-header__title">Partner resources &amp; training</h1>
     <p class="lc-page-header__lead">
-      A short playbook for sharing your links, running the live demo, and answering common questions.
+      Training videos for new reps, plus a short playbook for sharing your links, running the live demo, and answering common questions.
     </p>
   </header>
 
   <nav class="lc-page-nav" aria-label="Partner">
     <a href="/partner/dashboard">← Partner dashboard</a>
+    ·
+    <a href="#training-videos">Training videos</a>
     ·
     <a href="/partner/marketing">Marketing links</a>
     ·
@@ -46,6 +65,32 @@
       </p>
     </div>
   </div>
+
+  <section class="lc-card" id="training-videos" aria-labelledby="training-videos-title">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title" id="training-videos-title">New rep training videos</h2>
+    </div>
+    <div class="lc-card__body">
+      <p class="lc-mb-0">
+        Watch these before your first outreach. Only available to approved partners after you sign in.
+      </p>
+      {% for video in training_videos %}
+        <article class="lc-training-module">
+          <h3 class="lc-card__title" style="font-size: 1.05rem; margin: 0 0 0.35rem;">
+            {{ loop.index }}. {{ video.title }}
+          </h3>
+          <p class="lc-text-muted lc-mb-0">{{ video.description }}</p>
+          <video class="lc-training-video" controls preload="metadata" playsinline>
+            <source src="{{ video.url }}" type="video/mp4" />
+            Your browser does not support embedded video.
+            <a href="{{ video.url }}">Download or open the video</a>.
+          </video>
+        </article>
+      {% else %}
+        <p class="lc-text-muted">Training videos will be posted here soon.</p>
+      {% endfor %}
+    </div>
+  </section>
 
   <div class="lc-card">
     <div class="lc-card__header">

@@ -109,7 +109,7 @@ On `/partner/dashboard`, `/partner/marketing`, and `/partner/resources`:
 
 - Referral link (copyable) and referral code
 - Marketing links page with demo/landing URLs and suggested share copy
-- Resources & training playbook (quick start, pitch, demo script, objections, compliance)
+- Resources & training at `/partner/resources` — **training videos** (DO Spaces MP4, active partners only) plus text playbook (quick start, pitch, demo script, objections, compliance). Video catalog: `app/services/partner_training_service.py`
 - Count of referred businesses
 - Table: business name, city/state, lead status, payment placeholder (“Not paying yet”)
 

@@ -1,0 +1,145 @@
+{% extends "layout/base.html" %}
+{% from "admin/_admin_macros.html" import admin_toolbar %}
+
+{% block title %}A2P 10DLC Packet — Admin{% endblock %}
+
+{% block container_class %}lc-container--wide{% endblock %}
+
+{% block extra_head %}
+  {% include "admin/_admin_head.html" %}
+  <style>
+    .lc-a2p-copy {
+      width: 100%;
+      min-height: 4.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      margin: 0.5rem 0 1rem;
+      padding: 0.75rem;
+      border: 1px solid var(--lc-border, #d8dee6);
+      border-radius: 6px;
+      background: var(--lc-bg-muted, #f8f9fa);
+    }
+    .lc-a2p-copy--tall { min-height: 7rem; }
+    .lc-a2p-section { margin-bottom: var(--lc-space-5, 1.5rem); }
+    .lc-a2p-flags dt { font-weight: 600; margin-top: 0.75rem; }
+    .lc-a2p-flags dd { margin: 0.25rem 0 0; color: var(--lc-text-muted, #555); }
+    .lc-a2p-checklist { margin: 0; padding-left: 1.25rem; }
+    .lc-a2p-checklist li { margin: 0.35rem 0; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  {{ admin_toolbar(user) }}
+
+  <header class="lc-admin-header">
+    <h1 class="lc-admin-header__title">A2P 10DLC registration packet</h1>
+    <p class="lc-admin-header__lead">
+      Copy/paste reference for Twilio campaign registration. No API calls, no secrets.
+      See <code>docs/a2p-registration-packet-v1.md</code> for the same content in documentation form.
+    </p>
+  </header>
+
+  <nav class="lc-page-nav lc-admin-nav" aria-label="A2P packet">
+    <a href="/admin">← Admin dashboard</a>
+    <a href="/admin/system-check">System Check</a>
+    <a href="/privacy" target="_blank" rel="noopener">Privacy (public)</a>
+    <a href="/sms-terms" target="_blank" rel="noopener">SMS Terms (public)</a>
+  </nav>
+
+  <div class="lc-alert lc-alert--warning" role="note">
+    {{ packet.submission_warning }}
+  </div>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Use case</h2>
+    <p><strong>Recommended category:</strong> {{ packet.use_case_category }}</p>
+    <p class="lc-text-muted">{{ packet.use_case_category_notes }}</p>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Campaign description</h2>
+    <textarea class="lc-a2p-copy lc-a2p-copy--tall" readonly aria-label="Campaign description">{{ packet.campaign_description }}</textarea>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Sample messages</h2>
+    <p class="hint">Replace <code>[Business Name]</code> with the customer's SMS signature or business name.</p>
+    {% for msg in packet.sample_messages %}
+      <p><strong>Sample {{ loop.index }}</strong></p>
+      <textarea class="lc-a2p-copy" readonly aria-label="Sample message {{ loop.index }}">{{ msg }}</textarea>
+    {% endfor %}
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Opt-in</h2>
+    <textarea class="lc-a2p-copy lc-a2p-copy--tall" readonly aria-label="Opt-in explanation">{{ packet.opt_in_explanation }}</textarea>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Opt-out (STOP)</h2>
+    <textarea class="lc-a2p-copy" readonly aria-label="Opt-out explanation">{{ packet.opt_out_explanation }}</textarea>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">HELP</h2>
+    <textarea class="lc-a2p-copy" readonly aria-label="HELP explanation">{{ packet.help_explanation }}</textarea>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Third-party marketing</h2>
+    <textarea class="lc-a2p-copy lc-a2p-copy--tall" readonly aria-label="Third-party marketing wording">{{ packet.third_party_marketing_wording }}</textarea>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Policy URLs</h2>
+    <p class="hint">Base: <code>{{ packet.site_base }}</code></p>
+    <dl class="lc-meta-grid">
+      <div>
+        <dt>Privacy Policy</dt>
+        <dd><a href="{{ packet.privacy_url }}">{{ packet.privacy_url }}</a></dd>
+      </div>
+      <div>
+        <dt>Terms of Service</dt>
+        <dd><a href="{{ packet.terms_url }}">{{ packet.terms_url }}</a></dd>
+      </div>
+      <div>
+        <dt>SMS Terms</dt>
+        <dd><a href="{{ packet.sms_terms_url }}">{{ packet.sms_terms_url }}</a></dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Message content flags</h2>
+    <dl class="lc-a2p-flags">
+      <dt>Embedded links</dt>
+      <dd>{{ packet.message_flags.embedded_links }}</dd>
+      <dt>Phone numbers in message body</dt>
+      <dd>{{ packet.message_flags.phone_numbers }}</dd>
+      <dt>Lending content</dt>
+      <dd>{{ packet.message_flags.lending }}</dd>
+      <dt>Age-gated content</dt>
+      <dd>{{ packet.message_flags.age_gated }}</dd>
+    </dl>
+    <p class="hint lc-mb-0">{{ packet.message_flags.notes }}</p>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Per-business registration notes</h2>
+    <ul class="lc-a2p-checklist">
+      {% for note in packet.per_business_notes %}
+        <li>{{ note }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="lc-admin-section lc-a2p-section">
+    <h2 class="lc-admin-section__title">Pre-submission checklist</h2>
+    <ul class="lc-a2p-checklist">
+      {% for item in packet.registration_checklist %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}

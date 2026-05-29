@@ -1,0 +1,40 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Growth plan checkout — LeadCareAI{% endblock %}
+
+{% block content %}
+  <div class="lc-container" style="max-width: 36rem;">
+    <h1>Growth plan checkout</h1>
+    <p class="lc-lead">$199 setup + $147/month — confirm requirements before payment.</p>
+
+    {% if referral_code %}
+      <p class="lc-text-muted">Referral: <strong>{{ referral_code }}</strong></p>
+    {% endif %}
+
+    {% if error %}
+      <div class="lc-alert lc-alert--error" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/checkout/growth" class="lc-form">
+      <div class="lc-field">
+        <label class="lc-checkbox">
+          <input
+            type="checkbox"
+            name="call_forwarding_terms_acknowledged"
+            value="yes"
+            {% if form.call_forwarding_terms_acknowledged %}checked{% endif %}
+            required
+          />
+          I understand LeadCareAI requires a mobile business line that supports call forwarding,
+          and activation is complete only after a successful forwarding test.
+        </label>
+      </div>
+      <button type="submit" class="lc-btn lc-btn--primary">Continue to secure checkout</button>
+    </form>
+
+    <p class="lc-text-muted">
+      <a href="/demo/book">Book a demo instead</a>
+      · <a href="/">← Back to home</a>
+    </p>
+  </div>
+{% endblock %}

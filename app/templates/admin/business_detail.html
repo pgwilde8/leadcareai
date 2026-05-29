@@ -28,6 +28,9 @@
     <a href="/admin/businesses/{{ business.id }}/phone-numbers/new">Add phone number</a>
   </nav>
 
+  {% include "admin/_onboarding_checklist.html" %}
+  {% include "admin/_live_launch_test.html" %}
+
   <section class="lc-admin-section">
     <div class="lc-card">
       <div class="lc-card__header">
@@ -113,6 +116,67 @@
         {% else %}
           <p>No compliance profile yet. <a href="/admin/businesses/{{ business.id }}/compliance">Start setup</a>.</p>
         {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-admin-section" id="call-forwarding">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h2 class="lc-card__title">Call forwarding (mobile V1)</h2>
+      </div>
+      <div class="lc-card__body">
+        <dl class="lc-meta-grid">
+          <div>
+            <dt>Customer-facing carrier</dt>
+            <dd>{{ business.customer_phone_carrier or "—" }}</dd>
+          </div>
+          <div>
+            <dt>Mobile line</dt>
+            <dd>
+              {% if business.customer_phone_is_mobile is none %}—{% elif business.customer_phone_is_mobile %}Yes{% else %}No{% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Forwarding status</dt>
+            <dd>{{ status_badge(business.customer_phone_forwarding_status) }}</dd>
+          </div>
+          <div>
+            <dt>Test passed at</dt>
+            <dd>{{ business.call_forwarding_tested_at or "—" }}</dd>
+          </div>
+          {% if business.customer_phone_forwarding_notes %}
+            <div class="lc-meta-grid__wide">
+              <dt>Notes</dt>
+              <dd>{{ business.customer_phone_forwarding_notes }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+        <form method="post" action="/admin/businesses/{{ business.id }}/call-forwarding" class="lc-form lc-form--wide" style="margin-top: 1rem;">
+          <div class="lc-field">
+            <label for="forwarding_status">Update forwarding status</label>
+            <select id="forwarding_status" name="status" required>
+              <option value="not_started" {% if business.customer_phone_forwarding_status == 'not_started' %}selected{% endif %}>not_started</option>
+              <option value="instructions_sent" {% if business.customer_phone_forwarding_status == 'instructions_sent' %}selected{% endif %}>instructions_sent</option>
+              <option value="customer_attempted" {% if business.customer_phone_forwarding_status == 'customer_attempted' %}selected{% endif %}>customer_attempted</option>
+              <option value="test_passed" {% if business.customer_phone_forwarding_status == 'test_passed' %}selected{% endif %}>test_passed</option>
+              <option value="failed_needs_help" {% if business.customer_phone_forwarding_status == 'failed_needs_help' %}selected{% endif %}>failed_needs_help</option>
+            </select>
+          </div>
+          <div class="lc-field">
+            <label for="forwarding_notes">Notes</label>
+            <textarea id="forwarding_notes" name="notes" rows="3">{{ business.customer_phone_forwarding_notes or '' }}</textarea>
+          </div>
+          <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Save forwarding status</button>
+        </form>
+        <div class="lc-btn-group" style="margin-top: 0.75rem;">
+          <form method="post" action="/admin/businesses/{{ business.id }}/mark-forwarding-instructions-sent" style="display:inline;">
+            <button type="submit" class="lc-btn lc-btn--secondary lc-btn--sm">Mark instructions sent</button>
+          </form>
+          <form method="post" action="/admin/businesses/{{ business.id }}/mark-forwarding-test-passed" style="display:inline;">
+            <button type="submit" class="lc-btn lc-btn--primary lc-btn--sm">Mark forwarding test passed</button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
@@ -258,7 +322,7 @@
     </div>
   </section>
 
-  <section class="lc-admin-section">
+  <section class="lc-admin-section" id="link-user">
     <div class="lc-card">
       <div class="lc-card__header">
         <h2 class="lc-card__title">Link existing user</h2>

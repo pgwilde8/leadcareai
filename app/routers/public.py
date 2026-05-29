@@ -167,28 +167,72 @@ def landing_page(request: Request, db: Annotated[Session, Depends(get_db)]):
     )
 
 
-@router.get("/checkout/growth", response_model=None)
-def public_growth_checkout(
+@router.get("/checkout/growth", response_class=HTMLResponse, response_model=None)
+def public_growth_checkout_page(request: Request):
+    """Confirm mobile call-forwarding requirement before Stripe Checkout."""
+    if not growth_checkout_configured():
+        return RedirectResponse(url="/demo/book", status_code=303)
+
+    referral_code, _ = get_referral_from_session(request)
+    return templates.TemplateResponse(
+        request,
+        "public/checkout_growth.html",
+        {
+            "referral_code": referral_code,
+            "error": None,
+            "form": {"call_forwarding_terms_acknowledged": False},
+        },
+    )
+
+
+@router.post("/checkout/growth", response_model=None)
+def public_growth_checkout_start(
     request: Request,
     db: Annotated[Session, Depends(get_db)],
+    call_forwarding_terms_acknowledged: str = Form(""),
 ):
-    """Start Stripe Checkout for Growth ($199 setup + $147/mo) from the public site."""
+    """Start Stripe Checkout after the customer acknowledges call-forwarding requirements."""
     if not growth_checkout_configured():
         return RedirectResponse(url="/demo/book", status_code=303)
 
     referral_code, _ = get_referral_from_session(request)
     partner = resolve_referral_partner(db, request)
+    terms_ack = call_forwarding_terms_acknowledged.strip().lower() in {"1", "on", "yes", "true"}
+
+    if not terms_ack:
+        return templates.TemplateResponse(
+            request,
+            "public/checkout_growth.html",
+            {
+                "referral_code": referral_code,
+                "error": (
+                    "You must acknowledge the mobile call-forwarding requirement before checkout."
+                ),
+                "form": {"call_forwarding_terms_acknowledged": False},
+            },
+            status_code=400,
+        )
 
     try:
         result = business_lead_checkout_service.start_public_growth_checkout(
             db,
             partner=partner,
             referral_code=partner.referral_code if partner else referral_code,
+            call_forwarding_terms_acknowledged=True,
         )
         db.commit()
     except ValueError:
         db.rollback()
-        return RedirectResponse(url="/demo/book", status_code=303)
+        return templates.TemplateResponse(
+            request,
+            "public/checkout_growth.html",
+            {
+                "referral_code": referral_code,
+                "error": "Checkout is not available right now. Please book a demo instead.",
+                "form": {"call_forwarding_terms_acknowledged": terms_ack},
+            },
+            status_code=400,
+        )
     except Exception:
         db.rollback()
         return RedirectResponse(url="/?checkout=error#pricing", status_code=303)
@@ -253,9 +297,36 @@ def demo_book_submit(
     city: str = Form(""),
     state: str = Form(""),
     notes: str = Form(""),
+    call_forwarding_terms_acknowledged: str = Form(""),
 ):
     referral_code, _ = get_referral_from_session(request)
     partner = resolve_referral_partner(db, request)
+    terms_ack = call_forwarding_terms_acknowledged.strip().lower() in {"1", "on", "yes", "true"}
+    if not terms_ack:
+        form = {
+            "business_name": business_name,
+            "contact_name": contact_name,
+            "email": email,
+            "phone": phone,
+            "industry": industry,
+            "city": city,
+            "state": state,
+            "notes": notes,
+            "call_forwarding_terms_acknowledged": False,
+        }
+        return templates.TemplateResponse(
+            request,
+            "public/demo_book.html",
+            {
+                "error": (
+                    "You must acknowledge the mobile call-forwarding requirement to submit this form."
+                ),
+                "form": form,
+                "referral_code": referral_code,
+                "referral_partner_name": partner.display_name if partner else None,
+            },
+            status_code=400,
+        )
 
     form = {
         "business_name": business_name,
@@ -266,6 +337,7 @@ def demo_book_submit(
         "city": city,
         "state": state,
         "notes": notes,
+        "call_forwarding_terms_acknowledged": terms_ack,
     }
 
     try:
@@ -281,6 +353,7 @@ def demo_book_submit(
             notes=notes or None,
             partner=partner,
             referral_code=partner.referral_code if partner else referral_code,
+            call_forwarding_terms_acknowledged=terms_ack,
         )
         db.commit()
     except ValueError as exc:
@@ -330,6 +403,11 @@ def sms(request: Request) -> HTMLResponse:
     return _sms(request)
 
 
+@router.get("/sms-terms", response_class=HTMLResponse, response_model=None)
+def sms_terms(request: Request) -> HTMLResponse:
+    return _sms(request)
+
+
 @router.get("/refund-policy", response_class=HTMLResponse, response_model=None)
 def refund_policy(request: Request) -> HTMLResponse:
     return _refund_policy(request)
@@ -347,6 +425,11 @@ def legal_terms(request: Request) -> HTMLResponse:
 
 @router.get("/legal/sms", response_class=HTMLResponse, response_model=None)
 def legal_sms(request: Request) -> HTMLResponse:
+    return _sms(request)
+
+
+@router.get("/legal/sms-terms", response_class=HTMLResponse, response_model=None)
+def legal_sms_terms(request: Request) -> HTMLResponse:
     return _sms(request)
 
 

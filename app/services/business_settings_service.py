@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.models.business import Business
 from app.services.business_service import get_business
+from app.services import call_forwarding_service
 
 STOP_SUFFIX = " Reply STOP to opt out."
 MISSED_CALL_MESSAGE_MAX_LEN = 240
@@ -110,6 +111,9 @@ def update_business_settings(
     missed_call_textback_message: str | None = None,
     sms_signature: str | None = None,
     lead_intake_prompt: str | None = None,
+    customer_phone_is_mobile: bool | None = None,
+    customer_phone_carrier: str | None = None,
+    can_access_phone_during_onboarding: bool | None = None,
 ) -> Business:
     business = get_business(db, business_id)
 
@@ -129,6 +133,15 @@ def update_business_settings(
     business.missed_call_textback_message = normalize_missed_call_textback_message(
         missed_call_textback_message
     )
+
+    if customer_phone_is_mobile is not None or customer_phone_carrier is not None:
+        call_forwarding_service.update_call_forwarding_profile(
+            db,
+            business_id,
+            customer_phone_is_mobile=customer_phone_is_mobile,
+            customer_phone_carrier=customer_phone_carrier,
+            can_access_phone_during_onboarding=can_access_phone_during_onboarding,
+        )
 
     db.flush()
     return business

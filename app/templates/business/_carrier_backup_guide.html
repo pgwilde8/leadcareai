@@ -1,0 +1,112 @@
+{# Carrier-specific Backup Mode guide (call forwarding underneath). #}
+<section class="lc-carrier-guide">
+  <h2>{{ guidance.carrier_label }} — Backup Mode setup</h2>
+  <p class="lc-confidence lc-confidence--{{ guidance.confidence_level }}">
+    <strong>Guidance level:</strong> {{ guidance.confidence_label }}
+  </p>
+  <p><em>{{ guidance.caveat }}</em></p>
+  <p class="hint">{{ guidance.no_universal_compatibility }}</p>
+  <p>{{ guidance.recommended_approach }}</p>
+
+  {% if guidance.style == 'gsm_conditional' and guidance.conditional_codes %}
+    <h3>Conditional forwarding (recommended)</h3>
+    <p>Your phone rings first. LeadCareAI receives calls when you do not answer, are busy, or unreachable.</p>
+    {% if guidance.activation_note %}
+      <p class="hint">{{ guidance.activation_note }}</p>
+    {% endif %}
+    <div class="lc-table-wrap">
+      <table class="lc-code-table">
+        <thead>
+          <tr><th>When</th><th>Turn on (dial + Call)</th><th>Turn off</th></tr>
+        </thead>
+        <tbody>
+          {% for row in guidance.conditional_codes %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td><code>{{ row.on }}</code></td>
+              <td><code>{{ row.off }}</code></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if guidance.reset_code %}
+      <p class="hint">Reset all conditional forwarding: dial <code>{{ guidance.reset_code }}</code> then Call.</p>
+    {% endif %}
+    {% if guidance.optional_all_calls %}
+      <h3>Optional: all calls (use with caution)</h3>
+      <p>Turn on: <code>{{ guidance.optional_all_calls.on }}</code> · Turn off: <code>{{ guidance.optional_all_calls.off }}</code></p>
+      <p class="lc-warning"><strong>{{ guidance.optional_all_calls.warning }}</strong></p>
+    {% endif %}
+  {% elif guidance.style == 'verizon' and guidance.verizon_conditional %}
+    <h3>{{ guidance.verizon_conditional.label }}</h3>
+    <p>{{ guidance.verizon_conditional.detail }}</p>
+    <p class="lc-code-example"><code>{{ guidance.verizon_conditional.code }}</code></p>
+    {% if guidance.optional_all_calls %}
+      <h3>Optional: all calls (use with caution)</h3>
+      <p>Turn on: <code>{{ guidance.optional_all_calls.on }}</code> · Turn off: <code>{{ guidance.optional_all_calls.off }}</code></p>
+      <p class="lc-warning"><strong>{{ guidance.optional_all_calls.warning }}</strong></p>
+    {% endif %}
+  {% elif guidance.style == 'mvno_cautious' %}
+    <h3>Phone settings (try first)</h3>
+    <ul>
+      {% for step in guidance.phone_settings %}
+        <li>{{ step }}</li>
+      {% endfor %}
+    </ul>
+    <h3>Call your carrier</h3>
+    <p class="lc-support-script">“{{ guidance.carrier_support_script }}”</p>
+    {% if guidance.optional_common_codes %}
+      <details class="lc-optional-codes">
+        <summary>Optional: common GSM-style dial codes (not verified for {{ guidance.carrier_label }})</summary>
+        <p class="lc-warning"><strong>{{ guidance.optional_common_codes.disclaimer }}</strong></p>
+        {% if guidance.optional_common_codes.mvno_note %}
+          <p class="hint">{{ guidance.optional_common_codes.mvno_note }}</p>
+        {% endif %}
+        <div class="lc-table-wrap">
+          <table class="lc-code-table">
+            <thead>
+              <tr><th>When</th><th>Example turn on</th><th>Turn off</th></tr>
+            </thead>
+            <tbody>
+              {% for row in guidance.optional_common_codes.codes %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td><code>{{ row.on }}</code></td>
+                  <td><code>{{ row.off }}</code></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if guidance.optional_common_codes.reset_code %}
+          <p class="hint">Some networks use <code>{{ guidance.optional_common_codes.reset_code }}</code> to reset conditional forwarding.</p>
+        {% endif %}
+      </details>
+    {% endif %}
+  {% elif guidance.style == 'cautious' %}
+    <h3>Phone settings</h3>
+    <ul>
+      {% for step in guidance.phone_settings %}
+        <li>{{ step }}</li>
+      {% endfor %}
+    </ul>
+    <h3>Call your carrier</h3>
+    <p class="lc-support-script">“{{ guidance.carrier_support_script }}”</p>
+  {% endif %}
+
+  {% if guidance.notes and guidance.style != 'mvno_cautious' %}
+    <ul class="hint">
+      {% for note in guidance.notes %}
+        <li>{{ note }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <h3>Test Backup Mode</h3>
+  <ol>
+    {% for step in guidance.testing_steps %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+</section>

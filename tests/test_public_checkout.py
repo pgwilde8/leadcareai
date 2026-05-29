@@ -11,8 +11,27 @@ from app.models.business_lead import BusinessLead
 from app.services.stripe_service import CheckoutSessionResult
 
 
+def test_checkout_growth_get_shows_acknowledgement_form(client: TestClient) -> None:
+    response = client.get("/checkout/growth")
+    assert response.status_code == 200
+    assert "mobile business line" in response.text.lower()
+    assert 'method="post"' in response.text
+    assert "/checkout/growth" in response.text
+
+
 @patch("app.services.business_lead_checkout_service.stripe_service.create_growth_checkout_session")
-def test_checkout_growth_redirects_to_stripe(
+def test_checkout_growth_post_without_ack_does_not_call_stripe(
+    mock_checkout,
+    client: TestClient,
+) -> None:
+    response = client.post("/checkout/growth", data={}, follow_redirects=False)
+    assert response.status_code == 400
+    assert "call-forwarding" in response.text.lower()
+    mock_checkout.assert_not_called()
+
+
+@patch("app.services.business_lead_checkout_service.stripe_service.create_growth_checkout_session")
+def test_checkout_growth_post_with_ack_redirects_to_stripe(
     mock_checkout,
     client: TestClient,
     db_session: Session,
@@ -23,7 +42,11 @@ def test_checkout_growth_redirects_to_stripe(
         customer_id="cus_public",
     )
 
-    response = client.get("/checkout/growth", follow_redirects=False)
+    response = client.post(
+        "/checkout/growth",
+        data={"call_forwarding_terms_acknowledged": "on"},
+        follow_redirects=False,
+    )
     assert response.status_code == 303
     assert response.headers["location"] == "https://checkout.stripe.com/c/pay/cs_public_test"
 
@@ -33,6 +56,7 @@ def test_checkout_growth_redirects_to_stripe(
     assert lead.status == "qualified"
     assert lead.payment_status == "checkout_created"
     assert lead.stripe_checkout_session_id == "cs_public_test"
+    assert lead.call_forwarding_terms_acknowledged is True
 
     assert mock_checkout.called
     assert mock_checkout.call_args.kwargs.get("customer_email") is None

@@ -96,6 +96,37 @@ def _yes_no(label: str, value: str | None) -> SystemCheckItem:
     )
 
 
+def _collect_registered_route_paths() -> frozenset[str]:
+    from app.main import app
+
+    paths: set[str] = set()
+    for route in app.routes:
+        path = getattr(route, "path", None)
+        if path:
+            paths.add(path)
+    return frozenset(paths)
+
+
+def _route_registered(path: str, registered: frozenset[str]) -> SystemCheckItem:
+    present = path in registered
+    return SystemCheckItem(
+        f"Route {path}",
+        "registered" if present else "not found in application",
+        "ok" if present else "error",
+    )
+
+
+def _webhook_url(base: str, path: str) -> SystemCheckItem:
+    return SystemCheckItem(f"Webhook URL {path}", f"{base}{path}", "info")
+
+
+COMPLIANCE_ROUTE_PATHS = (
+    "/privacy",
+    "/terms",
+    "/sms-terms",
+    "/refund-policy",
+)
+
 def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
     settings = config.get_settings()
     base = (settings.effective_public_base_url or settings.app_base_url or "").rstrip("/")
@@ -141,6 +172,9 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
 
     smtp_password_display, smtp_password_status = mask_configured_suffix(settings.smtp_password)
 
+    legal_email = (settings.legal_contact_email or "").strip()
+    registered_paths = _collect_registered_route_paths()
+
     core = SystemCheckSection(
         title="Core",
         items=[
@@ -162,32 +196,43 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
             ),
             SystemCheckItem("Database reachable", db_reachable, db_status),
             SystemCheckItem("Alembic revision", alembic_value, alembic_status),
+            SystemCheckItem("SECRET_KEY", secret_display, secret_status),
+            SystemCheckItem(
+                "SESSION_SECRET",
+                "not used (sessions signed with SECRET_KEY)",
+                "info",
+            ),
+            SystemCheckItem(
+                "LEGAL_CONTACT_EMAIL",
+                legal_email or "not configured",
+                "ok" if legal_email else "warn",
+            ),
         ],
     )
 
-    twilio_notes = (
-        [
-            f"{base}/webhooks/twilio/sms",
-            f"{base}/webhooks/twilio/voice",
-            f"{base}/webhooks/twilio/voice/status",
-        ]
-        if base
-        else ["Configure PUBLIC_BASE_URL or APP_BASE_URL to show full webhook URLs."]
-    )
-    twilio = SystemCheckSection(
-        title="Twilio",
-        items=[
-            _yes_no("TWILIO_ACCOUNT_SID", settings.twilio_account_sid),
-            _yes_no("TWILIO_AUTH_TOKEN", settings.twilio_auth_token),
-            _yes_no("TWILIO_PHONE_NUMBER", settings.twilio_phone_number),
-            SystemCheckItem(
-                "TWILIO_WEBHOOK_AUTH_ENABLED",
-                "true" if settings.twilio_webhook_auth_enabled else "false",
-                "ok" if settings.twilio_webhook_auth_enabled else ("warn" if production else "info"),
-            ),
-        ],
-        notes=twilio_notes,
-    )
+    twilio_items: list[SystemCheckItem] = [
+        _yes_no("TWILIO_ACCOUNT_SID", settings.twilio_account_sid),
+        _yes_no("TWILIO_AUTH_TOKEN", settings.twilio_auth_token),
+        _yes_no("TWILIO_PHONE_NUMBER", settings.twilio_phone_number),
+        SystemCheckItem(
+            "TWILIO_WEBHOOK_AUTH_ENABLED",
+            "true" if settings.twilio_webhook_auth_enabled else "false",
+            "ok" if settings.twilio_webhook_auth_enabled else ("warn" if production else "info"),
+        ),
+    ]
+    twilio_notes: list[str] = []
+    if base:
+        twilio_items.extend(
+            [
+                _webhook_url(base, "/webhooks/twilio/sms"),
+                _webhook_url(base, "/webhooks/twilio/voice"),
+                _webhook_url(base, "/webhooks/twilio/voice/status"),
+            ]
+        )
+    else:
+        twilio_notes.append("Configure PUBLIC_BASE_URL or APP_BASE_URL for full Twilio webhook URLs.")
+
+    twilio = SystemCheckSection(title="Twilio", items=twilio_items, notes=twilio_notes)
 
     openai = SystemCheckSection(
         title="OpenAI",
@@ -202,23 +247,26 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
         ],
     )
 
-    stripe = SystemCheckSection(
-        title="Stripe",
-        items=[
-            SystemCheckItem("STRIPE_SECRET_KEY", stripe_mode_value, stripe_mode_status),
-            _yes_no("STRIPE_WEBHOOK_SECRET", settings.stripe_webhook_secret),
-            _yes_no(
-                "STRIPE_PRICE_ID_GROWTH_MONTHLY / GROWTH_PRODUCT",
-                settings.stripe_growth_monthly_price_id,
-            ),
-            SystemCheckItem(
-                "STRIPE_PRICE_ID_SETUP_FEE",
-                setup_display,
-                "ok" if setup_fee_ok else "warn",
-            ),
-        ],
-        notes=[f"{base}/webhooks/stripe" if base else "/webhooks/stripe (set public base URL for full URL)"],
-    )
+    stripe_items: list[SystemCheckItem] = [
+        SystemCheckItem("STRIPE_SECRET_KEY", stripe_mode_value, stripe_mode_status),
+        _yes_no("STRIPE_WEBHOOK_SECRET", settings.stripe_webhook_secret),
+        _yes_no(
+            "STRIPE_PRICE_ID_GROWTH_MONTHLY / GROWTH_PRODUCT",
+            settings.stripe_growth_monthly_price_id,
+        ),
+        SystemCheckItem(
+            "STRIPE_PRICE_ID_SETUP_FEE",
+            setup_display,
+            "ok" if setup_fee_ok else "warn",
+        ),
+    ]
+    stripe_notes: list[str] = []
+    if base:
+        stripe_items.append(_webhook_url(base, "/webhooks/stripe"))
+    else:
+        stripe_notes.append("Configure PUBLIC_BASE_URL or APP_BASE_URL for full Stripe webhook URL.")
+
+    stripe = SystemCheckSection(title="Stripe", items=stripe_items, notes=stripe_notes)
 
     email = SystemCheckSection(
         title="Email / SMTP",
@@ -246,10 +294,35 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
         notes=tax_notes,
     )
 
+    compliance = SystemCheckSection(
+        title="Compliance (public legal pages)",
+        items=[_route_registered(path, registered_paths) for path in COMPLIANCE_ROUTE_PATHS],
+        notes=[
+            "Verify pages return 200 over HTTPS in production (this check only confirms routes are registered).",
+            f"Privacy: {base}/privacy" if base else "/privacy",
+            f"SMS Terms: {base}/sms-terms" if base else "/sms-terms",
+        ],
+    )
+
+    a2p = SystemCheckSection(
+        title="A2P 10DLC",
+        items=[
+            _route_registered("/admin/a2p-packet", registered_paths),
+            SystemCheckItem(
+                "A2P registration packet",
+                "available — docs/a2p-registration-packet-v1.md and /admin/a2p-packet",
+                "ok",
+            ),
+        ],
+        notes=[
+            "Twilio/TCR campaign registration is manual; approval is not guaranteed.",
+            "Use /admin/a2p-packet for copy/paste campaign description and sample messages.",
+        ],
+    )
+
     security = SystemCheckSection(
         title="Security / admin",
         items=[
-            SystemCheckItem("SECRET_KEY", secret_display, secret_status),
             SystemCheckItem(
                 "ADMIN_EMAIL configured",
                 "yes" if (settings.admin_email or "").strip() else "no",
@@ -258,8 +331,9 @@ def build_system_check_sections(db: Session) -> list[SystemCheckSection]:
         ],
         notes=[
             "Launch checklist: docs/production-launch-checklist-v1.md",
+            "System check: docs/admin-system-check-v1.md",
             "Secrets are never displayed on this page.",
         ],
     )
 
-    return [core, twilio, openai, stripe, email, partner_tax, security]
+    return [core, twilio, openai, stripe, email, partner_tax, compliance, a2p, security]

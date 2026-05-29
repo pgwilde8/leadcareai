@@ -27,14 +27,44 @@ Legacy aliases in docs sometimes use `STRIPE_GROWTH_PRICE_ID` — the app reads 
 
 Checkout uses **subscription mode** with two line items: recurring Growth price + one-time setup price.
 
+## Call-forwarding acknowledgement (required before checkout)
+
+Growth checkout cannot start unless `BusinessLead.call_forwarding_terms_acknowledged` is true.
+
+| Source | How acknowledgement is recorded |
+|--------|----------------------------------|
+| `/demo/book` | Required checkbox on submit |
+| `/checkout/growth` | Required checkbox before POST starts Stripe |
+| Admin lead detail | Manual **Record acknowledgement** after phone confirmation |
+
+If acknowledgement is missing, checkout creation returns:
+
+> This lead has not acknowledged the mobile call-forwarding requirement. Send them the demo/signup form or collect acknowledgement before checkout.
+
+**After payment:** activation still requires a live call-forwarding test (`customer_phone_forwarding_status = test_passed`). Acknowledgement alone does not clear the business dashboard Backup Mode banner.
+
 ## Admin flow
 
-1. Prospect submits `/demo` (creates `BusinessLead`, optional partner attribution).
+1. Prospect submits `/demo/book` (creates `BusinessLead` with acknowledgement checkbox, optional partner attribution).
 2. Admin reviews `/admin/business-leads` and sets status to **contacted** or **qualified**.
-3. On lead detail `/admin/business-leads/{id}`, click **Create checkout link**.
-4. System creates a **pending** `Business` (not active until paid) and a Stripe Checkout Session.
-5. Copy **Open checkout link** and send to the prospect.
-6. On payment, Stripe sends `checkout.session.completed` → lead marked **converted** / **paid**, business **active**.
+3. Confirm **Call forwarding terms acknowledged: Yes** (or record admin acknowledgement).
+4. On lead detail `/admin/business-leads/{id}`, click **Create checkout link**.
+5. System creates a **pending** `Business` (not active until paid) and a Stripe Checkout Session.
+6. Copy **Open checkout link** and send to the prospect.
+7. On payment, Stripe sends `checkout.session.completed` → lead marked **converted** / **paid**, business **active**.
+
+### Public self-serve checkout
+
+1. Customer clicks **Buy Growth plan** on the landing page → `/checkout/growth`.
+2. Customer checks the call-forwarding acknowledgement box and submits.
+3. App creates a `website_checkout` lead (acknowledged) and redirects to Stripe.
+
+## Admin routes
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/admin/business-leads/{id}/acknowledge-call-forwarding` | Record manual acknowledgement |
+| POST | `/admin/business-leads/{id}/create-checkout` | Create Stripe session (blocked if not acknowledged) |
 
 ### Payment statuses (`business_leads.payment_status`)
 

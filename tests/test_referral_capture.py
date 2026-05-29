@@ -72,6 +72,7 @@ def _demo_form_data(**overrides: str) -> dict[str, str]:
         "city": "Austin",
         "state": "TX",
         "notes": "We miss a lot of after-hours calls.",
+        "call_forwarding_terms_acknowledged": "on",
     }
     data.update(overrides)
     return data

@@ -25,6 +25,8 @@ from app.services import (
     business_lead_checkout_service,
     business_lead_service,
     business_service,
+    business_onboarding_service,
+    call_forwarding_service,
     commission_payout_service,
     commission_service,
     compliance_service,
@@ -33,6 +35,7 @@ from app.services import (
     message_service,
     partner_service,
     phone_number_service,
+    a2p_packet_service,
     system_check_service,
     user_invite_service,
 )
@@ -225,6 +228,23 @@ def system_check_page(
             "user": auth,
             "sections": sections,
         },
+    )
+
+
+@router.get("/a2p-packet", response_class=HTMLResponse, response_model=None)
+def a2p_packet_page(request: Request, db: Annotated[Session, Depends(get_db)]):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+    settings = get_settings()
+    site_base = (settings.public_base_url or settings.app_base_url or a2p_packet_service.PRODUCTION_SITE_BASE).rstrip(
+        "/"
+    )
+    packet = a2p_packet_service.build_a2p_packet(site_base=site_base)
+    return templates.TemplateResponse(
+        request,
+        "admin/a2p_packet.html",
+        {"user": auth, "packet": packet},
     )
 
 
@@ -818,6 +838,21 @@ def business_detail_page(
     if isinstance(auth, RedirectResponse):
         return auth
 
+    ctx = _business_detail_context(db, auth=auth, business_id=business_id)
+    if isinstance(ctx, RedirectResponse):
+        return ctx
+
+    return templates.TemplateResponse(request, "admin/business_detail.html", ctx)
+
+
+def _business_detail_context(
+    db: Session,
+    *,
+    auth: User,
+    business_id: uuid.UUID,
+    link_error: str | None = None,
+    launch_verify_error: str | None = None,
+) -> dict | RedirectResponse:
     try:
         business = business_service.get_business(db, business_id)
     except ValueError:
@@ -830,11 +865,9 @@ def business_detail_page(
         .order_by(BusinessUser.created_at)
         .all()
     )
-
     phone_numbers = phone_number_service.list_phone_numbers_for_business(db, business_id)
     leads = lead_service.list_leads_for_business(db, business_id)
     compliance_profile = compliance_service.get_compliance_profile_for_business(db, business_id)
-
     primary_user_link = links[0] if links else None
     business_user_invite = None
     if primary_user_link is not None:
@@ -843,21 +876,136 @@ def business_detail_page(
             user_id=primary_user_link.user_id,
             purpose=user_invite_service.BUSINESS_INVITE,
         )
+    onboarding = business_onboarding_service.build_business_onboarding_checklist(db, business)
+    launch_verifier = None
+    if business.launch_verified_by_user_id is not None:
+        launch_verifier = db.get(User, business.launch_verified_by_user_id)
 
-    return templates.TemplateResponse(
-        request,
-        "admin/business_detail.html",
-        {
-            "user": auth,
-            "business": business,
-            "links": links,
-            "link_error": None,
-            "phone_numbers": phone_numbers,
-            "leads": leads,
-            "compliance_profile": compliance_profile,
-            "business_user_invite": business_user_invite,
-        },
-    )
+    return {
+        "user": auth,
+        "business": business,
+        "links": links,
+        "link_error": link_error,
+        "launch_verify_error": launch_verify_error,
+        "phone_numbers": phone_numbers,
+        "leads": leads,
+        "compliance_profile": compliance_profile,
+        "business_user_invite": business_user_invite,
+        "onboarding": onboarding,
+        "launch_verifier": launch_verifier,
+    }
+
+
+@router.post("/businesses/{business_id}/mark-launch-verified", response_model=None)
+def business_mark_launch_verified(
+    request: Request,
+    business_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    launch_verification_notes: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    try:
+        business_onboarding_service.mark_launch_verified(
+            db,
+            business_id,
+            verified_by_user_id=auth.id,
+            notes=launch_verification_notes or None,
+        )
+        db.commit()
+    except ValueError as exc:
+        db.rollback()
+        ctx = _business_detail_context(
+            db,
+            auth=auth,
+            business_id=business_id,
+            launch_verify_error=str(exc),
+        )
+        if isinstance(ctx, RedirectResponse):
+            return ctx
+        return templates.TemplateResponse(
+            request,
+            "admin/business_detail.html",
+            ctx,
+            status_code=400,
+        )
+
+    return RedirectResponse(url=f"/admin/businesses/{business_id}#live-launch-test", status_code=303)
+
+
+@router.post("/businesses/{business_id}/mark-forwarding-test-passed", response_model=None)
+def business_mark_forwarding_test_passed(
+    request: Request,
+    business_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    notes: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    try:
+        call_forwarding_service.admin_update_forwarding(
+            db,
+            business_id,
+            status="test_passed",
+            notes=notes or None,
+        )
+        db.commit()
+    except ValueError:
+        db.rollback()
+    return RedirectResponse(url=f"/admin/businesses/{business_id}#call-forwarding", status_code=303)
+
+
+@router.post("/businesses/{business_id}/mark-forwarding-instructions-sent", response_model=None)
+def business_mark_forwarding_instructions_sent(
+    request: Request,
+    business_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    notes: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    try:
+        call_forwarding_service.admin_update_forwarding(
+            db,
+            business_id,
+            status="instructions_sent",
+            notes=notes or None,
+        )
+        db.commit()
+    except ValueError:
+        db.rollback()
+    return RedirectResponse(url=f"/admin/businesses/{business_id}#call-forwarding", status_code=303)
+
+
+@router.post("/businesses/{business_id}/call-forwarding", response_model=None)
+def business_call_forwarding_admin_update(
+    request: Request,
+    business_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    status: str = Form(""),
+    notes: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    try:
+        call_forwarding_service.admin_update_forwarding(
+            db,
+            business_id,
+            status=status,
+            notes=notes or None,
+        )
+        db.commit()
+    except ValueError:
+        db.rollback()
+    return RedirectResponse(url=f"/admin/businesses/{business_id}", status_code=303)
 
 
 @router.get("/businesses/{business_id}/compliance", response_class=HTMLResponse, response_model=None)
@@ -1926,6 +2074,57 @@ def business_lead_status_update(
         )
 
     return RedirectResponse(url=f"/admin/business-leads/{lead.id}", status_code=303)
+
+
+@router.post("/business-leads/{lead_id}/acknowledge-call-forwarding", response_model=None)
+def business_lead_acknowledge_call_forwarding(
+    request: Request,
+    lead_id: uuid.UUID,
+    db: Annotated[Session, Depends(get_db)],
+    admin_confirm_call_forwarding: str = Form(""),
+):
+    auth = _require_admin(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    from app.models.business import Business
+    from app.models.business_lead import BUSINESS_LEAD_STATUSES
+
+    confirm = admin_confirm_call_forwarding.strip().lower() in {"1", "on", "yes", "true"}
+    if not confirm:
+        try:
+            lead = business_lead_service.get_business_lead(db, lead_id)
+        except ValueError:
+            return RedirectResponse(url="/admin/business-leads", status_code=303)
+
+        converted_business = None
+        if lead.converted_business_id is not None:
+            converted_business = db.get(Business, lead.converted_business_id)
+
+        return templates.TemplateResponse(
+            request,
+            "admin/business_lead_detail.html",
+            {
+                "user": auth,
+                "lead": lead,
+                "converted_business": converted_business,
+                "statuses": sorted(BUSINESS_LEAD_STATUSES),
+                "status_error": None,
+                "checkout_error": (
+                    "Check the confirmation box to record call-forwarding acknowledgement."
+                ),
+            },
+            status_code=400,
+        )
+
+    try:
+        business_lead_service.acknowledge_call_forwarding_terms(db, lead_id)
+        db.commit()
+    except ValueError:
+        db.rollback()
+        return RedirectResponse(url="/admin/business-leads", status_code=303)
+
+    return RedirectResponse(url=f"/admin/business-leads/{lead_id}", status_code=303)
 
 
 @router.post("/business-leads/{lead_id}/create-checkout", response_model=None)

@@ -71,6 +71,39 @@
 
   <div class="lc-card lc-admin-section">
     <div class="lc-card__header">
+      <h2 class="lc-card__title">Call forwarding requirement</h2>
+    </div>
+    <div class="lc-card__body">
+      <p>
+        <strong>Call forwarding terms acknowledged:</strong>
+        {% if lead.call_forwarding_terms_acknowledged %}Yes{% else %}No{% endif %}
+      </p>
+      {% if lead.call_forwarding_terms_acknowledged %}
+        <p class="lc-text-muted lc-mb-0">
+          Recorded on lead (updated {{ lead.updated_at }}). Activation still requires a live forwarding test after purchase.
+        </p>
+      {% else %}
+        <div class="lc-alert lc-alert--warning" role="alert">
+          Checkout is blocked until this business acknowledges a mobile line with call forwarding.
+          Send them <a href="/demo/book">/demo/book</a> or confirm by phone below.
+        </div>
+        <form
+          method="post"
+          action="/admin/business-leads/{{ lead.id }}/acknowledge-call-forwarding"
+          class="lc-form"
+        >
+          <label class="lc-checkbox">
+            <input type="checkbox" name="admin_confirm_call_forwarding" value="yes" required />
+            I have confirmed with this business that they use a mobile business line and understand call forwarding is required.
+          </label>
+          <button type="submit" class="lc-btn lc-btn--secondary">Record acknowledgement</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="lc-card lc-admin-section">
+    <div class="lc-card__header">
       <h2 class="lc-card__title">Stripe checkout</h2>
       {% if lead.payment_status == 'paid' %}{{ status_badge('paid') }}{% endif %}
     </div>
@@ -83,16 +116,22 @@
         <p>Checkout link (share with prospect):</p>
         <p><a href="{{ lead.stripe_checkout_url }}" target="_blank" rel="noopener">{{ lead.stripe_checkout_url }}</a></p>
         <p><a href="{{ lead.stripe_checkout_url }}" target="_blank" rel="noopener"><strong>Open checkout link</strong></a></p>
-        {% if lead.status in ['contacted', 'qualified', 'converted'] %}
+        {% if lead.call_forwarding_terms_acknowledged and lead.status in ['contacted', 'qualified', 'converted'] %}
           <form method="post" action="/admin/business-leads/{{ lead.id }}/create-checkout">
             <button type="submit" class="lc-btn lc-btn--secondary">Regenerate checkout link</button>
           </form>
         {% endif %}
       {% elif lead.status in ['contacted', 'qualified'] %}
-        <form method="post" action="/admin/business-leads/{{ lead.id }}/create-checkout">
-          <button type="submit" class="lc-btn lc-btn--primary">Create checkout link</button>
-        </form>
-        <p class="lc-text-muted">Creates a pending Business record and Stripe Checkout for Growth ($147/mo) + setup fee ($199).</p>
+        {% if lead.call_forwarding_terms_acknowledged %}
+          <form method="post" action="/admin/business-leads/{{ lead.id }}/create-checkout">
+            <button type="submit" class="lc-btn lc-btn--primary">Create checkout link</button>
+          </form>
+          <p class="lc-text-muted">Creates a pending Business record and Stripe Checkout for Growth ($147/mo) + setup fee ($199).</p>
+        {% else %}
+          <div class="lc-alert lc-alert--warning" role="alert">
+            <strong>Create checkout link</strong> is unavailable until call-forwarding terms are acknowledged.
+          </div>
+        {% endif %}
       {% else %}
         <div class="lc-alert lc-alert--warning">
           Set lead status to <strong>contacted</strong> or <strong>qualified</strong> before creating checkout.

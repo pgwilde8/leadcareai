@@ -18,6 +18,7 @@ from app.models.partner_customer import PartnerCustomer
 from app.models.user import User
 from app.models.user_invite_token import UserInviteToken
 from app.services import business_lead_checkout_service
+from app.services.business_lead_checkout_service import CHECKOUT_ACK_REQUIRED_MESSAGE
 from app.services.business_lead_service import create_demo_lead
 from app.services.partner_document_service import seed_default_document_templates
 from app.services.partner_service import approve_application
@@ -44,7 +45,11 @@ def _qualified_lead(db_session: Session, **kwargs) -> BusinessLead:
         "state": "TX",
     }
     defaults.update(kwargs)
-    lead, _ = create_demo_lead(db_session, **defaults)
+    lead, _ = create_demo_lead(
+        db_session,
+        call_forwarding_terms_acknowledged=True,
+        **defaults,
+    )
     lead.status = "qualified"
     db_session.flush()
     return lead
@@ -71,6 +76,7 @@ def _referred_lead(db_session: Session) -> tuple[BusinessLead, Partner, PartnerC
         state="TX",
         partner=partner,
         referral_code=partner.referral_code,
+        call_forwarding_terms_acknowledged=True,
     )
     lead.status = "qualified"
     db_session.flush()
@@ -368,3 +374,127 @@ def test_webhook_checkout_completed_idempotent(
         .all()
     )
     assert len(events) == 1
+
+
+@patch("app.services.business_lead_checkout_service.stripe_service.create_growth_checkout_session")
+def test_checkout_blocked_when_call_forwarding_not_acknowledged(
+    mock_checkout: patch,
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    lead = _qualified_lead(db_session, email="no-ack@example.com")
+    lead.call_forwarding_terms_acknowledged = False
+    db_session.commit()
+    _login_admin(client, db_session)
+
+    response = client.post(f"/admin/business-leads/{lead.id}/create-checkout")
+    assert response.status_code == 400
+    assert CHECKOUT_ACK_REQUIRED_MESSAGE in response.text
+    mock_checkout.assert_not_called()
+
+    db_session.refresh(lead)
+    assert lead.payment_status == "none"
+    assert lead.stripe_checkout_session_id is None
+
+
+@patch("app.services.business_lead_checkout_service.stripe_service.create_growth_checkout_session")
+def test_checkout_allowed_when_call_forwarding_acknowledged(
+    mock_checkout: patch,
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    mock_checkout.return_value = CheckoutSessionResult(
+        session_id="cs_ack_ok",
+        url="https://checkout.stripe.com/c/pay/cs_ack_ok",
+    )
+    lead = _qualified_lead(db_session, email="ack-ok@example.com")
+    assert lead.call_forwarding_terms_acknowledged is True
+    db_session.commit()
+    _login_admin(client, db_session)
+
+    response = client.post(
+        f"/admin/business-leads/{lead.id}/create-checkout",
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    mock_checkout.assert_called_once()
+
+
+def test_admin_lead_detail_shows_acknowledgement_status(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    lead = _qualified_lead(db_session, email="detail-ack@example.com")
+    lead.call_forwarding_terms_acknowledged = False
+    db_session.commit()
+    _login_admin(client, db_session)
+
+    response = client.get(f"/admin/business-leads/{lead.id}")
+    assert response.status_code == 200
+    assert "Call forwarding terms acknowledged" in response.text
+    assert "Checkout is blocked until" in response.text
+    assert "unavailable until call-forwarding terms are acknowledged" in response.text.lower()
+
+
+def test_admin_can_manually_acknowledge_call_forwarding(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    lead = _qualified_lead(db_session, email="manual-ack@example.com")
+    lead.call_forwarding_terms_acknowledged = False
+    db_session.commit()
+    _login_admin(client, db_session)
+
+    response = client.post(
+        f"/admin/business-leads/{lead.id}/acknowledge-call-forwarding",
+        data={"admin_confirm_call_forwarding": "yes"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+
+    db_session.refresh(lead)
+    assert lead.call_forwarding_terms_acknowledged is True
+
+    detail = client.get(f"/admin/business-leads/{lead.id}")
+    assert "Call forwarding terms acknowledged" in detail.text
+
+
+def test_manual_acknowledgement_does_not_mark_forwarding_test_passed(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    from app.models.business import Business
+    from app.services.business_service import create_business, link_user_to_business
+    from app.services.user_service import create_user
+
+    lead = _qualified_lead(db_session, email="no-test-pass@example.com")
+    lead.call_forwarding_terms_acknowledged = False
+    business = create_business(db_session, name="Post Ack Co")
+    business.customer_phone_forwarding_status = "not_started"
+    lead.converted_business_id = business.id
+    db_session.commit()
+    _login_admin(client, db_session)
+
+    client.post(
+        f"/admin/business-leads/{lead.id}/acknowledge-call-forwarding",
+        data={"admin_confirm_call_forwarding": "yes"},
+    )
+
+    db_session.refresh(business)
+    assert business.customer_phone_forwarding_status == "not_started"
+    assert business.call_forwarding_tested_at is None
+
+    user = create_user(
+        db_session,
+        email="banner-still@example.com",
+        password="banner-secret",
+        role="business_user",
+    )
+    link_user_to_business(db_session, user.id, business.id)
+    db_session.commit()
+
+    client.post("/login", data={"email": "banner-still@example.com", "password": "banner-secret"})
+    dashboard = client.get("/business/dashboard")
+    from app.services.call_forwarding_service import INCOMPLETE_BANNER_MESSAGE
+
+    assert INCOMPLETE_BANNER_MESSAGE in dashboard.text

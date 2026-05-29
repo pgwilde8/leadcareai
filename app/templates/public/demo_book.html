@@ -59,6 +59,19 @@
           <label for="notes">What happens when you miss calls?</label>
           <textarea id="notes" name="notes" rows="4" placeholder="Optional — how you handle voicemails, after-hours, etc.">{{ form.notes or '' }}</textarea>
         </div>
+        <div class="lc-field">
+          <label class="lc-checkbox">
+            <input
+              type="checkbox"
+              name="call_forwarding_terms_acknowledged"
+              value="yes"
+              {% if form.call_forwarding_terms_acknowledged %}checked{% endif %}
+              required
+            />
+            I understand LeadCareAI requires a mobile business line that supports call forwarding,
+            and activation is complete only after a successful forwarding test.
+          </label>
+        </div>
         <button type="submit" class="lc-btn lc-btn--primary">Submit</button>
       </form>
     </div>

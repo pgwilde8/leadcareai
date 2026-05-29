@@ -7,10 +7,29 @@ from datetime import datetime
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, Text, Uuid, func
+from sqlalchemy import Boolean, DateTime, String, Text, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+CUSTOMER_PHONE_CARRIERS = frozenset({
+    "verizon",
+    "att",
+    "t_mobile",
+    "metro_tmobile",
+    "cricket",
+    "boost",
+    "consumer_cellular",
+    "other",
+})
+
+CALL_FORWARDING_STATUSES = frozenset({
+    "not_started",
+    "instructions_sent",
+    "customer_attempted",
+    "test_passed",
+    "failed_needs_help",
+})
 
 if TYPE_CHECKING:
     from app.models.business_compliance_profile import BusinessComplianceProfile
@@ -54,6 +73,29 @@ class Business(Base):
         nullable=True,
         index=True,
     )
+    customer_phone_carrier: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    customer_phone_is_mobile: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    customer_phone_forwarding_status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="not_started",
+        index=True,
+    )
+    customer_phone_forwarding_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    call_forwarding_tested_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    launch_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    launch_verified_by_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        nullable=True,
+        index=True,
+    )
+    launch_verification_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

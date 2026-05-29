@@ -93,6 +93,7 @@ def create_demo_lead(
     notes: str | None = None,
     partner: Partner | None = None,
     referral_code: str | None = None,
+    call_forwarding_terms_acknowledged: bool = False,
 ) -> tuple[BusinessLead, PartnerCustomer | None]:
     if not business_name.strip():
         raise ValueError("Business name is required")
@@ -137,6 +138,7 @@ def create_demo_lead(
             referral_code=referral_code,
             partner_id=partner.id if partner else None,
             status="new",
+            call_forwarding_terms_acknowledged=call_forwarding_terms_acknowledged,
         )
         db.add(lead)
         db.flush()
@@ -154,11 +156,20 @@ def create_demo_lead(
     return lead, partner_customer
 
 
+def acknowledge_call_forwarding_terms(db: Session, lead_id: uuid.UUID) -> BusinessLead:
+    """Admin or form confirmation that the prospect understands mobile forwarding requirements."""
+    lead = get_business_lead(db, lead_id)
+    lead.call_forwarding_terms_acknowledged = True
+    db.flush()
+    return lead
+
+
 def create_website_checkout_lead(
     db: Session,
     *,
     partner: Partner | None = None,
     referral_code: str | None = None,
+    call_forwarding_terms_acknowledged: bool = False,
 ) -> tuple[BusinessLead, PartnerCustomer | None]:
     """Placeholder lead for public pricing checkout; Stripe collects real contact info."""
     lead_id = uuid.uuid4()
@@ -174,6 +185,7 @@ def create_website_checkout_lead(
         partner_id=partner.id if partner else None,
         status="qualified",
         notes="Created from public pricing page; contact details pending Stripe Checkout.",
+        call_forwarding_terms_acknowledged=call_forwarding_terms_acknowledged,
     )
     db.add(lead)
     db.flush()

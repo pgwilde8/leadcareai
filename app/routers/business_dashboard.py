@@ -13,7 +13,7 @@ from app.core.database import get_db
 from app.models.business import Business
 from app.models.user import User
 from app.routers.auth import require_business_user
-from app.services import lead_service, message_service, phone_number_service
+from app.services import call_forwarding_service, lead_service, message_service, phone_number_service
 from app.services import business_settings_service
 from app.services import notification_service
 from app.services.lead_service import BUSINESS_SELECTABLE_STATUSES, LEAD_STATUSES
@@ -27,6 +27,11 @@ def _require_business(request: Request, db: Session) -> tuple[User, Business] | 
 
 
 def _settings_form_from_business(business: Business) -> dict[str, str]:
+    mobile_value = ""
+    if business.customer_phone_is_mobile is True:
+        mobile_value = "yes"
+    elif business.customer_phone_is_mobile is False:
+        mobile_value = "no"
     return {
         "name": business.name or "",
         "industry": business.industry or "",
@@ -38,7 +43,26 @@ def _settings_form_from_business(business: Business) -> dict[str, str]:
         "missed_call_textback_message": business.missed_call_textback_message or "",
         "sms_signature": business.sms_signature or "",
         "lead_intake_prompt": business.lead_intake_prompt or "",
+        "customer_phone_is_mobile": mobile_value,
+        "customer_phone_carrier": business.customer_phone_carrier or "",
     }
+
+
+def _business_page_context(
+    *,
+    user: User,
+    business: Business,
+    extra: dict | None = None,
+) -> dict:
+    ctx = {
+        "user": user,
+        "business": business,
+        "forwarding_incomplete": not call_forwarding_service.is_forwarding_setup_complete(business),
+        "forwarding_banner_message": call_forwarding_service.INCOMPLETE_BANNER_MESSAGE,
+    }
+    if extra:
+        ctx.update(extra)
+    return ctx
 
 
 def _lead_detail_context(
@@ -82,11 +106,7 @@ def business_dashboard(
     return templates.TemplateResponse(
         request,
         "business/dashboard.html",
-        {
-            "user": user,
-            "business": business,
-            "stats": stats,
-        },
+        _business_page_context(user=user, business=business, extra={"stats": stats}),
     )
 
 
@@ -105,12 +125,14 @@ def business_leads_list(
     return templates.TemplateResponse(
         request,
         "business/leads.html",
-        {
-            "user": user,
-            "business": business,
-            "inbox_rows": inbox_rows,
-            "recommended_action_for_lead": lead_service.recommended_action_for_lead,
-        },
+        _business_page_context(
+            user=user,
+            business=business,
+            extra={
+                "inbox_rows": inbox_rows,
+                "recommended_action_for_lead": lead_service.recommended_action_for_lead,
+            },
+        ),
     )
 
 
@@ -130,11 +152,16 @@ def business_lead_detail(
     except ValueError:
         return RedirectResponse(url="/business/leads", status_code=303)
 
-    return templates.TemplateResponse(
-        request,
-        "business/lead_detail.html",
-        _lead_detail_context(db, user=user, business=business, lead=lead),
+    detail_ctx = _lead_detail_context(db, user=user, business=business, lead=lead)
+    detail_ctx.update(
+        {
+            "forwarding_incomplete": not call_forwarding_service.is_forwarding_setup_complete(
+                business
+            ),
+            "forwarding_banner_message": call_forwarding_service.INCOMPLETE_BANNER_MESSAGE,
+        }
     )
+    return templates.TemplateResponse(request, "business/lead_detail.html", detail_ctx)
 
 
 @router.post("/leads/{lead_id}/status", response_model=None)
@@ -193,17 +220,20 @@ def business_settings_page(
     return templates.TemplateResponse(
         request,
         "business/settings.html",
-        {
-            "user": user,
-            "business": business,
-            "phone_numbers": phone_numbers,
-            "form": _settings_form_from_business(business),
-            "default_missed_call_message": business_settings_service.preview_default_missed_call_message(
-                business
-            ),
-            "saved": saved == 1,
-            "error": None,
-        },
+        _business_page_context(
+            user=user,
+            business=business,
+            extra={
+                "phone_numbers": phone_numbers,
+                "form": _settings_form_from_business(business),
+                "default_missed_call_message": business_settings_service.preview_default_missed_call_message(
+                    business
+                ),
+                "saved": saved == 1,
+                "error": None,
+                "carrier_choices": call_forwarding_service.CARRIER_LABELS,
+            },
+        ),
     )
 
 
@@ -221,6 +251,9 @@ def business_settings_save(
     missed_call_textback_message: str = Form(""),
     sms_signature: str = Form(""),
     lead_intake_prompt: str = Form(""),
+    customer_phone_is_mobile: str = Form(""),
+    customer_phone_carrier: str = Form(""),
+    can_access_phone_during_onboarding: str = Form(""),
 ):
     auth = _require_business(request, db)
     if isinstance(auth, RedirectResponse):
@@ -238,9 +271,21 @@ def business_settings_save(
         "missed_call_textback_message": missed_call_textback_message,
         "sms_signature": sms_signature,
         "lead_intake_prompt": lead_intake_prompt,
+        "customer_phone_is_mobile": customer_phone_is_mobile,
+        "customer_phone_carrier": customer_phone_carrier,
     }
-
     try:
+        mobile_raw = customer_phone_is_mobile.strip().lower()
+        mobile_bool: bool | None = None
+        if mobile_raw == "yes":
+            mobile_bool = True
+        elif mobile_raw == "no":
+            mobile_bool = False
+        elif mobile_raw:
+            raise ValueError("Please indicate whether your customer-facing number is a mobile phone")
+
+        can_access = can_access_phone_during_onboarding.strip().lower() == "yes"
+
         business_settings_service.update_business_settings(
             db,
             business.id,
@@ -254,6 +299,9 @@ def business_settings_save(
             missed_call_textback_message=missed_call_textback_message or None,
             sms_signature=sms_signature or None,
             lead_intake_prompt=lead_intake_prompt or None,
+            customer_phone_is_mobile=mobile_bool,
+            customer_phone_carrier=customer_phone_carrier or None,
+            can_access_phone_during_onboarding=False if not can_access else None,
         )
         db.commit()
     except ValueError as exc:
@@ -262,18 +310,131 @@ def business_settings_save(
         return templates.TemplateResponse(
             request,
             "business/settings.html",
-            {
-                "user": user,
-                "business": business,
-                "phone_numbers": phone_numbers,
-                "form": form,
-                "default_missed_call_message": business_settings_service.preview_default_missed_call_message(
-                    business
-                ),
-                "saved": False,
-                "error": str(exc),
-            },
+            _business_page_context(
+                user=user,
+                business=business,
+                extra={
+                    "phone_numbers": phone_numbers,
+                    "form": form,
+                    "default_missed_call_message": business_settings_service.preview_default_missed_call_message(
+                        business
+                    ),
+                    "saved": False,
+                    "error": str(exc),
+                    "carrier_choices": call_forwarding_service.CARRIER_LABELS,
+                },
+            ),
             status_code=400,
         )
 
     return RedirectResponse(url="/business/settings?saved=1", status_code=303)
+
+
+def _backup_mode_page_response(
+    request: Request,
+    *,
+    user: User,
+    business: Business,
+    db: Session,
+):
+    call_forwarding_service.mark_instructions_sent(db, business.id)
+    db.commit()
+    db.refresh(business)
+
+    assigned = call_forwarding_service.get_assigned_leadcare_number(db, business.id)
+    assigned_display = (
+        call_forwarding_service.format_phone_for_display(assigned.phone_number)
+        if assigned
+        else None
+    )
+    leadcare_e164 = assigned.phone_number if assigned else None
+    guidance = call_forwarding_service.get_carrier_guidance(
+        business.customer_phone_carrier,
+        leadcare_e164,
+    )
+
+    return templates.TemplateResponse(
+        request,
+        "business/backup_mode.html",
+        _business_page_context(
+            user=user,
+            business=business,
+            extra={
+                "assigned_number": assigned,
+                "assigned_number_display": assigned_display,
+                "guidance": guidance,
+                "backup_mode_subtitle": call_forwarding_service.BACKUP_MODE_SUBTITLE,
+                "backup_mode_plain_language": call_forwarding_service.BACKUP_MODE_PLAIN_LANGUAGE,
+                "setup_checklist": call_forwarding_service.SETUP_CHECKLIST_ITEMS,
+                "carrier_caveat": call_forwarding_service.CARRIER_CAVEAT,
+                "carrier_label": call_forwarding_service.carrier_display_label(
+                    business.customer_phone_carrier
+                ),
+                "status_label": business.customer_phone_forwarding_status.replace("_", " "),
+                "setup_complete": call_forwarding_service.is_forwarding_setup_complete(business),
+            },
+        ),
+    )
+
+
+@router.get("/backup-mode", response_class=HTMLResponse, response_model=None)
+def business_backup_mode_page(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    auth = _require_business(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    user, business = auth
+    return _backup_mode_page_response(request, user=user, business=business, db=db)
+
+
+@router.get("/call-forwarding", response_class=HTMLResponse, response_model=None)
+def business_call_forwarding_page(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    """Legacy URL; same Backup Mode page for compatibility."""
+    auth = _require_business(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    user, business = auth
+    return _backup_mode_page_response(request, user=user, business=business, db=db)
+
+
+def _mark_backup_mode_attempted(
+    request: Request,
+    db: Session,
+) -> RedirectResponse | None:
+    auth = _require_business(request, db)
+    if isinstance(auth, RedirectResponse):
+        return auth
+
+    _user, business = auth
+    call_forwarding_service.mark_customer_attempted(db, business.id)
+    db.commit()
+    return None
+
+
+@router.post("/backup-mode/attempted", response_model=None)
+def business_backup_mode_attempted(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    redirect = _mark_backup_mode_attempted(request, db)
+    if redirect is not None:
+        return redirect
+    return RedirectResponse(url="/business/backup-mode", status_code=303)
+
+
+@router.post("/call-forwarding/attempted", response_model=None)
+def business_call_forwarding_attempted(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+):
+    redirect = _mark_backup_mode_attempted(request, db)
+    if redirect is not None:
+        return redirect
+    return RedirectResponse(url="/business/backup-mode", status_code=303)

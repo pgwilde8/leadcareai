@@ -1,0 +1,106 @@
+<section class="lc-admin-section" id="onboarding-checklist">
+  <div class="lc-card">
+    <div class="lc-card__header">
+      <h2 class="lc-card__title">Customer onboarding checklist</h2>
+      <p class="lc-mb-0">
+        Ready for launch:
+        {% if onboarding.ready_for_launch %}
+          <strong class="lc-text-success">Yes</strong>
+        {% else %}
+          <strong class="lc-text-warning">No</strong>
+        {% endif %}
+        · Launch verified:
+        {% if onboarding.launch_verified %}
+          <strong class="lc-text-success">Yes</strong>
+        {% else %}
+          <strong class="lc-text-warning">No</strong>
+        {% endif %}
+      </p>
+    </div>
+    <div class="lc-card__body">
+      {% if not onboarding.ready_for_launch and onboarding.launch_missing_labels %}
+        <div class="lc-alert lc-alert--warning" role="status">
+          <strong>Still needed for launch:</strong>
+          {{ onboarding.launch_missing_labels | join(', ') }}
+        </div>
+      {% endif %}
+      <p class="lc-text-muted">
+        Launch readiness does not require a live lead. Post-launch verification confirms intake is working.
+      </p>
+
+      <h3 class="lc-admin-section__title">Launch requirements</h3>
+      <ul class="lc-onboarding-list">
+        {% for item in onboarding.launch_items %}
+          <li class="lc-onboarding-item lc-onboarding-item--{{ item.status }}">
+            <span class="lc-onboarding-item__icon" aria-hidden="true">
+              {% if item.status == 'complete' %}✓{% elif item.status == 'warning' %}⚠{% elif item.status == 'manual' %}✎{% else %}○{% endif %}
+            </span>
+            <div class="lc-onboarding-item__body">
+              <strong>{{ item.label }}</strong>
+              <span class="lc-onboarding-item__status">{{ item.status }}</span>
+              <p class="lc-mb-0">{{ item.description }}</p>
+              {% if item.action_hint %}
+                <p class="hint lc-mb-0">{{ item.action_hint }}</p>
+              {% endif %}
+              {% if item.action_url %}
+                <p class="lc-mb-0"><a href="{{ item.action_url }}">Open →</a></p>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <h3 class="lc-admin-section__title">Setup tracking</h3>
+      <ul class="lc-onboarding-list">
+        {% for item in onboarding.setup_items %}
+          {% if not item.is_launch_required and item.key != 'business_created' %}
+            <li class="lc-onboarding-item lc-onboarding-item--{{ item.status }}">
+              <span class="lc-onboarding-item__icon" aria-hidden="true">
+                {% if item.status == 'complete' %}✓{% elif item.status == 'warning' %}⚠{% elif item.status == 'manual' %}✎{% else %}○{% endif %}
+              </span>
+              <div class="lc-onboarding-item__body">
+                <strong>{{ item.label }}</strong>
+                <span class="lc-onboarding-item__status">{{ item.status }}</span>
+                <p class="lc-mb-0">{{ item.description }}</p>
+                {% if item.action_url %}
+                  <p class="lc-mb-0"><a href="{{ item.action_url }}">Open →</a></p>
+                {% endif %}
+              </div>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+
+      <h3 class="lc-admin-section__title">Post-launch verification</h3>
+      <ul class="lc-onboarding-list">
+        {% for item in onboarding.post_launch_items %}
+          <li class="lc-onboarding-item lc-onboarding-item--{{ item.status }}">
+            <span class="lc-onboarding-item__icon" aria-hidden="true">
+              {% if item.status == 'complete' %}✓{% elif item.status == 'warning' %}⚠{% else %}○{% endif %}
+            </span>
+            <div class="lc-onboarding-item__body">
+              <strong>{{ item.label }}</strong>
+              <p class="lc-mb-0">{{ item.description }}</p>
+              {% if item.action_url %}
+                <p class="lc-mb-0"><a href="{{ item.action_url }}">Open →</a></p>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lc-onboarding-list { list-style: none; padding: 0; margin: 0 0 1.5rem; }
+  .lc-onboarding-item { display: flex; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid #eee; }
+  .lc-onboarding-item__icon { font-weight: bold; min-width: 1.25rem; }
+  .lc-onboarding-item--complete .lc-onboarding-item__icon { color: #0d6b2f; }
+  .lc-onboarding-item--warning .lc-onboarding-item__icon { color: #9a6b00; }
+  .lc-onboarding-item--missing .lc-onboarding-item__icon { color: #9b1c1c; }
+  .lc-onboarding-item--manual .lc-onboarding-item__icon { color: #555; }
+  .lc-onboarding-item__status { font-size: 0.8rem; color: #666; margin-left: 0.35rem; }
+  .lc-text-success { color: #0d6b2f; }
+  .lc-text-warning { color: #9a6b00; }
+</style>

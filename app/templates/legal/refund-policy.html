@@ -6,6 +6,7 @@
   <article>
     <h1>Refund &amp; Cancellation Policy</h1>
     <p><strong>Last updated:</strong> May 28, 2026</p>
+    {% include "legal/_draft_notice.html" %}
 
     <p>
       This Refund &amp; Cancellation Policy explains how refunds, cancellations, setup fees, and subscription
@@ -54,24 +55,30 @@
     </ul>
 
     <h2>3. Setup fee refunds</h2>
-    <p>The setup fee is <strong>non-refundable</strong> once setup work has begun.</p>
     <p>
-      Setup work may begin after purchase and may include account creation, configuration, phone number assignment,
-      SMS setup, onboarding, support, or testing.
+      The setup fee is <strong>generally non-refundable</strong> once onboarding or configuration work has begun
+      (account creation, phone number assignment, SMS setup, notifications, onboarding support, or testing).
     </p>
     <p>
-      If you request cancellation <strong>before</strong> any setup work has started, Webwise Solutions LLC may,
-      at its sole discretion, issue a full or partial refund of the setup fee.
+      If you request cancellation <strong>before</strong> any setup work has started, we may review your request
+      case-by-case and, at our discretion, issue a full or partial refund of the setup fee.
     </p>
 
-    <h2>4. Monthly subscription billing</h2>
+    <h2>4. Stripe billing</h2>
+    <p>
+      Payments and subscriptions are processed by <strong>Stripe</strong>. Card and billing details are handled under
+      Stripe’s terms and privacy practices. {{ settings.app_name }} stores Stripe customer/subscription references, not
+      full payment card numbers.
+    </p>
+
+    <h2>5. Monthly subscription billing</h2>
     <p>
       {{ settings.app_name }} is billed as a recurring monthly subscription unless otherwise stated in writing.
       Monthly subscription fees are billed in advance for the upcoming billing period. By subscribing, you authorize
       recurring billing until you cancel.
     </p>
 
-    <h2>5. Monthly subscription refunds</h2>
+    <h2>6. Monthly subscription refunds</h2>
     <p>
       Monthly subscription fees are <strong>non-refundable</strong> after billing, except where required by law or
       approved by Webwise Solutions LLC in its sole discretion.
@@ -86,19 +93,27 @@
       <a href="/terms">Terms of Service</a>.
     </p>
 
-    <h2>6. Cancellation</h2>
+    <h2>7. Cancellation</h2>
     <p>
       You may cancel your subscription at any time before your next billing date. Cancellation stops future billing;
       it does not automatically refund fees already paid.
     </p>
-    <p>You may cancel by using the billing portal if available, or by contacting support:</p>
+    <p>You may cancel by using the Stripe billing portal if available, or by contacting:</p>
     <ul>
+      <li><a href="mailto:{{ settings.legal_contact_email }}">{{ settings.legal_contact_email }}</a></li>
       <li><a href="/contact">{{ settings.app_name }} contact form</a></li>
-      <li><a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a></li>
     </ul>
     <p>Please include your business name, account email, and cancellation request.</p>
 
-    <h2>7. Failed payments and non-payment</h2>
+    <h2>8. Call forwarding and service readiness</h2>
+    <p>
+      {{ settings.app_name }} depends on your mobile carrier and your configuration of call forwarding (Backup Mode).
+      You are responsible for completing forwarding setup and any required forwarding test before relying on missed-call
+      recovery. If you cannot or will not configure forwarding, service may be limited regardless of subscription status.
+      We do not guarantee that every carrier or phone plan supports the forwarding codes or behavior you need.
+    </p>
+
+    <h2>9. Failed payments and non-payment</h2>
     <p>
       If a payment fails, {{ settings.app_name }} may retry the payment, notify you, suspend service, or cancel your
       account. Service may be interrupted if payment is not successfully received.
@@ -108,7 +123,7 @@
       interruptions, or other service issues caused by non-payment or suspended service.
     </p>
 
-    <h2>8. Phone numbers and service after cancellation</h2>
+    <h2>10. Phone numbers and service after cancellation</h2>
     <p>
       After cancellation, {{ settings.app_name }} may release, disable, reassign, or stop supporting any phone numbers,
       SMS flows, dashboards, automations, or configurations associated with your account.
@@ -119,7 +134,7 @@
       cancellation if your forwarding settings remain active.
     </p>
 
-    <h2>9. Refunds for technical issues</h2>
+    <h2>11. Refunds for technical issues</h2>
     <p>If you experience a technical issue, contact support promptly. We may attempt to troubleshoot, repair,
       reconfigure, or otherwise resolve the issue.</p>
     <p>
@@ -127,7 +142,7 @@
       sole discretion of Webwise Solutions LLC unless required by law.
     </p>
 
-    <h2>10. Third-party services</h2>
+    <h2>12. Third-party services</h2>
     <p>
       {{ settings.app_name }} relies on third-party providers such as payment processors, telecommunications providers,
       SMS providers, hosting providers, AI providers, and email providers. We do not guarantee uninterrupted
@@ -138,37 +153,37 @@
       providers.
     </p>
 
-    <h2>11. Abuse, misuse, or policy violations</h2>
+    <h2>13. Abuse, misuse, or policy violations</h2>
     <p>
       {{ settings.app_name }} may suspend or terminate service without refund if we determine that an account is being
       used for unlawful, abusive, fraudulent, misleading, high-risk, spam-related, or prohibited activity, or if the
       customer violates our <a href="/terms">Terms of Service</a> or acceptable use rules.
     </p>
 
-    <h2>12. Chargebacks and disputes</h2>
+    <h2>14. Chargebacks and disputes</h2>
     <p>
       If you dispute or charge back a payment, we may suspend your account while the dispute is reviewed. Chargebacks,
       disputes, reversals, or payment fraud may result in cancellation of service, loss of access, collection activity,
       and/or refusal of future service.
     </p>
 
-    <h2>13. Promotional offers</h2>
+    <h2>15. Promotional offers</h2>
     <p>
       Promotional pricing, discounts, coupons, trials, or special offers may have additional terms. Unless stated
       otherwise, setup fees and monthly subscription fees remain subject to this policy.
     </p>
 
-    <h2>14. Changes to this policy</h2>
+    <h2>16. Changes to this policy</h2>
     <p>
       We may update this Refund &amp; Cancellation Policy from time to time. The updated version will be posted on our
       website with a revised “Last updated” date.
     </p>
 
-    <h2>15. Contact</h2>
+    <h2>17. Contact</h2>
     <p>For refund, billing, or cancellation questions, contact us at:</p>
     <p>
-      <a href="/contact">leadcareai.com/contact</a><br />
-      <a href="mailto:{{ settings.default_support_email }}">{{ settings.default_support_email }}</a>
+      <a href="mailto:{{ settings.legal_contact_email }}">{{ settings.legal_contact_email }}</a><br />
+      <a href="/contact">Contact form</a>
     </p>
     <p>
       Webwise Solutions LLC<br />
@@ -180,7 +195,7 @@
     <p>
       <a href="/privacy">Privacy Policy</a> ·
       <a href="/terms">Terms of Service</a> ·
-      <a href="/sms">SMS Program Terms</a>
+      <a href="/sms-terms">SMS Terms</a>
     </p>
   </article>
 {% endblock %}

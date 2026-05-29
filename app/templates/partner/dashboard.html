@@ -14,12 +14,17 @@
   </p>
   <p>Referral code: <strong>{{ partner.referral_code }}</strong></p>
   <p>
+    <a href="/partner/resources#training-videos"><strong>Start here: training videos</strong></a>
+    ·
     <a href="/partner/marketing">Marketing links</a>
     ·
-    <a href="/partner/resources">Resources &amp; training</a>
+    <a href="/partner/resources">Resources &amp; playbook</a>
     ·
     <a href="/partner/payplan">Pay plan</a>
   </p>
+  {% if stats.businesses_referred == 0 %}
+    <p class="lc-text-muted">New on the team? Watch the training videos before sharing your referral link.</p>
+  {% endif %}
 
   <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;" />
   {% include "shared/_demo_sales_script.html" %}

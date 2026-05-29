@@ -59,6 +59,9 @@ def test_active_partner_can_view_resources_playbook(
     assert f"/demo?ref={code}" in response.text
     assert "Do I have to change my number" in response.text
     assert "carrier" in response.text.lower()
+    assert "New rep training videos" in response.text
+    assert "LeadCareAI_Sales_Playbook.mp4" in response.text
+    assert "training-videos" in response.text
 
 
 def test_non_partner_cannot_access_resources(

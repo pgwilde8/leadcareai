@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     admin_email: str = "admin@example.com"
     admin_password: str = "change-me"
     default_support_email: str = "support@leadcareai.com"
+    legal_contact_email: str = "paul@leadcareai.com"
 
     public_base_url: str | None = None
 

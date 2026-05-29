@@ -6,6 +6,7 @@
   <article>
     <h1>Terms of Service</h1>
     <p><strong>Last updated:</strong> May 28, 2026</p>
+    {% include "legal/_draft_notice.html" %}
 
     <p>
       These Terms of Service (“Terms”) govern your access to and use of {{ settings.app_name }}, a service operated
@@ -31,7 +32,7 @@
     </p>
     <p>
       <strong>Support:</strong>
-     
+      <a href="mailto:{{ settings.legal_contact_email }}">{{ settings.legal_contact_email }}</a><br />
       <strong>Website:</strong>
       <a href="/contact">{{ settings.app_name }} contact</a>
     </p>
@@ -57,12 +58,14 @@
       <li>Monthly lead reports</li>
       <li>Billing portal access</li>
       <li>Setup and onboarding support</li>
+      <li>Backup Mode / call-forwarding setup guidance (carrier-controlled; not automatic)</li>
       <li>Partner/referral attribution where applicable</li>
     </ul>
     <p>
-      {{ settings.app_name }} is not an emergency response service, live human answering service, call center, legal
-      advisor, medical provider, financial advisor, insurance carrier, licensed trade provider, or guarantee of sales,
-      leads, revenue, appointments, or business results.
+      {{ settings.app_name }} is not an emergency response service, is not a substitute for 911 or other emergency
+      dispatch, and is not a live human answering service, call center, legal advisor, medical provider, financial
+      advisor, insurance carrier, licensed trade provider, or guarantee of sales, leads, revenue, appointments, or
+      business results. Do not use the Service for life-or-safety-critical communications.
     </p>
 
     <h2>3. Eligibility</h2>
@@ -106,7 +109,9 @@
     <ul>
       <li>Providing accurate business, contact, billing, and service information</li>
       <li>Keeping staff notification phone numbers and email addresses current</li>
-      <li>Configuring call forwarding or phone routing correctly</li>
+      <li>Maintaining your mobile business line and enabling call forwarding where you choose to use Backup Mode</li>
+      <li>Configuring call forwarding or phone routing correctly — carrier compatibility is not guaranteed</li>
+      <li>Completing required forwarding tests before relying on the Service in production</li>
       <li>Testing your missed-call recovery setup</li>
       <li>Monitoring your dashboard, messages, alerts, and leads</li>
       <li>Responding to your customers and prospects</li>
@@ -193,7 +198,7 @@
     <p>
       {{ settings.app_name }} may send and receive text messages, place or receive calls, and deliver staff alerts as
       part of the Service. This section describes how those communications work and your responsibilities as a customer.
-      For additional SMS program details, see our <a href="/sms">SMS Program Terms</a>.
+      For additional SMS program details, see our <a href="/sms-terms">SMS Terms</a>.
     </p>
 
     <h3>10.1 Your compliance responsibilities</h3>
@@ -262,7 +267,7 @@
     </p>
     <p>
       After an opt-out, a confirming message may be sent where permitted. Recipients may reply <strong>HELP</strong> for
-      assistance information where that feature is supported. See our <a href="/sms">SMS Program Terms</a> for more detail.
+      assistance information where that feature is supported. See our <a href="/sms-terms">SMS Terms</a> for more detail.
     </p>
 
     <h3>10.5 Call forwarding and phone routing</h3>
@@ -571,7 +576,7 @@
 
     <p>
       <a href="/privacy">Privacy Policy</a> ·
-      <a href="/sms">SMS Program Terms</a> ·
+      <a href="/sms-terms">SMS Terms</a> ·
       <a href="/refund-policy">Refund &amp; Cancellation Policy</a>
     </p>
   </article>

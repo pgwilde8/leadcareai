@@ -193,3 +193,37 @@ def test_system_check_production_missing_tax_key_warning(
     assert "PARTNER_TAX_ENCRYPTION_KEY" in response.text
     assert "required" in response.text.lower() or "not configured" in response.text.lower()
     assert "lc-check-error" in response.text
+
+
+def test_system_check_shows_compliance_and_a2p_sections(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    _login_admin(client, db_session)
+    response = client.get("/admin/system-check")
+    assert response.status_code == 200
+    text = response.text
+    assert "Compliance (public legal pages)" in text
+    assert "A2P 10DLC" in text
+    assert "Route /privacy" in text
+    assert "Route /sms-terms" in text
+    assert "Route /admin/a2p-packet" in text
+    assert "/admin/a2p-packet" in text
+    assert "approval is not guaranteed" in text.lower()
+    assert "LEGAL_CONTACT_EMAIL" in text
+    assert "webhooks/stripe" in text
+
+
+def test_system_check_shows_stripe_webhook_url(
+    client: TestClient,
+    db_session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    patch_get_settings(
+        monkeypatch,
+        public_base_url="https://leadcareai.com",
+        app_base_url="https://leadcareai.com",
+    )
+    _login_admin(client, db_session)
+    response = client.get("/admin/system-check")
+    assert "https://leadcareai.com/webhooks/stripe" in response.text

@@ -1,0 +1,148 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Backup Mode — {{ business.name }}{% endblock %}
+
+{% block content %}
+  <h1>Backup Mode</h1>
+  <p class="lc-lead">{{ backup_mode_subtitle }}</p>
+  <p class="lc-plain-language">{{ backup_mode_plain_language }}</p>
+  <p class="hint">
+    Backup Mode uses <strong>call forwarding</strong> on your mobile carrier. LeadCareAI cannot turn
+    forwarding on or off for you — you control it on your phone or with your carrier.
+  </p>
+  <p>Signed in as <strong>{{ user.email }}</strong></p>
+
+  {% include "business/_nav.html" %}
+  {% include "business/_forwarding_banner.html" %}
+
+  {% if setup_complete %}
+    <div class="lc-alert lc-alert--success" role="status">
+      <strong>Backup Mode test passed.</strong> You can turn forwarding on whenever you need backup and off when you want calls direct again.
+    </div>
+  {% endif %}
+
+  <section class="lc-backup-hero">
+    <h2>Forward calls to</h2>
+    {% if assigned_number and assigned_number_display %}
+      <p class="lc-backup-number"><strong>{{ assigned_number_display }}</strong></p>
+      <p class="hint">Full number: {{ assigned_number.phone_number }}</p>
+    {% else %}
+      <p class="error"><strong>No LeadCareAI number is assigned yet.</strong> Contact support before turning on Backup Mode.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>What is Backup Mode?</h2>
+    <p>
+      Backup Mode is your missed-call safety net. When call forwarding is enabled on your mobile line,
+      missed, busy, or unreachable calls go to LeadCareAI. LeadCareAI texts callers, captures job details,
+      saves the lead, and alerts your team.
+    </p>
+    <ul>
+      <li><strong>Turn Backup Mode on</strong> when you are busy, after hours, driving, on a job, or need a break.</li>
+      <li><strong>Turn forwarding off</strong> when you want calls going directly to you again.</li>
+      <li>Forwarding is controlled by <strong>your carrier</strong>. LeadCareAI guides you but cannot flip the carrier switch automatically.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>When to use Backup Mode</h2>
+    <ul class="lc-backup-examples">
+      <li>On a job</li>
+      <li>Driving</li>
+      <li>Dinner or family time</li>
+      <li>After hours</li>
+      <li>Weekends</li>
+      <li>When your spouse or helper is busy</li>
+      <li>Vacation</li>
+      <li>Already on another call</li>
+    </ul>
+  </section>
+
+  {% if business.customer_phone_carrier %}
+    {% include "business/_carrier_backup_guide.html" %}
+  {% else %}
+    <section class="lc-alert lc-alert--info">
+      <p>
+        Select your mobile carrier in <a href="/business/settings">Settings</a> to see carrier-specific
+        Backup Mode codes and steps.
+      </p>
+    </section>
+  {% endif %}
+
+  <section>
+    <h2>General steps (any carrier)</h2>
+    <ol>
+      <li>Open your phone dialer or call settings on the line customers call.</li>
+      <li>Enable call forwarding for <strong>missed</strong>, <strong>unanswered</strong>, or <strong>busy</strong> calls.</li>
+      <li>Enter your LeadCareAI number{% if assigned_number_display %}: <strong>{{ assigned_number_display }}</strong>{% endif %}.</li>
+      <li>Save or confirm, then test from another phone.</li>
+    </ol>
+    <p><em>{{ carrier_caveat }}</em></p>
+  </section>
+
+  <section>
+    <h2>Setup checklist</h2>
+    <p>Work through these steps (check off on paper or mentally for now):</p>
+    <ul class="lc-checklist">
+      {% for item in setup_checklist %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Your setup status</h2>
+    <table>
+      <tbody>
+        <tr><th>Carrier</th><td>{{ carrier_label }}</td></tr>
+        <tr><th>Mobile line</th><td>{% if business.customer_phone_is_mobile %}Yes{% elif business.customer_phone_is_mobile is none %}Not answered{% else %}No{% endif %}</td></tr>
+        <tr><th>Status</th><td>{{ status_label }}</td></tr>
+        {% if business.call_forwarding_tested_at %}
+          <tr><th>Test passed at</th><td>{{ business.call_forwarding_tested_at }}</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </section>
+
+  {% if not setup_complete %}
+    <section>
+      <h2>Ready for a live test?</h2>
+      <p>
+        After you turn on forwarding, tell us so we can complete your setup test.
+        LeadCareAI does not enable forwarding on your behalf.
+      </p>
+      <form method="post" action="/business/backup-mode/attempted">
+        <button type="submit">I turned on Backup Mode on my phone</button>
+      </form>
+    </section>
+  {% endif %}
+
+  <p><a href="/business/settings">Update carrier or mobile line details →</a></p>
+
+  <form method="post" action="/logout">
+    <button type="submit">Log out</button>
+  </form>
+
+  <style>
+    body { max-width: 48rem; }
+    .lc-lead { font-size: 1.05rem; color: #333; }
+    .lc-plain-language { font-size: 1rem; line-height: 1.5; }
+    .lc-backup-number { font-size: 1.35rem; margin: 0.25rem 0; }
+    .lc-backup-examples { columns: 2; gap: 0.25rem 1.5rem; }
+    .lc-checklist { list-style: none; padding-left: 0; }
+    .lc-checklist li::before { content: "☐ "; }
+    .lc-carrier-guide { margin: 1.5rem 0; padding: 1rem; background: #f8f9fa; border-radius: 6px; }
+    .lc-code-table { width: 100%; font-size: 0.9rem; }
+    .lc-code-table code { word-break: break-all; }
+    .lc-code-example code { font-size: 1.1rem; }
+    .lc-warning { color: #7a4f01; background: #fff8e6; padding: 0.5rem 0.75rem; border-radius: 4px; }
+    .lc-support-script { font-style: italic; }
+    .hint { font-size: 0.9rem; color: #555; }
+    .error { color: #9b1c1c; }
+    @media (max-width: 32rem) {
+      .lc-backup-examples { columns: 1; }
+      .lc-code-table { font-size: 0.8rem; }
+    }
+  </style>
+{% endblock %}

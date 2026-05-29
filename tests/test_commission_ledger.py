@@ -227,6 +227,7 @@ def test_checkout_link_creation_creates_no_commission(
         state="TX",
         partner=partner,
         referral_code=partner.referral_code,
+        call_forwarding_terms_acknowledged=True,
     )
     lead.status = "qualified"
     db_session.commit()

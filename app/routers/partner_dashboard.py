@@ -15,6 +15,7 @@ from app.models.business import Business
 from app.routers.auth import get_current_user, require_partner
 from app.services.partner_service import PARTNER_STATUS_ACTIVE
 from app.services import business_lead_service, commission_payout_service, commission_service
+from app.services.partner_training_service import list_partner_training_videos
 from app.services.demo_live_service import DEMO_PHONE_DISPLAY
 from app.templates import templates
 
@@ -168,5 +169,6 @@ def partner_resources(
             "referral_landing_link": f"{base}/r/{code}",
             "demo_book_link": f"{base}/demo/book?ref={code}",
             "demo_phone_display": DEMO_PHONE_DISPLAY,
+            "training_videos": list_partner_training_videos(),
         },
     )

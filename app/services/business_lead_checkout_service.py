@@ -24,6 +24,10 @@ from app.services.user_invite_service import create_or_invite_business_user_for_
 logger = logging.getLogger(__name__)
 
 CHECKOUT_ALLOWED_STATUSES = frozenset({"contacted", "qualified"})
+CHECKOUT_ACK_REQUIRED_MESSAGE = (
+    "This lead has not acknowledged the mobile call-forwarding requirement. "
+    "Send them the demo/signup form or collect acknowledgement before checkout."
+)
 PAYMENT_STATUS_NONE = "none"
 PAYMENT_STATUS_CHECKOUT_CREATED = "checkout_created"
 PAYMENT_STATUS_PAID = "paid"
@@ -108,6 +112,8 @@ def create_checkout_for_lead(db: Session, lead_id: uuid.UUID) -> LeadCheckoutRes
         raise ValueError("Lead is already paid")
     if lead.status == "converted" and lead.payment_status == PAYMENT_STATUS_PAID:
         raise ValueError("Lead is already converted and paid")
+    if not lead.call_forwarding_terms_acknowledged:
+        raise ValueError(CHECKOUT_ACK_REQUIRED_MESSAGE)
 
     business = ensure_business_from_lead(db, lead)
     partner_customer = get_partner_customer_for_lead(db, lead.id)
@@ -168,8 +174,13 @@ def start_public_growth_checkout(
     *,
     partner: Partner | None = None,
     referral_code: str | None = None,
+    call_forwarding_terms_acknowledged: bool = False,
 ) -> LeadCheckoutResult:
     """Create a website lead and Stripe Checkout for the public Growth plan."""
+    if not call_forwarding_terms_acknowledged:
+        raise ValueError(
+            "You must acknowledge the mobile call-forwarding requirement before checkout."
+        )
     if not stripe_service.growth_checkout_configured():
         raise ValueError("Online checkout is not configured. Please book a demo instead.")
 
@@ -177,6 +188,7 @@ def start_public_growth_checkout(
         db,
         partner=partner,
         referral_code=referral_code,
+        call_forwarding_terms_acknowledged=True,
     )
     return create_checkout_for_lead(db, lead.id)
 
