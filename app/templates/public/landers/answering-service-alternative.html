@@ -1,0 +1,325 @@
+{% extends "public/landers/_base.html" %}
+{% from "layout/_seo_tags.html" import seo_tags %}
+
+{% block title %}Answering Service Alternative for Small Service Businesses | {{ settings.app_name }}{% endblock %}
+
+{% block seo_meta %}
+  {{ seo_tags(
+    description="Looking for an answering service? " ~ settings.app_name ~ " is a simpler missed-call backup for plumbers, roofers, HVAC techs, and local service businesses. Instantly text missed callers, capture job details, and alert your team.",
+    keywords="answering service alternative, answering service for business, business phone answering service, after hours answering service, phone answering service alternative, virtual phone answering service alternative, missed call text back, missed call text back for small business, missed call recovery software, business missed call text back, service business answering service, contractor answering service alternative, answering service for contractors, answering service for roofers, roofing answering service, answering service for plumbers, plumbing answering service, HVAC answering service, electrician answering service, garage door answering service, pest control answering service, landscaping answering service",
+    canonical_path="/answering-service-alternative",
+    og_title="A Simpler Answering Service Alternative for Service Businesses",
+    og_description=settings.app_name ~ " texts missed callers, captures job details, and alerts your team — without a complicated CRM or full answering service.",
+    twitter_title="Answering Service Alternative for Small Service Businesses",
+    twitter_description="Catch missed calls before they become lost jobs. " ~ settings.app_name ~ " texts missed callers, captures job details, and alerts your team.",
+    json_ld='{
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "' ~ settings.app_name ~ '",
+      "serviceType": "Missed-call recovery and answering service alternative",
+      "provider": {
+        "@type": "Organization",
+        "name": "' ~ settings.app_name ~ '",
+        "url": "' ~ absolute_public_url("/") ~ '"
+      },
+      "areaServed": "United States",
+      "description": "' ~ settings.app_name ~ ' helps small service businesses recover missed calls with instant text-back, AI-assisted lead intake, staff alerts, and a simple dashboard.",
+      "offers": {
+        "@type": "Offer",
+        "price": "147",
+        "priceCurrency": "USD",
+        "description": "$147/month Growth plan with $199 setup fee"
+      }
+    }'
+  ) }}
+{% endblock %}
+
+{% block content %}
+  <section class="lc-hero lc-lander-hero" aria-labelledby="asa-hero-title">
+    <div class="lc-hero__layout">
+      <div class="lc-hero__content">
+        <p class="lc-hero__eyebrow">Answering service alternative · missed-call recovery</p>
+        <h1 id="asa-hero-title" class="lc-hero__title">
+          A Simpler Answering Service Alternative for Small Service Businesses
+        </h1>
+        <div class="lc-hero__actions" style="margin-top: var(--lc-space-5);">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the interactive demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a setup call</a>
+        </div>
+        <p class="lc-text-muted lc-mb-0" style="margin-top: var(--lc-space-4); font-size: 0.9rem;">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+      <div class="lc-hero__visual">
+        <a class="lc-hero__logo" href="/" tabindex="-1">
+          <img
+            src="https://our-cloud-storage.sfo3.cdn.digitaloceanspaces.com/leadcareai/logo%20images/leadcareai-logo.png"
+            alt="{{ settings.app_name }}"
+            width="280"
+            height="80"
+            decoding="async"
+          />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-catch-title">
+    <header class="lc-page-header">
+      <h2 id="asa-catch-title" class="lc-page-header__title">Catch Missed Calls Without Hiring a Full Answering Service</h2>
+    </header>
+    <p class="lc-hero__lead" style="margin-top: 0;">
+      When you miss a call, {{ settings.app_name }} texts the caller right away, asks what they need, captures the job details, and alerts you or your team.
+    </p>
+    <p class="lc-text-muted">
+      No complicated CRM. No full-time receptionist. No calling an answering service every time you need an hour of coverage — including
+      <strong>after hours</strong> or when you need a <strong>business phone answering service</strong> backup, not a full call center.
+    </p>
+    <p class="lc-lander-emphasis lc-mb-0">Just a simple missed-call safety net for contractors and local trades.</p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-problem-title">
+    <header class="lc-page-header">
+      <h2 id="asa-problem-title" class="lc-page-header__title">Why Missed Calls Turn Into Lost Jobs</h2>
+    </header>
+    <p class="lc-text-muted">
+      You are on a job, driving, on another call, eating lunch, or with family. Your wife or office helper is busy. The phone rings — nobody answers.
+      That caller may have a leak, roof damage, no heat, or another urgent problem. By the time you call back, they may already be talking to someone else.
+    </p>
+    <p class="lc-text-muted lc-mb-0">
+      For many owners comparing <strong>answering service costs</strong> and <strong>answering service prices</strong>, the real loss is not the monthly fee — it is the job that went to the next company on the list.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-backup-title">
+    <header class="lc-page-header">
+      <h2 id="asa-backup-title" class="lc-page-header__title">Meet {{ settings.app_name }} Backup Mode</h2>
+      <p class="lc-page-header__lead">A done-for-you missed-call recovery system — an honest answering service alternative, not a live receptionist.</p>
+    </header>
+    <ol class="lc-lander-steps">
+      <li>
+        <strong>Forward missed or unanswered calls</strong>
+        <p class="lc-text-muted lc-mb-0">To your {{ settings.app_name }} recovery number. Your business phone still rings like normal.</p>
+      </li>
+      <li>
+        <strong>Instant text to the caller</strong>
+        <p class="lc-text-muted lc-mb-0">Missed-call text-back while interest is high — no waiting on voicemail.</p>
+      </li>
+      <li>
+        <strong>Lead saved and team alerted</strong>
+        <p class="lc-text-muted lc-mb-0">Job details in your dashboard; SMS or email alert to your crew.</p>
+      </li>
+    </ol>
+    <p class="lc-mb-0">
+      <a href="/backup-mode">Learn about Backup Mode</a> — how your existing call forwarding becomes a lead-saving system.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-example-title">
+    <div class="lc-card">
+      <div class="lc-card__header">
+        <h3 id="asa-example-title" class="lc-card__title">Example: on the ladder, call still caught</h3>
+      </div>
+      <div class="lc-card__body">
+        <p class="lc-text-muted">
+          A homeowner calls your roofing company. You cannot safely answer from the ladder.
+        </p>
+        <div class="lc-lander-chat" role="group" aria-label="Sample SMS thread">
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--out">
+            Sorry we missed your call. What can we help with today?
+          </div>
+          <div class="lc-lander-chat__bubble lc-lander-chat__bubble--in">
+            Storm damage. Water is coming in near the bedroom ceiling.
+          </div>
+        </div>
+        <p class="lc-mb-0">
+          {{ settings.app_name }} saves the lead, marks urgency, and alerts you — the job is not lost because you could not grab the phone.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-industries-title">
+    <header class="lc-page-header">
+      <h2 id="asa-industries-title" class="lc-page-header__title">Built for Plumbers, Roofers, HVAC Techs, and Local Service Businesses</h2>
+      <p class="lc-page-header__lead">
+        Trade-specific pages for owners searching for an answering service for their industry.
+      </p>
+    </header>
+    <ul class="lc-lander-industry-list">
+      <li><a href="/for/plumbers">Plumbers</a> — answering service for plumbers</li>
+      <li><a href="/for/roofers">Roofers</a> — answering service for roofers</li>
+      <li>HVAC answering service</li>
+      <li>Electrician answering service</li>
+      <li>Garage door answering service</li>
+      <li>Pest control answering service</li>
+      <li>Landscaping answering service</li>
+      <li>Locksmiths, appliance repair, cleaners, mobile mechanics</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-simple-title">
+    <header class="lc-page-header">
+      <h2 id="asa-simple-title" class="lc-page-header__title">Not a Full CRM. Not a Call Center. Just Missed-Call Recovery.</h2>
+    </header>
+    <p class="lc-lander-emphasis">Catch missed calls and turn them into conversations.</p>
+    <ul class="lc-text-muted">
+      <li>Instant missed-call text-back</li>
+      <li>AI-assisted SMS intake</li>
+      <li>Lead dashboard</li>
+      <li>Staff alerts</li>
+      <li>Backup Mode setup guidance</li>
+      <li>Live launch verification</li>
+    </ul>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-compare-title">
+    <header class="lc-page-header">
+      <h2 id="asa-compare-title" class="lc-page-header__title">Answering Service vs {{ settings.app_name }}</h2>
+      <p class="lc-page-header__lead">
+        An honest comparison — we are not claiming to be the “best answering service,” but a simpler option when you mainly need missed-call backup.
+      </p>
+    </header>
+    <p class="lc-text-muted">
+      Traditional answering services can work, but many small businesses pay per call or per minute, schedule coverage windows, and manage scripts.
+      Sometimes you need <strong>answering service for business</strong> coverage without that overhead.
+    </p>
+    <div class="lc-card">
+      <div class="lc-card__body" style="overflow-x: auto;">
+        <table class="lc-lander-compare">
+          <thead>
+            <tr>
+              <th scope="col">Traditional answering service</th>
+              <th scope="col">{{ settings.app_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Human operator answers calls</td>
+              <td>Instant text-back to missed callers</td>
+            </tr>
+            <tr>
+              <td>Often priced per call or per minute</td>
+              <td>$199 setup · $147/month Growth plan</td>
+            </tr>
+            <tr>
+              <td>May require scheduling coverage</td>
+              <td>Backup Mode when you need it</td>
+            </tr>
+            <tr>
+              <td>Handoffs and scripts</td>
+              <td>Captures job details by SMS</td>
+            </tr>
+            <tr>
+              <td>Full call coverage</td>
+              <td>Missed-call recovery focus</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="lc-text-muted lc-mb-0">
+      {{ settings.app_name }} is a practical <strong>answering service alternative</strong> and <strong>contractor answering service alternative</strong> for teams that want missed-call text-back without a complicated CRM.
+    </p>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-family-title">
+    <header class="lc-page-header">
+      <h2 id="asa-family-title" class="lc-page-header__title">Give Your Family and Team Breathing Room</h2>
+    </header>
+    <p class="lc-text-muted lc-mb-0">
+      Many small service businesses are family-run. {{ settings.app_name }} does not replace your spouse, office helper, or receptionist — it gives them backup when life gets busy.
+    </p>
+  </section>
+
+  <section class="lc-section">
+    <div class="lc-card lc-text-center">
+      <div class="lc-card__body">
+        <h2 class="lc-card__title">Pricing</h2>
+        <p class="lc-lander-pricing__price">$199 setup · $147/month Growth plan</p>
+        <p class="lc-text-muted">
+          Straightforward pricing vs. unpredictable per-minute answering service bills. One recovered job can often pay for the month.
+        </p>
+        {% if is_checkout_available() %}
+          <p><a class="lc-btn lc-btn--accent" href="/checkout/growth">Get started with Growth</a></p>
+        {% else %}
+          <p><a class="lc-btn lc-btn--accent" href="/demo/book">Book a setup call</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="asa-demo-title">
+    <h2 id="asa-demo-title">Try the interactive demo</h2>
+    <p>See what happens when a missed caller gets an instant text-back.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+      <a class="lc-btn lc-btn--secondary" href="tel:+18336691335">Call 1-833-669-1335</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Schedule a setup call</a>
+    </div>
+  </section>
+
+  <section class="lc-section" aria-labelledby="asa-faq-title">
+    <header class="lc-page-header">
+      <h2 id="asa-faq-title" class="lc-page-header__title">FAQ</h2>
+    </header>
+    <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>Is {{ settings.app_name }} an answering service?</dt>
+        <dd>
+          {{ settings.app_name }} is an <strong>answering service alternative</strong> for missed calls — not a live human receptionist.
+          It texts missed callers, collects job details, and alerts your team.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>How does this compare to an after hours answering service?</dt>
+        <dd>
+          Many businesses use answering services after hours. {{ settings.app_name }} Backup Mode can cover missed and unanswered calls with instant SMS follow-up,
+          so homeowners get a response even when your office is closed — without per-minute operator fees for every short call.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>What are typical answering service costs vs. {{ settings.app_name }}?</dt>
+        <dd>
+          Traditional services often charge per call or per minute, which adds up fast. Growth plan is $199 one-time setup and $147/month with missed-call text-back,
+          lead intake, and dashboard access — pricing is listed clearly on this page.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace voicemail?</dt>
+        <dd>
+          For many missed calls, yes. Instead of voicemail, {{ settings.app_name }} starts a text conversation while the customer is still engaged.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does this replace my wife, office helper, or receptionist?</dt>
+        <dd>
+          No. It gives them backup when they are busy, away, or already helping someone else.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Do I need a full CRM?</dt>
+        <dd>
+          No. {{ settings.app_name }} is missed-call recovery software with a simple lead list — not a full marketing platform.
+        </dd>
+      </div>
+      <div class="lc-faq__item">
+        <dt>Does call forwarding work with my phone?</dt>
+        <dd>
+          Most major carriers support call forwarding. We guide setup and run a live test before launch.
+          See <a href="/backup-mode">Backup Mode</a>.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="lc-section lc-lander-cta-band" aria-labelledby="asa-final-cta">
+    <h2 id="asa-final-cta">Stop letting missed calls turn into lost jobs</h2>
+    <p>Try {{ settings.app_name }} today.</p>
+    <div class="lc-btn-group" style="justify-content: center;">
+      <a class="lc-btn lc-btn--accent" href="/demo">Try the demo</a>
+      <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a conversation</a>
+    </div>
+  </section>
+{% endblock %}

@@ -158,6 +158,22 @@ def roofers_lander_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "public/landers/roofers.html", {})
 
 
+@router.get("/answering-service-alternative", response_class=HTMLResponse, response_model=None)
+def answering_service_alternative_lander_page(request: Request) -> HTMLResponse:
+    """Answering service alternative for small local service businesses."""
+    return templates.TemplateResponse(
+        request,
+        "public/landers/answering-service-alternative.html",
+        {},
+    )
+
+
+@router.get("/for/answering-service-alternative", response_model=None)
+def answering_service_alternative_legacy_redirect() -> RedirectResponse:
+    """Permanent redirect from earlier /for/ path to canonical URL."""
+    return RedirectResponse(url="/answering-service-alternative", status_code=301)
+
+
 @router.get("/r/{referral_code}", response_class=HTMLResponse, response_model=None)
 def referral_landing_page(
     request: Request,

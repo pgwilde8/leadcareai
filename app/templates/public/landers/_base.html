@@ -151,6 +151,41 @@
       margin: 0;
       color: var(--lc-text-muted);
     }
+    .lc-lander-compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    .lc-lander-compare th,
+    .lc-lander-compare td {
+      padding: var(--lc-space-3) var(--lc-space-4);
+      border: 1px solid var(--lc-border);
+      text-align: left;
+      vertical-align: top;
+    }
+    .lc-lander-compare th {
+      background: var(--lc-bg-muted);
+      color: var(--lc-primary-dark);
+      font-weight: 700;
+    }
+    .lc-lander-industry-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: var(--lc-space-3);
+    }
+    .lc-lander-industry-list li {
+      padding: var(--lc-space-3);
+      background: var(--lc-bg-muted);
+      border: 1px solid var(--lc-border);
+      border-radius: var(--lc-radius-md);
+      font-size: 0.9rem;
+    }
+    .lc-lander-industry-list a {
+      font-weight: 600;
+    }
     @media (max-width: 768px) {
       .lc-lander-hero .lc-hero__layout {
         flex-direction: column;

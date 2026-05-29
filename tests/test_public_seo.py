@@ -55,3 +55,11 @@ def test_backup_mode_has_canonical(client: TestClient) -> None:
     response = client.get("/backup-mode")
     assert response.status_code == 200
     assert absolute_public_url("/backup-mode") in response.text
+
+
+def test_plumbers_lander_has_canonical_and_target_keyword(client: TestClient) -> None:
+    response = client.get("/for/plumbers")
+    assert response.status_code == 200
+    text = response.text
+    assert absolute_public_url("/for/plumbers") in text
+    assert "answering service for plumbers" in text.lower()

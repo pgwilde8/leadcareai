@@ -1,14 +1,37 @@
 {% extends "public/landers/_base.html" %}
 {% from "layout/_seo_tags.html" import seo_tags %}
 
-{% block title %}Answering Service Alternative for Plumbers | {{ settings.app_name }}{% endblock %}
+{% block title %}Answering Service for Plumbers — A Simpler Alternative | {{ settings.app_name }}{% endblock %}
 
 {% block seo_meta %}
   {{ seo_tags(
-    description="LeadCareAI helps plumbing contractors recover missed calls with instant text-back, lead intake, staff alerts, and a simple dashboard. Built for plumbers who need backup without a complicated CRM.",
-    keywords="plumber answering service alternative, plumbing missed call text back, emergency plumber lead capture, plumbing CRM alternative, missed call recovery plumbers, call forwarding plumbing business, water leak callback, LeadCareAI plumbers",
+    description="Looking for an answering service for plumbers? " ~ settings.app_name ~ " texts missed callers instantly, captures job details, and alerts your crew — no heavy CRM or per-minute call center bills.",
+    keywords="answering service for plumbers, plumber answering service alternative, plumbing missed call text back, emergency plumber lead capture, missed call recovery plumbers, call forwarding plumbing business, LeadCare AI plumbers",
     canonical_path="/for/plumbers",
-    og_title="Answering Service Alternative for Plumbers | " ~ settings.app_name,
+    og_title="Answering Service for Plumbers — A Simpler Alternative | " ~ settings.app_name,
+    json_ld='{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Answering Service for Plumbers",
+          "url": "' ~ absolute_public_url("/for/plumbers") ~ '",
+          "description": "Missed-call recovery and answering service alternative for plumbing contractors — instant SMS follow-up when you miss a call."
+        },
+        {
+          "@type": "Service",
+          "name": "' ~ settings.app_name ~ ' for Plumbers",
+          "serviceType": "Missed-call recovery and answering service for plumbers",
+          "provider": {
+            "@type": "Organization",
+            "name": "' ~ settings.app_name ~ '",
+            "url": "' ~ absolute_public_url("/") ~ '"
+          },
+          "areaServed": "US",
+          "description": "Instant text-back for missed plumbing calls, lead intake, and team alerts without a complicated CRM."
+        }
+      ]
+    }'
   ) }}
 {% endblock %}
 
@@ -18,7 +41,7 @@
       <div class="lc-hero__content">
         <p class="lc-hero__eyebrow">Missed-call recovery for plumbing contractors</p>
         <h1 id="plumbers-hero-title" class="lc-hero__title">
-          A Simpler Answering Service Alternative for Plumbers
+          Answering Service for Plumbers — Without the Call Center Bill
         </h1>
         <p class="lc-hero__lead">
           When you’re under a sink, on a job, or driving, {{ settings.app_name }} texts missed callers, captures the job details,
@@ -165,7 +188,8 @@
 
   <section class="lc-section" aria-labelledby="plumbers-why-title">
     <header class="lc-page-header">
-      <h2 id="plumbers-why-title" class="lc-page-header__title">Why plumbers choose {{ settings.app_name }}</h2>
+      <h2 id="plumbers-why-title" class="lc-page-header__title">A better answering service for plumbers</h2>
+      <p class="lc-page-header__lead">Why plumbing contractors choose {{ settings.app_name }} over traditional call centers and heavy CRMs.</p>
     </header>
     <div class="lc-grid lc-grid--2">
       <div class="lc-card">
@@ -225,6 +249,13 @@
       <h2 id="plumbers-faq-title" class="lc-page-header__title">Quick answers</h2>
     </header>
     <dl class="lc-faq">
+      <div class="lc-faq__item">
+        <dt>How is this different from an answering service for plumbers?</dt>
+        <dd>
+          Traditional answering services charge per minute and use live operators. {{ settings.app_name }} texts missed callers
+          immediately, collects job details by SMS, and alerts your crew — so you respond faster without training a call center on your trade.
+        </dd>
+      </div>
       <div class="lc-faq__item">
         <dt>Do I need a new business phone number?</dt>
         <dd>

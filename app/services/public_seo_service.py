@@ -20,6 +20,7 @@ PUBLIC_SITEMAP_PATHS: tuple[str, ...] = (
     "/backup-mode",
     "/for/plumbers",
     "/for/roofers",
+    "/answering-service-alternative",
     "/demo",
     "/demo/book",
     "/partners",
@@ -70,7 +71,13 @@ def sitemap_xml_body() -> str:
     for path in PUBLIC_SITEMAP_PATHS:
         loc = escape(absolute_public_url(path))
         priority = "1.0" if path == "/" else "0.8"
-        changefreq = "weekly" if path in {"/", "/for/plumbers", "/for/roofers", "/backup-mode"} else "monthly"
+        changefreq = "weekly" if path in {
+            "/",
+            "/for/plumbers",
+            "/for/roofers",
+            "/answering-service-alternative",
+            "/backup-mode",
+        } else "monthly"
         entries.append(
             f"  <url>\n"
             f"    <loc>{loc}</loc>\n"
