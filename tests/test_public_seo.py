@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.services.public_seo_service import PUBLIC_SITEMAP_PATHS, absolute_public_url, robots_txt_body, sitemap_xml_body
-from tests.settings_helpers import clear_settings_cache
+from tests.settings_helpers import clear_settings_cache, patch_get_settings
 from tests.test_public_landers import LANDER_ROUTES
 
 
@@ -95,7 +95,35 @@ def test_footer_includes_answering_service_hub_site_wide(client: TestClient) -> 
         assert response.status_code == 200, path
         text = response.text
         assert 'href="/answering-service"' in text, path
-        assert "Guides" in text or "guides" in text.lower()
+        assert "answering service guides" in text.lower() or "guides" in text.lower()
+
+
+def test_footer_social_links_when_urls_configured(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    linkedin = "https://www.linkedin.com/company/leadcareai"
+    facebook = "https://www.facebook.com/leadcareai"
+    youtube = "https://www.youtube.com/channel/UCw-mEAPg5NEbKu90H2kPzmw"
+    settings = patch_get_settings(
+        monkeypatch,
+        linkedin_url=linkedin,
+        facebook_url=facebook,
+        youtube_url=youtube,
+    )
+    import app.templates as templates_module
+
+    templates_module.templates.env.globals["settings"] = settings
+    response = client.get("/")
+    assert response.status_code == 200
+    text = response.text
+    assert linkedin in text
+    assert facebook in text
+    assert youtube in text
+    assert "on YouTube" in text
+    assert 'rel="noopener noreferrer"' in text
+    assert 'aria-label="Social media"' in text
+    assert 'href="/answering-service"' in text
+    assert 'href="/for/plumbers"' in text
 
 
 def test_footer_includes_top_guide_links(client: TestClient) -> None:

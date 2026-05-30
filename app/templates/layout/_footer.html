@@ -1,20 +1,62 @@
-<footer class="lc-footer site-footer site-footer--compact">
-  <div class="lc-container site-container lc-footer__inner site-footer__inner">
-    <p class="lc-footer__copy site-footer__copy">
-      &copy; {{ settings.app_name }}. Missed-call SMS follow-up for local service businesses.
-    </p>
-    <nav class="lc-footer__nav site-footer__nav" aria-label="Footer">
-      <a href="/">Home</a>
-      <a href="/about">About</a>
-      <a href="/faq">FAQ</a>
-      <a href="/contact">Contact</a>
-      <a href="/demo">Live demo</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
-      <a href="/sms-terms">SMS Terms</a>
-      <a href="/refund-policy">Refunds</a>
-      <a href="/sitemap.xml">Sitemap</a>
-    </nav>
-    {% include "layout/_footer_guides.html" %}
+<footer class="lc-footer site-footer" role="contentinfo">
+  <div class="lc-container site-container">
+    <div class="lc-footer__main">
+      <div class="lc-footer__links-grid">
+        <div class="lc-footer__links-col">
+          <h3 class="lc-footer__heading">Company</h3>
+          <ul class="lc-footer__list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/partners">Partners</a></li>
+            <li><a href="/backup-mode">Backup Mode</a></li>
+          </ul>
+        </div>
+        <div class="lc-footer__links-col">
+          <h3 class="lc-footer__heading">Answering service guides</h3>
+          <ul class="lc-footer__list">
+            <li><a href="/answering-service">Answering service hub</a></li>
+            <li><a href="/answering-service-alternative">Answering service alternative</a></li>
+            <li><a href="/business-answering-service-alternative">Business</a></li>
+            <li><a href="/after-hours-answering-service-alternative">After-hours</a></li>
+            <li><a href="/contractors-answering-service-alternative">Contractors</a></li>
+            <li><a href="/for/plumbers">Plumbers</a></li>
+            <li><a href="/for/roofers">Roofers</a></li>
+          </ul>
+        </div>
+        <div class="lc-footer__links-col">
+          <h3 class="lc-footer__heading">Legal</h3>
+          <ul class="lc-footer__list">
+            <li><a href="/privacy">Privacy</a></li>
+            <li><a href="/terms">Terms</a></li>
+            <li><a href="/sms-terms">SMS Terms</a></li>
+            <li><a href="/refund-policy">Refunds</a></li>
+            <li><a href="/sitemap.xml">Sitemap</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="lc-footer__cta">
+        <p class="lc-footer__cta-lead">
+          Missed calls should not become lost jobs. See how {{ settings.app_name }} texts callers back when nobody can answer.
+        </p>
+        <div class="lc-footer__cta-actions">
+          <a class="lc-btn lc-btn--accent" href="/demo">Try the live demo</a>
+          <a class="lc-btn lc-btn--secondary" href="/demo/book">Book a setup call</a>
+        </div>
+        <p class="lc-footer__cta-phone lc-mb-0">
+          <strong>1-833-669-1335</strong>
+          · <a href="tel:+18336691335">Call the demo number</a>
+        </p>
+      </div>
+    </div>
+
+    {% include "layout/_social_links.html" %}
+
+    <div class="lc-footer__bottom">
+      <p class="lc-footer__copy site-footer__copy lc-mb-0">
+        &copy; {{ settings.app_name }}. Missed-call SMS follow-up for local service businesses.
+      </p>
+    </div>
   </div>
 </footer>

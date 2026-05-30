@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     legal_contact_email: str = "paul@leadcareai.com"
 
     public_base_url: str | None = None
+    linkedin_url: str | None = None
+    facebook_url: str | None = None
+    youtube_url: str | None = None
 
     email_provider: str = "smtp"
     smtp_host: str | None = None
